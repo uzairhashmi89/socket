@@ -146,7 +146,7 @@ export default function Immersive() {
       <RadioPlayer url={TestVideo} />
 
       <Box
-              className="main-chat"
+              className="main-chat immersive_chat"
               sx={{
                 display: "flex",
                 flexDirection: "column",

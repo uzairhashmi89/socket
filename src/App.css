@@ -109,6 +109,15 @@ border: 1px solid rgb(81, 81, 81);
   }
 
   @media only screen and (max-width: 768.5px) {
+
+    .immersive_chat {
+      position: static !important;
+    }
+
+    .immersive_chat .stream-impressive {
+      background-color: rgb(18 16 49) !important;
+    }
+
     .main-chat{
       width: 100%;
       margin: 0;
@@ -131,6 +140,6 @@ border: 1px solid rgb(81, 81, 81);
     padding: 10px !important;
   }
   .video-player{
-    height: 100%;
+    height: 100% !important;
   }
 }
