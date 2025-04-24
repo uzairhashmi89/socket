@@ -354,6 +354,7 @@ function OnlyChat() {
             width: "auto",
             opacity: 0.95,
           }}
+          className="send-message-input"
         >
           <input
             value={input}

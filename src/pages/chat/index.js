@@ -356,6 +356,7 @@ function Chat() {
             width: "auto",
             opacity: 0.95,
           }}
+          className="send-message-input"
         >
           <input
             value={input}
