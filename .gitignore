@@ -1,0 +1,19 @@
+node_modules
+build
+.idea
+
+*.log
+*.env
+*.env.*
+!.env.example
+
+# migration
+src/migrations/*.json
+
+#video convert
+temp
+
+# logs
+logs
+
+.vscode

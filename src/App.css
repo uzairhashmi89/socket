@@ -1,0 +1,106 @@
+body {
+    font-family: 'Poppins', 'Roboto', 'Noto Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+.stream-impressive{
+    background-color: rgb(18 16 49);
+    font-family: 'Poppins', 'Roboto', 'Noto Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    color: rgb(235, 235, 235);
+    font-size: 16px;
+}
+.self-center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+}
+.hr{
+    width: 90%;
+border: 1px solid rgb(81, 81, 81);
+}
+.scan-qr{
+    background-color: hsla(0,0%,100%,.12);
+    color: rgb(235, 235, 235);
+    border-radius: 10px;
+    font-weight: 500;
+    padding: 15px;
+    margin: auto;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0 10px;
+
+}
+.show-qr{
+    font-size: 16px;
+    color: #fff;
+    text-align: center;
+}
+.qr-code{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+.qr-code canvas{
+    border-radius: 30px;
+}
+.cancel-btn{
+    background-color: hsla(0,0%,100%,.12);
+    color: rgb(235, 235, 235);
+    border-radius: 10px;
+    font-weight: 500;
+    padding: 15px 20px;
+    margin: auto;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+.simple-avatar {
+    align-self: flex-start;
+    border-radius: 9999px; /* full rounding */
+    object-fit: cover;
+    height: 28px;
+    width: 28px;
+  }
+  .chat-ui{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+  }
+  .video-player{
+    width: 70%;
+  }
+  .main-chat{
+    width: 30%;
+    height: calc(100vh - 32px);
+    overflow-y: hidden;
+
+  }
+  .static-chat-button{
+    background-color: rgb(255, 255, 255);
+    color: rgb(22, 26, 47);
+    width: 100px;
+    height: 45px;
+    border-radius: 10px;
+    font-family: Poppins;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0 10px;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .message-container::-webkit-scrollbar{
+    display: none;
+  }
