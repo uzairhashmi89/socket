@@ -84,7 +84,7 @@ border: 1px solid rgb(81, 81, 81);
     width: 70%;
   }
   .main-chat{
-    width: 30%;
+    width: 35%;
     height: calc(100vh - 32px);
     overflow-y: hidden;
     min-height: 100vh;
@@ -115,7 +115,7 @@ border: 1px solid rgb(81, 81, 81);
       padding: 0 !important;
     }
     .video-player {
-      width: 100%;
+      width: 100% !important;
   }
   .chat-ui{
     flex-direction: column;

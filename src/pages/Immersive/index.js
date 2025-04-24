@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { QRCode } from "react-qrcode-logo";
 import { useFocusable } from "@noriginmedia/norigin-spatial-navigation";
-import PhoneAndroidIcon from "@mui/icons-material/PhoneAndroid";
+import RadioPlayer from "./Component/RadioPlayer.js"
 import { Box } from "@mui/material";
 
 export default function Immersive() {
@@ -13,7 +13,8 @@ export default function Immersive() {
   const [fontSize, setFontSize] = useState(() => {
     return storedFontSize ? parseInt(storedFontSize, 10) : 12;
   });
-
+  const TestVideo =
+  "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8";
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -101,8 +102,7 @@ export default function Immersive() {
             <img
               src={chatAds[chatAdIndex].assetUrl}
               alt="Chat Ad"
-              height={135}
-              width={466}
+              width="100%"
             />
           )}
         </div>
@@ -142,7 +142,26 @@ export default function Immersive() {
   };
 
   return (
-    <div className="stream-impressive font-poppins flex-1 flex flex-col w-[100%] overflow-auto no-scrollbar mt-6">
+    <Box className="chat-ui">
+      <RadioPlayer url={TestVideo} />
+
+      <Box
+              className="main-chat"
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                flex: 1,
+                p: 0,
+                backgroundColor: "transparent",
+                color: "white",
+                opacity: 1,
+                position: "absolute",
+                right: "0",
+                top: "0",
+                borderLeft: "1px solid gray",
+              }}
+            >
+<div style={{background:'rgb(18 16 49 / 50%)'}} className="stream-impressive font-poppins flex-1 flex flex-col w-[100%] overflow-auto no-scrollbar mt-6">
       <div className="self-center">
       <div className=" mt-[18px] mb-[34px] flex flex-col items-center space-y-[33px]">
             <p className="show-qr font-medium text-2xl leading-[30px] text-white-85 text-center">
@@ -252,5 +271,9 @@ export default function Immersive() {
         })}
       </Box>
     </div>
+
+            </Box>
+    </Box>
+    
   );
 }
