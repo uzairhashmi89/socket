@@ -143,3 +143,79 @@ border: 1px solid rgb(81, 81, 81);
     height: 100% !important;
   }
 }
+
+
+
+
+.emojiSelect {
+  right: 4px !important;
+  top: 1px !important;
+  color: white;
+}
+
+/* draftjs emoji theme override */
+.emojiSuggestions {
+  background: #282c46 !important;
+  border-radius: 4px !important;
+  border: none !important;
+  box-shadow: 0px 0px 7px 3px rgba(0, 0, 0, 0.2) !important;
+}
+.emojiSuggestionsEntry {
+  padding: 10px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+.emojiSuggestionsEntryFocused {
+  background: #1c2039 !important;
+  padding: 10px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+.emojiSuggestionsEntryText {
+  margin-left: 14px !important;
+}
+
+.emojiSelect {
+  position: absolute !important;
+  right: 0 !important;
+  top: 0 !important;
+}
+.emojiSelectButton {
+  background: none !important;
+  border: none !important;
+  width: 40px !important;
+}
+
+.emojiSelectButtonPressed {
+  background: none !important;
+  border: none !important;
+  width: 40px !important;
+}
+
+.comment-input .DraftEditor-root {
+  padding-right: 80px;
+}
+
+.comment-input .emojiSelect {
+  top: -3px !important;
+  right: 4px !important;
+}
+
+.comment-input .chat-gif-icon {
+  right: 42px;
+}
+
+.emojiSelectPopover {
+  background: #282c46 !important;
+  border-radius: 4px !important;
+  border: none !important;
+  box-shadow: 0px 0px 7px 3px rgba(0, 0, 0, 0.2) !important;
+}
+
+.emojiSelectButton {
+  color: white !important;
+}
+
+.emojiSelectButtonPressed {
+  color: white !important;
+}

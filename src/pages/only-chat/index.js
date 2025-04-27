@@ -1,10 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { io } from "socket.io-client";
 import { Box, Button, TextField, Typography, Avatar } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import {
-  ChatBubble,
-} from "@mui/icons-material";
+import { EditorState } from "draft-js";
+import Editor, { PluginEditorProps } from "@draft-js-plugins/editor";
+import createEmojiPlugin, { defaultTheme } from "@draft-js-plugins/emoji";
+import { ChatBubble } from "@mui/icons-material";
 
 // const socket = io('https://api.staging-new.boltplus.tv/public_chat');
 const socket = io("https://api.staging-new.boltplus.tv", {
@@ -12,6 +13,16 @@ const socket = io("https://api.staging-new.boltplus.tv", {
   path: "/public-socket/",
   transports: ["websocket"], // optionally add 'polling' if needed
 });
+
+defaultTheme.emojiSuggestions += " emojiSuggestions";
+defaultTheme.emojiSuggestionsEntry += " emojiSuggestionsEntry";
+defaultTheme.emojiSuggestionsEntryFocused += " emojiSuggestionsEntryFocused";
+defaultTheme.emojiSuggestionsEntryText += " emojiSuggestionsEntryText";
+defaultTheme.emojiSelect += " emojiSelect";
+defaultTheme.emojiSelectButton += " emojiSelectButton";
+defaultTheme.emojiSelectButtonPressed += " emojiSelectButtonPressed";
+defaultTheme.emojiSelectPopover += " emojiSelectPopover";
+
 function OnlyChat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -27,19 +38,6 @@ function OnlyChat() {
         emitJoin(localStorage.getItem("userName"));
       }
     });
-
-    // const userPayload = {
-    //   id: socket?.id,
-    //   username: 'Owais',
-    // }
-
-    // const payload = {
-    //   channelId: "68090b895880466655dc6a17",
-    //   channelType: "channel",
-    //   user: userPayload
-    // }
-
-    // socket.emit("join", payload);
 
     socket.on("message", (message) => {
       console.log("message", message);
@@ -64,8 +62,6 @@ function OnlyChat() {
         message: input,
         draftContent: "",
         type: "text",
-        // poll:  '',
-        // giphy: '',
       };
       socket.emit("sendMessage", payload);
       setInput("");
@@ -119,7 +115,6 @@ function OnlyChat() {
       try {
         const response = await fetch(
           "https://api.staging-new.boltplus.tv/messages/open/channel/68090b895880466655dc6a17",
-          // 'http://localhost:5001/messages/open/channel/68090b895880466655dc6a17',
           {
             method: "GET",
           }
@@ -182,8 +177,6 @@ function OnlyChat() {
     }
     return null;
   };
-  const TestVideo =
-    "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8";
 
   const [username, setUsername] = useState(
     localStorage.getItem("userName") || ""
@@ -250,6 +243,21 @@ function OnlyChat() {
     }
   }, [messages, chatAds]);
 
+  const [editorState, setEditorState] = useState(() =>
+    EditorState.createEmpty()
+  );
+
+  const { EmojiSuggestions, EmojiSelect, plugins } = useMemo(() => {
+    const emojiPlugin = createEmojiPlugin({
+      useNativeArt: true,
+      theme: defaultTheme,
+    });
+    const { EmojiSuggestions, EmojiSelect } = emojiPlugin;
+
+    const plugins = [emojiPlugin];
+    return { plugins, EmojiSuggestions, EmojiSelect };
+  }, []);
+
   return (
     <Box className="chat-ui">
       <Box
@@ -266,13 +274,20 @@ function OnlyChat() {
           borderLeft: "1px solid gray",
         }}
       >
-        <div style={{position: 'fixed', top: 0, background: "#0b0c2a", width: '100%'}}>
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            background: "#0b0c2a",
+            width: "100%",
+          }}
+        >
           <button className="static-chat-button">
             <ChatBubble /> Chat
           </button>
         </div>
         <Box
-        ref={scrollableContainerRef} 
+          ref={scrollableContainerRef}
           sx={{
             display: "flex",
             flexDirection: "column-reverse",
@@ -290,7 +305,7 @@ function OnlyChat() {
             const isFirstMessage = index === 0;
 
             return (
-              <Box              
+              <Box
                 className="message"
                 key={index}
                 ref={isFirstMessage ? firstMessageRef : null}
@@ -399,6 +414,13 @@ function OnlyChat() {
               color: "white",
             }}
           />
+          <Editor
+            editorState={editorState}
+            onChange={setEditorState}
+            plugins={[plugins]}
+          />
+          <EmojiSuggestions />
+          <EmojiSelect closeOnEmojiSelect />
           <button
             onClick={sendMessage}
             style={{
@@ -464,7 +486,7 @@ function OnlyChat() {
           Save
         </Button>
       </Box>
-      
+
       {!isSettingUsername && username && (
         <Box sx={{ position: "fixed", top: 10, right: 10, zIndex: 5 }}>
           <Button variant="outlined" onClick={() => setIsSettingUsername(true)}>

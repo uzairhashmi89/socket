@@ -4,6 +4,7 @@ import OnlyChat from "./pages/only-chat";
 import StreamImpressive from "./pages/StreamImpressive";
 import Immersive from "./pages/Immersive";
 import './App.css';
+import "@draft-js-plugins/emoji/lib/plugin.css";
 import ChatNew from "./pages/chat/new";
 
 function App() {
