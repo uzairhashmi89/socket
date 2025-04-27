@@ -121,8 +121,7 @@ function OnlyChat() {
           "https://api.staging-new.boltplus.tv/messages/open/channel/68090b895880466655dc6a17",
           // 'http://localhost:5001/messages/open/channel/68090b895880466655dc6a17',
           {
-            method: "POST",
-            body: JSON.stringify({}),
+            method: "GET",
           }
         );
 
@@ -223,10 +222,33 @@ function OnlyChat() {
     console.log("Joining channel with payload:", payload);
     socket.emit("join", payload);
   };
+  const scrollableContainerRef = useRef(null);
+  const firstMessageRef = useRef(null);
 
-  // useEffect(() => {
-  //   messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  // }, [messages]);
+  useEffect(() => {
+    const scrollToBottom = () => {
+      if (scrollableContainerRef.current) {
+        const scrollableElement = scrollableContainerRef.current;
+        // Check if user is near the top (newest messages, scrollTop close to 0)
+        const isNearBottom = scrollableElement.scrollTop < 100; // Adjust threshold as needed
+
+        if (isNearBottom) {
+          if (firstMessageRef.current) {
+            firstMessageRef.current.scrollIntoView({ behavior: "smooth" });
+          } else {
+            // Fallback to scrollTop = 0 if ref isn't set yet
+            scrollableElement.scrollTop = 0;
+          }
+        }
+      }
+    };
+
+    // Debounce to handle rapid message updates
+    if (chatAds?.length > 0 && messages?.length > 0) {
+      const timeout = setTimeout(scrollToBottom, 1000);
+      return () => clearTimeout(timeout);
+    }
+  }, [messages, chatAds]);
 
   return (
     <Box className="chat-ui">
@@ -244,18 +266,20 @@ function OnlyChat() {
           borderLeft: "1px solid gray",
         }}
       >
-        <div>
+        <div style={{position: 'fixed', top: 0, background: "#0b0c2a", width: '100%'}}>
           <button className="static-chat-button">
             <ChatBubble /> Chat
           </button>
         </div>
         <Box
+        ref={scrollableContainerRef} 
           sx={{
             display: "flex",
             flexDirection: "column-reverse",
             overflowY: "auto",
             mt: "auto",
-            pb: "0px",
+            p: "55px 10px 65px",
+            scrollBehavior: "smooth",
           }}
           className="message-container"
         >
@@ -263,11 +287,13 @@ function OnlyChat() {
             const name = item?.sender || "User";
             const avatarUrl = item?.sender?.photoUrl;
             const initial = getInitial(name);
+            const isFirstMessage = index === 0;
 
             return (
-              <Box
+              <Box              
                 className="message"
                 key={index}
+                ref={isFirstMessage ? firstMessageRef : null}
                 sx={{
                   display: "flex",
                   flexDirection: "column",
@@ -348,10 +374,10 @@ function OnlyChat() {
             padding: "1rem 0",
             backgroundColor: "#0b0c2a",
             borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-            position: "static",
+            position: "fixed",
             bottom: 0,
             right: 0,
-            width: "auto",
+            width: "95%",
             opacity: 0.95,
           }}
           className="send-message-input"
@@ -396,7 +422,7 @@ function OnlyChat() {
       </Box>
       <Box
         sx={{
-          position: "absolute", // Example positioning
+          position: "fixed", // Example positioning
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
@@ -440,14 +466,14 @@ function OnlyChat() {
       </Box>
       
       {!isSettingUsername && username && (
-        <Box sx={{ position: "absolute", top: 20, right: 20, zIndex: 5 }}>
+        <Box sx={{ position: "fixed", top: 10, right: 10, zIndex: 5 }}>
           <Button variant="outlined" onClick={() => setIsSettingUsername(true)}>
             Edit Username
           </Button>
         </Box>
       )}
       {!isSettingUsername && !username && (
-        <Box sx={{ position: "absolute", top: 10, right: 10, zIndex: 5 }}>
+        <Box sx={{ position: "fixed", top: 10, right: 10, zIndex: 5 }}>
           <Button variant="outlined" onClick={() => setIsSettingUsername(true)}>
             Set Username
           </Button>

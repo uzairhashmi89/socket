@@ -87,7 +87,7 @@ border: 1px solid rgb(81, 81, 81);
     width: 35%;
     height: calc(100vh - 32px);
     overflow-y: hidden;
-    min-height: 100vh;
+    min-height: calc(100vh - 32px);
 
   }
   .static-chat-button{

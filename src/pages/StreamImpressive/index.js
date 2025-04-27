@@ -19,8 +19,7 @@ export default function LiveChatImmersive() {
         const response = await fetch(
           "https://api.staging-new.boltplus.tv/messages/open/channel/68090b895880466655dc6a17",
           {
-            method: "POST",
-            body: JSON.stringify({}),
+            method: "GET",
           }
         );
 

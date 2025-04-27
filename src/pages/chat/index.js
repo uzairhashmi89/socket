@@ -122,8 +122,7 @@ function Chat() {
           "https://api.staging-new.boltplus.tv/messages/open/channel/68090b895880466655dc6a17",
           // 'http://localhost:5001/messages/open/channel/68090b895880466655dc6a17',
           {
-            method: "POST",
-            body: JSON.stringify({}),
+            method: "GET",
           }
         );
 
@@ -398,7 +397,7 @@ function Chat() {
       </Box>
       <Box
         sx={{
-          position: "absolute", // Example positioning
+          position: "fixed", // Example positioning
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",

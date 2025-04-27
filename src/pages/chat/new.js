@@ -87,8 +87,7 @@ function ChatNew() {
         const response = await fetch(
           "https://api.staging-new.boltplus.tv/messages/open/channel/68090b895880466655dc6a17", // Use your actual channel ID
           {
-            method: "POST", // Assuming an empty body is needed for this endpoint
-            body: JSON.stringify({}),
+            method: "GET",
             headers: {
               "Content-Type": "application/json", // Specify content type if sending a body
               // Keep other necessary headers based on API requirements, but remove unnecessary browser-specific ones
@@ -434,7 +433,7 @@ function ChatNew() {
              
         <Box
           sx={{
-            position: "absolute", // Example positioning
+            position: "fixed", // Example positioning
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
