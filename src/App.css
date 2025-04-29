@@ -147,11 +147,7 @@ border: 1px solid rgb(81, 81, 81);
 
 
 
-.emojiSelect {
-  right: 4px !important;
-  top: 1px !important;
-  color: white;
-}
+
 
 /* draftjs emoji theme override */
 .emojiSuggestions {
@@ -177,8 +173,8 @@ border: 1px solid rgb(81, 81, 81);
 
 .emojiSelect {
   position: absolute !important;
-  right: 0 !important;
-  top: 0 !important;
+  right: 60px !important;
+  top: 22px !important;
 }
 .emojiSelectButton {
   background: none !important;
@@ -218,4 +214,69 @@ border: 1px solid rgb(81, 81, 81);
 
 .emojiSelectButtonPressed {
   color: white !important;
+}
+
+.editor, .multilineEditor {
+  box-sizing: border-box;
+  /* border: 1px solid #ddd; */
+  cursor: text;
+  padding: 8px;
+  border-radius: 6px;
+  background: #1c2039;
+  width: 100%;
+  position: relative;
+}
+
+.multilineEditor .public-DraftEditor-content {
+  max-height: 250px;
+  min-height: 150px;
+  overflow: auto;
+}
+
+.editor .public-DraftEditor-content {
+  max-height: 120px;
+  overflow: auto;
+}
+
+.editor .public-DraftEditorPlaceholder-root {
+  position: absolute;
+  color: gray;
+}
+
+.editor .popover {
+  background-color: #1b1f3a;
+}
+
+.editor .popover .entry-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.editor .popover .entry-row[aria-selected="true"] {
+  background-color: #00000080;
+}
+
+.editor .public-DraftStyleDefault-block p {
+  background-color: transparent;
+  color: #1d9bf0;
+}
+
+.editor .public-DraftStyleDefault-block {
+  display: flex;
+}
+
+.editor .public-DraftStyleDefault-block span {
+  /* word-break: break-word; */
+  min-width: 1px;
+  /* display: block; */
+}
+.editor .public-DraftEditor-content {
+  max-height: 50px !important;
+  min-width: 300px;
+}
+
+.DraftEditor-editorContainer {
+  position: relative;
+  z-index: 1;
 }

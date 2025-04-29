@@ -1,15 +1,19 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import { io } from "socket.io-client";
+import {
+  ContentState,
+  convertToRaw,
+  DraftHandleValue,
+  EditorState,
+} from "draft-js";
 import { Box, Button, TextField, Typography, Avatar } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import { EditorState } from "draft-js";
 import Editor, { PluginEditorProps } from "@draft-js-plugins/editor";
 import createEmojiPlugin, { defaultTheme } from "@draft-js-plugins/emoji";
 import { ChatBubble } from "@mui/icons-material";
+import { GiphyModal } from "./GiphyModal";
 
-// const socket = io('https://api.staging-new.boltplus.tv/public_chat');
 const socket = io("https://api.staging-new.boltplus.tv", {
-  // const socket = io('http://localhost:5001', {
   path: "/public-socket/",
   transports: ["websocket"], // optionally add 'polling' if needed
 });
@@ -30,6 +34,10 @@ function OnlyChat() {
 
   const [chatAds, setChatAds] = useState([]);
   const [chatAdIndex, setChatAdIndex] = useState(0);
+
+  const [editorState, setEditorState] = useState(() =>
+    EditorState.createEmpty()
+  );
 
   useEffect(() => {
     socket.on("connect", () => {
@@ -55,21 +63,33 @@ function OnlyChat() {
       socket.disconnect();
     };
   }, []);
-
+  console.log("input", input);
   const sendMessage = () => {
-    if (input.trim()) {
+    if (input?.message) {
       const payload = {
-        message: input,
+        message: input?.message,
         draftContent: "",
         type: "text",
       };
       socket.emit("sendMessage", payload);
       setInput("");
+      setEditorState(EditorState.createEmpty());
     }
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") sendMessage();
+  const sendGiphy = (data) => {
+    if (data?.giphy) {
+      const payload = {
+        message: "",
+        giphy: data?.giphy,
+        draftContent: "",
+        type: "giphy",
+      };
+      socket.emit("sendMessage", payload);
+      setInput("");
+      setShowGiphyModal(false);
+      setEditorState(EditorState.createEmpty());
+    }
   };
 
   // Fetch ads
@@ -181,6 +201,7 @@ function OnlyChat() {
   const [username, setUsername] = useState(
     localStorage.getItem("userName") || ""
   );
+
   const [isSettingUsername, setIsSettingUsername] = useState(
     !localStorage.getItem("userName")
   );
@@ -243,10 +264,6 @@ function OnlyChat() {
     }
   }, [messages, chatAds]);
 
-  const [editorState, setEditorState] = useState(() =>
-    EditorState.createEmpty()
-  );
-
   const { EmojiSuggestions, EmojiSelect, plugins } = useMemo(() => {
     const emojiPlugin = createEmojiPlugin({
       useNativeArt: true,
@@ -257,6 +274,47 @@ function OnlyChat() {
     const plugins = [emojiPlugin];
     return { plugins, EmojiSuggestions, EmojiSelect };
   }, []);
+
+  useEffect(() => {
+    const newState = EditorState.push(
+      editorState,
+      ContentState.createFromText(""),
+      "insert-characters"
+    );
+    setEditorState(EditorState.moveFocusToEnd(newState));
+  }, []);
+
+  const handleKeyCommand = (command) => {
+    if (command === "split-block" && !!sendMessage) {
+      sendMessage();
+      return "handled";
+    }
+    return "not-handled";
+  };
+
+  const updateChatState = (payload) => {
+    setInput((prev) => ({ ...prev, ...payload }));
+  };
+
+  const onChangeText = (message) => {
+    updateChatState({ message });
+  };
+
+  const onChangeDraftContent = (draftContent) => {
+    updateChatState({ draftContent });
+  };
+  const onChangeEditorState = (editorState) => {
+    updateChatState({ editorState });
+  };
+
+  useEffect(() => {
+    onChangeEditorState(editorState);
+    const editorData = convertToRaw(editorState.getCurrentContent());
+    onChangeDraftContent(JSON.stringify(editorData));
+    onChangeText(editorData?.blocks?.map((item) => item.text)?.join("\n"));
+  }, [editorState]);
+
+  const [showGiphyModal, setShowGiphyModal] = useState(false);
 
   return (
     <Box className="chat-ui">
@@ -271,7 +329,6 @@ function OnlyChat() {
           color: "white",
           opacity: 1,
           position: "",
-          borderLeft: "1px solid gray",
         }}
       >
         <div
@@ -306,7 +363,7 @@ function OnlyChat() {
 
             return (
               <Box
-                className="message"
+                className="message chat-input"
                 key={index}
                 ref={isFirstMessage ? firstMessageRef : null}
                 sx={{
@@ -371,7 +428,19 @@ function OnlyChat() {
                   </Box>
 
                   {/* Message line */}
-                  <Box sx={{ pl: "5px" }}>{item?.message}</Box>
+                  {item?.type === "text" ? (
+                    <Box sx={{ pl: "5px" }}>{item?.message}</Box>
+                  ) : (
+                    <Box sx={{ pl: "5px" }}>
+                      <img
+                        src={
+                          "https://media.giphy.com/media/" +
+                          (item.giphy && item.giphy.id) +
+                          "/giphy.gif"
+                        }
+                      />
+                    </Box>
+                  )}
                 </Box>
                 {/* Optional Ad */}
                 {renderChatAd(index)}
@@ -386,18 +455,18 @@ function OnlyChat() {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "1rem 0",
+            padding: "1rem 10px",
             backgroundColor: "#0b0c2a",
             borderTop: "1px solid rgba(255, 255, 255, 0.1)",
             position: "fixed",
             bottom: 0,
             right: 0,
-            width: "95%",
+            width: "100%",
             opacity: 0.95,
           }}
-          className="send-message-input"
+          className="send-message-input editor"
         >
-          <input
+          {/* <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -413,11 +482,13 @@ function OnlyChat() {
               padding: "0 10px",
               color: "white",
             }}
-          />
+          /> */}
           <Editor
             editorState={editorState}
             onChange={setEditorState}
-            plugins={[plugins]}
+            plugins={plugins}
+            handleKeyCommand={handleKeyCommand}
+            placeholder="Type something..."
           />
           <EmojiSuggestions />
           <EmojiSelect closeOnEmojiSelect />
@@ -440,6 +511,28 @@ function OnlyChat() {
           >
             <SendIcon />
           </button>
+
+          <Button
+            className="chat-gif-icon"
+            size="small"
+            onClick={() => setShowGiphyModal(true)}
+            sx={{
+              borderStyle: "solid",
+              height: 18,
+              minWidth: 40,
+              pl: 0,
+              pr: 0,
+              borderColor: "white",
+              borderWidth: 1,
+              color: "white",
+              fontSize: 12,
+              position: "absolute",
+              right: 105,
+              top: 32,
+            }}
+          >
+            GIF
+          </Button>
         </Box>
       </Box>
       <Box
@@ -501,6 +594,16 @@ function OnlyChat() {
           </Button>
         </Box>
       )}
+
+      <GiphyModal
+        open={showGiphyModal}
+        inputPlaceholder="Type something..."
+        initialEditorState={editorState}
+        onClose={() => setShowGiphyModal(false)}
+        onSelectItem={(data) => {
+          sendGiphy(data);
+        }}
+      />
     </Box>
   );
 }
