@@ -1,16 +1,32 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { io } from "socket.io-client";
-import { Box, Button, TextField, Typography, Avatar } from "@mui/material";
+import {
+  ContentState,
+  convertToRaw,
+  EditorState,
+} from "draft-js";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import RadioPlayer from "./RadioPlayer.js";
+import Editor  from "@draft-js-plugins/editor";
+import createEmojiPlugin, { defaultTheme } from "@draft-js-plugins/emoji";
 import { ChatBubble } from "@mui/icons-material";
+import { GiphyModal } from "../../Components/GiphyModal";
+import RadioPlayer from "../Immersive/Component/RadioPlayer";
 
-// const socket = io('https://api.staging-new.boltplus.tv/public_chat');
 const socket = io("https://api.staging-new.boltplus.tv", {
-  // const socket = io('http://localhost:5001', {
   path: "/public-socket/",
   transports: ["websocket"], // optionally add 'polling' if needed
 });
+
+defaultTheme.emojiSuggestions += " emojiSuggestions";
+defaultTheme.emojiSuggestionsEntry += " emojiSuggestionsEntry";
+defaultTheme.emojiSuggestionsEntryFocused += " emojiSuggestionsEntryFocused";
+defaultTheme.emojiSuggestionsEntryText += " emojiSuggestionsEntryText";
+defaultTheme.emojiSelect += " emojiSelect";
+defaultTheme.emojiSelectButton += " emojiSelectButton";
+defaultTheme.emojiSelectButtonPressed += " emojiSelectButtonPressed";
+defaultTheme.emojiSelectPopover += " emojiSelectPopover";
+
 function Chat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -18,6 +34,10 @@ function Chat() {
 
   const [chatAds, setChatAds] = useState([]);
   const [chatAdIndex, setChatAdIndex] = useState(0);
+
+  const [editorState, setEditorState] = useState(() =>
+    EditorState.createEmpty()
+  );
 
   useEffect(() => {
     socket.on("connect", () => {
@@ -43,23 +63,33 @@ function Chat() {
       socket.disconnect();
     };
   }, []);
-
+  console.log("input", input);
   const sendMessage = () => {
-    if (input.trim()) {
+    if (input?.message) {
       const payload = {
-        message: input,
+        message: input?.message,
         draftContent: "",
         type: "text",
-        // poll:  '',
-        // giphy: '',
       };
       socket.emit("sendMessage", payload);
       setInput("");
+      setEditorState(EditorState.createEmpty());
     }
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") sendMessage();
+  const sendGiphy = (data) => {
+    if (data?.giphy) {
+      const payload = {
+        message: "",
+        giphy: data?.giphy,
+        draftContent: "",
+        type: "giphy",
+      };
+      socket.emit("sendMessage", payload);
+      setInput("");
+      setShowGiphyModal(false);
+      setEditorState(EditorState.createEmpty());
+    }
   };
 
   // Fetch ads
@@ -105,7 +135,6 @@ function Chat() {
       try {
         const response = await fetch(
           "https://api.staging-new.boltplus.tv/messages/open/channel/68090b895880466655dc6a17",
-          // 'http://localhost:5001/messages/open/channel/68090b895880466655dc6a17',
           {
             method: "GET",
           }
@@ -174,6 +203,7 @@ function Chat() {
   const [username, setUsername] = useState(
     localStorage.getItem("userName") || ""
   );
+
   const [isSettingUsername, setIsSettingUsername] = useState(
     !localStorage.getItem("userName")
   );
@@ -208,13 +238,89 @@ function Chat() {
     console.log("Joining channel with payload:", payload);
     socket.emit("join", payload);
   };
+  const scrollableContainerRef = useRef(null);
+  const firstMessageRef = useRef(null);
 
-  // useEffect(() => {
-  //   messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  // }, [messages]);
+  useEffect(() => {
+    const scrollToBottom = () => {
+      if (scrollableContainerRef.current) {
+        const scrollableElement = scrollableContainerRef.current;
+        // Check if user is near the top (newest messages, scrollTop close to 0)
+        const isNearBottom = scrollableElement.scrollTop < 100; // Adjust threshold as needed
+
+        if (isNearBottom) {
+          if (firstMessageRef.current) {
+            firstMessageRef.current.scrollIntoView({ behavior: "smooth" });
+          } else {
+            // Fallback to scrollTop = 0 if ref isn't set yet
+            scrollableElement.scrollTop = 0;
+          }
+        }
+      }
+    };
+
+    // Debounce to handle rapid message updates
+    if (chatAds?.length > 0 && messages?.length > 0) {
+      const timeout = setTimeout(scrollToBottom, 1000);
+      return () => clearTimeout(timeout);
+    }
+  }, [messages, chatAds]);
+
+  const { EmojiSuggestions, EmojiSelect, plugins } = useMemo(() => {
+    const emojiPlugin = createEmojiPlugin({
+      useNativeArt: true,
+      theme: defaultTheme,
+    });
+    const { EmojiSuggestions, EmojiSelect } = emojiPlugin;
+
+    const plugins = [emojiPlugin];
+    return { plugins, EmojiSuggestions, EmojiSelect };
+  }, []);
+
+  useEffect(() => {
+    const newState = EditorState.push(
+      editorState,
+      ContentState.createFromText(""),
+      "insert-characters"
+    );
+    setEditorState(EditorState.moveFocusToEnd(newState));
+  }, []);
+
+  const handleKeyCommand = (command) => {
+    if (command === "split-block" && !!sendMessage) {
+      sendMessage();
+      return "handled";
+    }
+    return "not-handled";
+  };
+
+  const updateChatState = (payload) => {
+    setInput((prev) => ({ ...prev, ...payload }));
+  };
+
+  const onChangeText = (message) => {
+    updateChatState({ message });
+  };
+
+  const onChangeDraftContent = (draftContent) => {
+    updateChatState({ draftContent });
+  };
+  const onChangeEditorState = (editorState) => {
+    updateChatState({ editorState });
+  };
+
+  useEffect(() => {
+    onChangeEditorState(editorState);
+    const editorData = convertToRaw(editorState.getCurrentContent());
+    onChangeDraftContent(JSON.stringify(editorData));
+    onChangeText(editorData?.blocks?.map((item) => item.text)?.join("\n"));
+  }, [editorState]);
+
+  const [showGiphyModal, setShowGiphyModal] = useState(false);
 
   return (
     <Box className="chat-ui">
+      
       <RadioPlayer url={TestVideo} />
       <Box
         className="main-chat"
@@ -227,21 +333,29 @@ function Chat() {
           color: "white",
           opacity: 1,
           position: "",
-          borderLeft: "1px solid gray",
         }}
       >
-        <div>
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            background: "#0b0c2a",
+            width: "100%",
+          }}
+        >
           <button className="static-chat-button">
             <ChatBubble /> Chat
           </button>
         </div>
         <Box
+          ref={scrollableContainerRef}
           sx={{
             display: "flex",
             flexDirection: "column-reverse",
             overflowY: "auto",
             mt: "auto",
-            pb: "0px",
+            p: "55px 10px 65px",
+            scrollBehavior: "smooth",
           }}
           className="message-container"
         >
@@ -249,11 +363,13 @@ function Chat() {
             const name = item?.sender || "User";
             const avatarUrl = item?.sender?.photoUrl;
             const initial = getInitial(name);
+            const isFirstMessage = index === 0;
 
             return (
               <Box
                 className="message"
                 key={index}
+                ref={isFirstMessage ? firstMessageRef : null}
                 sx={{
                   display: "flex",
                   flexDirection: "column",
@@ -323,7 +439,7 @@ function Chat() {
                       <img
                         src={
                           "https://media.giphy.com/media/" +
-                          (item?.giphy && item?.giphy.id) +
+                          (item.giphy && item.giphy.id) +
                           "/giphy.gif"
                         }
                         width={250}
@@ -344,34 +460,26 @@ function Chat() {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "1rem 0",
+            padding: "1rem 10px",
             backgroundColor: "#0b0c2a",
             borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-            position: "static",
+            position: "absolute",
             bottom: 0,
             right: 0,
-            width: "auto",
+            width: "100%",
             opacity: 0.95,
           }}
-          className="send-message-input"
+          className="send-message-input editor with_video"
         >
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Type your message..."
-            style={{
-              width: "95%",
-              marginRight: "1rem",
-              backgroundColor: "rgb(55, 57, 71)",
-              border: "1px solid rgb(55, 57, 71)",
-              outline: 0,
-              height: "50px",
-              borderRadius: "8px",
-              padding: "0 10px",
-              color: "white",
-            }}
+          <Editor
+            editorState={editorState}
+            onChange={setEditorState}
+            plugins={plugins}
+            handleKeyCommand={handleKeyCommand}
+            placeholder="Type something..."
           />
+          <EmojiSuggestions />
+          <EmojiSelect closeOnEmojiSelect />
           <button
             onClick={sendMessage}
             style={{
@@ -391,6 +499,28 @@ function Chat() {
           >
             <SendIcon />
           </button>
+
+          <Button
+            className="chat-gif-icon"
+            size="small"
+            onClick={() => setShowGiphyModal(true)}
+            sx={{
+              borderStyle: "solid",
+              height: 18,
+              minWidth: 40,
+              pl: 0,
+              pr: 0,
+              borderColor: "white",
+              borderWidth: 1,
+              color: "white",
+              fontSize: 12,
+              position: "absolute",
+              right: 105,
+              top: 32,
+            }}
+          >
+            GIF
+          </Button>
         </Box>
       </Box>
       <Box
@@ -439,19 +569,29 @@ function Chat() {
       </Box>
 
       {!isSettingUsername && username && (
-        <Box sx={{ position: "absolute", top: 20, right: 20, zIndex: 5 }}>
+        <Box sx={{ position: "fixed", top: 10, right: 10, zIndex: 5 }}>
           <Button variant="outlined" onClick={() => setIsSettingUsername(true)}>
             Edit Username
           </Button>
         </Box>
       )}
       {!isSettingUsername && !username && (
-        <Box sx={{ position: "absolute", top: 10, right: 10, zIndex: 5 }}>
+        <Box sx={{ position: "fixed", top: 10, right: 10, zIndex: 5 }}>
           <Button variant="outlined" onClick={() => setIsSettingUsername(true)}>
             Set Username
           </Button>
         </Box>
       )}
+
+      <GiphyModal
+        open={showGiphyModal}
+        inputPlaceholder="Type something..."
+        initialEditorState={editorState}
+        onClose={() => setShowGiphyModal(false)}
+        onSelectItem={(data) => {
+          sendGiphy(data);
+        }}
+      />
     </Box>
   );
 }

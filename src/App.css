@@ -88,7 +88,13 @@ border: 1px solid rgb(81, 81, 81);
     height: calc(100vh - 32px);
     overflow-y: hidden;
     min-height: calc(100vh - 32px);
+    position: relative;
 
+  }
+  .scanQR {
+    width: 96%;
+    height: calc(100vh - 128px);
+    min-height: auto;
   }
   .static-chat-button{
     background-color: rgb(255, 255, 255);
@@ -106,6 +112,12 @@ border: 1px solid rgb(81, 81, 81);
   }
   .message-container::-webkit-scrollbar{
     display: none;
+  }
+
+  @media only screen and (max-width: 1199px) {
+    .video-player {
+      width: 62%;
+    }
   }
 
   @media only screen and (max-width: 768.5px) {
@@ -274,6 +286,12 @@ border: 1px solid rgb(81, 81, 81);
 .editor .public-DraftEditor-content {
   max-height: 50px !important;
   min-width: 300px;
+}
+
+.editor.with_video .public-DraftEditor-content {
+  max-height: 50px !important;
+  min-width: 220px;
+  max-width: calc(100% - 120px);
 }
 
 .DraftEditor-editorContainer {

@@ -11,7 +11,7 @@ import SendIcon from "@mui/icons-material/Send";
 import Editor, { PluginEditorProps } from "@draft-js-plugins/editor";
 import createEmojiPlugin, { defaultTheme } from "@draft-js-plugins/emoji";
 import { ChatBubble } from "@mui/icons-material";
-import { GiphyModal } from "./GiphyModal";
+import { GiphyModal } from "../../Components/GiphyModal";
 
 const socket = io("https://api.staging-new.boltplus.tv", {
   path: "/public-socket/",
@@ -466,23 +466,6 @@ function OnlyChat() {
           }}
           className="send-message-input editor"
         >
-          {/* <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Type your message..."
-            style={{
-              width: "95%",
-              marginRight: "1rem",
-              backgroundColor: "rgb(55, 57, 71)",
-              border: "1px solid rgb(55, 57, 71)",
-              outline: 0,
-              height: "50px",
-              borderRadius: "8px",
-              padding: "0 10px",
-              color: "white",
-            }}
-          /> */}
           <Editor
             editorState={editorState}
             onChange={setEditorState}

@@ -2,16 +2,15 @@ import React from 'react';
 import ReactPlayer from 'react-player';
 
 
-const RadioPlayer = ({ url }) => {
+const RadioPlayer = ({ url, width }) => {
   return (
     <div  style={{
-        // width: '100vw',
+        width: width,
         height: '100vh',
         backgroundColor: '#000',
         overflow: 'hidden',
         margin: 0,
         padding: 0,
-        width: '100%'
       }}
       className='video-player'
       >
