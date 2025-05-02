@@ -3,9 +3,7 @@ import { io } from "socket.io-client";
 import { Box, Button, TextField, Typography, Avatar } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import RadioPlayer from "./RadioPlayer.js";
-import {
-  ChatBubble,
-} from "@mui/icons-material";
+import { ChatBubble } from "@mui/icons-material";
 
 // const socket = io('https://api.staging-new.boltplus.tv/public_chat');
 const socket = io("https://api.staging-new.boltplus.tv", {
@@ -28,19 +26,6 @@ function Chat() {
         emitJoin(localStorage.getItem("userName"));
       }
     });
-
-    // const userPayload = {
-    //   id: socket?.id,
-    //   username: 'Owais',
-    // }
-
-    // const payload = {
-    //   channelId: "68090b895880466655dc6a17",
-    //   channelType: "channel",
-    //   user: userPayload
-    // }
-
-    // socket.emit("join", payload);
 
     socket.on("message", (message) => {
       console.log("message", message);
@@ -331,10 +316,23 @@ function Chat() {
                   </Box>
 
                   {/* Message line */}
-                  <Box sx={{ pl: "5px" }}>{item?.message}</Box>
+                  {item?.type === "text" ? (
+                    <Box sx={{ pl: "5px" }}>{item?.message}</Box>
+                  ) : (
+                    <Box sx={{ pl: "5px" }}>
+                      <img
+                        src={
+                          "https://media.giphy.com/media/" +
+                          (item?.giphy && item?.giphy.id) +
+                          "/giphy.gif"
+                        }
+                        width={250}
+                      />
+                    </Box>
+                  )}
                 </Box>
                 {/* Optional Ad */}
-                {renderChatAd(index)}
+                {/* {renderChatAd(index)} */}
               </Box>
             );
           })}
@@ -439,7 +437,7 @@ function Chat() {
           Save
         </Button>
       </Box>
-      
+
       {!isSettingUsername && username && (
         <Box sx={{ position: "absolute", top: 20, right: 20, zIndex: 5 }}>
           <Button variant="outlined" onClick={() => setIsSettingUsername(true)}>

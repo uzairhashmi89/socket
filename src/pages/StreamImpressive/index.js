@@ -286,10 +286,22 @@ export default function LiveChatImmersive() {
                 </Box>
 
                 {/* Message line */}
-                <Box sx={{ pl: "5px" }}>{item?.message}</Box>
+                {item?.type === "text" ? (
+                    <Box sx={{ pl: "5px" }}>{item?.message}</Box>
+                  ) : (
+                    <Box sx={{ pl: "5px" }}>
+                      <img
+                        src={
+                          "https://media.giphy.com/media/" +
+                          (item?.giphy && item?.giphy.id) +
+                          "/giphy.gif"
+                        }
+                      />
+                    </Box>
+                  )}
               </Box>
               {/* Optional Ad */}
-              {renderChatAd(index)}
+              {/* {renderChatAd(index)} */}
             </Box>
           );
         })}

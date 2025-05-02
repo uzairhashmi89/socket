@@ -443,7 +443,7 @@ function OnlyChat() {
                   )}
                 </Box>
                 {/* Optional Ad */}
-                {renderChatAd(index)}
+                {/* {renderChatAd(index)} */}
               </Box>
             );
           })}

@@ -247,7 +247,6 @@ function ChatNew() {
           mt={1}
           sx={{ width: "97%", borderRadius: 8, padding: "0px" }}
         >
-                   
           {currentAd &&
             currentAd.assetUrl && ( // Ensure ad and assetUrl exist
               <Box
@@ -257,7 +256,6 @@ function ChatNew() {
                 sx={{ width: "100%", borderRadius: 8 }}
               />
             )}
-                 
         </Box>
       );
     }
@@ -269,8 +267,8 @@ function ChatNew() {
   return (
     <Box className="chat-ui">
       {/* Added basic layout styles */}
-            <RadioPlayer url={TestVideo} /> {/* Keep if needed */}     
-      {/* Main chat area */}     
+      <RadioPlayer url={TestVideo} /> {/* Keep if needed */}
+      {/* Main chat area */}
       <Box
         ref={messagesContainerRef} // Attach ref to the scrollable container
         className="main-chat"
@@ -294,7 +292,6 @@ function ChatNew() {
             pb: "80px",
           }}
         >
-                 
           {messages?.map((item, index) => {
             const name = item?.sender || "Guest"; // Access username from sender object
             const avatarUrl = item?.sender?.photoUrl; // Access photoUrl from sender object
@@ -311,9 +308,7 @@ function ChatNew() {
                   mb: 2,
                 }}
               >
-                             
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                 
                   {avatarUrl ? (
                     <Avatar
                       src={avatarUrl}
@@ -331,10 +326,10 @@ function ChatNew() {
                         textTransform: "uppercase",
                       }}
                     >
-                                          {initial}                 
+                      {initial}
                     </Avatar>
                   )}
-                                 
+
                   <Typography
                     sx={{
                       color: "rgba(255, 255, 255, 0.5)",
@@ -342,25 +337,31 @@ function ChatNew() {
                       fontSize: "18px",
                     }}
                   >
-                                      {name}               
+                    {name}
                   </Typography>
-                               
                 </Box>
-                             
+
                 <Box sx={{ pl: "44px" }}>
-                                 
-                  {item.type === "text" && (
-                    <Typography variant="body1">{item?.message}</Typography>
+                  {item?.type === "text" ? (
+                    <Box sx={{ pl: "5px" }}>{item?.message}</Box>
+                  ) : (
+                    <Box sx={{ pl: "5px" }}>
+                      <img
+                        src={
+                          "https://media.giphy.com/media/" +
+                          (item?.giphy && item?.giphy.id) +
+                          "/giphy.gif"
+                        }
+                      />
+                    </Box>
                   )}
-                               
                 </Box>
-                              {renderChatAd(index)}           
+                {/* {renderChatAd(index)} */}
               </Box>
             );
           })}
-               
         </Box>
-             
+
         <Box
           sx={{
             display: "flex",
@@ -377,8 +378,8 @@ function ChatNew() {
             gap: "1rem", // Add gap between input and button
           }}
         >
-                  {/* Message Input */}
-                 
+          {/* Message Input */}
+
           <TextField
             fullWidth // Allow TextField to take available width
             variant="outlined" // Or 'standard', 'filled'
@@ -405,7 +406,7 @@ function ChatNew() {
               },
             }}
           />
-                  {/* Send Button */}       
+          {/* Send Button */}
           <Button
             variant="contained" // Use MUI contained button style
             onClick={sendMessage}
@@ -424,13 +425,12 @@ function ChatNew() {
               padding: 0, // Remove default button padding
             }}
           >
-                      <SendIcon />       
+            <SendIcon />
           </Button>
-               
         </Box>
-              {/* Username Setting Area */}     
+        {/* Username Setting Area */}
         {/* Position this outside the main chat and input boxes if it's a separate overlay */}
-             
+
         <Box
           sx={{
             position: "fixed", // Example positioning
@@ -446,11 +446,10 @@ function ChatNew() {
             gap: 2,
           }}
         >
-                 
           <Typography variant="h6" sx={{ color: "white" }}>
             Set Username
           </Typography>
-                 
+
           <TextField
             label="Username"
             variant="outlined"
@@ -470,25 +469,23 @@ function ChatNew() {
               },
             }}
           />
-                 
+
           <Button variant="contained" onClick={handleSaveUsername}>
             Save
           </Button>
-               
         </Box>
-              {/* Edit Username Button Area */}     
-        {/* Position this where you want the Edit button to appear */}     
+        {/* Edit Username Button Area */}
+        {/* Position this where you want the Edit button to appear */}
         {!isSettingUsername &&
           username && ( // Only show if username is set and not currently setting
             <Box sx={{ position: "absolute", top: 10, right: 10, zIndex: 5 }}>
-              {/* Example position */}         
+              {/* Example position */}
               <Button
                 variant="outlined"
                 onClick={() => setIsSettingUsername(true)}
               >
                 Edit Username
               </Button>
-                     
             </Box>
           )}
         {/* Handle case where username is not set initially and the setting box is hidden */}
