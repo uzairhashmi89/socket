@@ -234,8 +234,7 @@ useEffect(() => {
     }
     return null;
   };
-  const TestVideo =
-    "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8";
+  const TestVideo = "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8";
 
   const [username, setUsername] = useState(
     localStorage.getItem("userName") || ""
@@ -382,7 +381,7 @@ useEffect(() => {
             background: "linear-gradient(to bottom, rgba(38, 40, 37, 1) 40%, rgba(38, 40, 37, 0) 95%)",
             // backgroundColor: "red",.
             width: "100%",
-            marginTop:"5px",
+            marginTop:"0px",
             display: "flex",
             alignItems: "baseline",
             gap: "20px",
@@ -419,7 +418,9 @@ useEffect(() => {
             const avatarUrl = item?.sender?.photoUrl;
             const initial = getInitial(name);
             const isFirstMessage = index === 0;
-
+            const nameColors = ["#6FCF97", "#219653", "#F2C94C","#F2994A","#F0F0F1","#EB5757"];
+            // Pick a random color for each message render
+             const randomColor = nameColors[Math.floor(Math.random() * nameColors.length)];
             return (
               <Box
                 className="message"
@@ -462,7 +463,8 @@ useEffect(() => {
                           width: 30,
                           height: 30,
                           borderRadius: "50%",
-                          backgroundColor: getColorFromName(name),
+                          // backgroundColor: getColorFromName(name),
+                          backgroundColor: getColorFromName(randomColor),
                           color: "white",
                           display: "flex",
                           alignItems: "center",
@@ -477,7 +479,8 @@ useEffect(() => {
                     )}
                     <Box
                       sx={{
-                        color: "rgba(255, 255, 255, 0.5)",
+                        color: randomColor,
+                        // color: "rgba(255, 255, 255, 0.5)",
                         fontWeight: 500,
                         fontSize:"13.5px"
                       }}

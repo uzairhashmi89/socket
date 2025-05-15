@@ -409,6 +409,9 @@ function OnlyChat() {
             const avatarUrl = item?.sender?.photoUrl;
             const initial = getInitial(name);
             const isFirstMessage = index === 0;
+             const nameColors = ["#6FCF97", "#219653", "#F2C94C","#F2994A","#F0F0F1","#EB5757"];
+            // Pick a random color for each message render
+             const randomColor = nameColors[Math.floor(Math.random() * nameColors.length)];
 
             return (
               <Box
@@ -422,7 +425,7 @@ function OnlyChat() {
                   mb: 2,
                 }}
                 style={{
-                  marginBottom: "10px",
+                  marginBottom: "7px",
                 }}
               >
                 <Box
@@ -452,7 +455,7 @@ function OnlyChat() {
                           width: 30,
                           height: 30,
                           borderRadius: "50%",
-                          backgroundColor: getColorFromName(name),
+                          backgroundColor: getColorFromName(randomColor),
                           color: "white",
                           display: "flex",
                           alignItems: "center",
@@ -467,7 +470,7 @@ function OnlyChat() {
                     )}
                     <Box
                       sx={{
-                        color: "rgba(255, 255, 255, 0.5)",
+                        color: randomColor,
                         fontWeight: 600,
                         fontSize:"16px"
                       }}
@@ -499,7 +502,7 @@ function OnlyChat() {
 
           <div ref={messagesEndRef} />
         </Box>
-        <Box className="qr-code-wrapper" style={{background: "#F0F0F11A",width: "30%",marginLeft: '0',marginRight: '0'}}>
+        <Box className="qr-code-wrapper" style={{background: "#F0F0F11A",width: "30%",marginLeft: '0',marginRight: '0',marginBottom:'30px'}}>
           <QrCode />
         </Box>
         <Box

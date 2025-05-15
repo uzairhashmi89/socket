@@ -424,8 +424,7 @@ function Immersive() {
               backgroundColor: "transparent",
               color: "white",
               opacity: 1,
-              // height: 'calc(100vh - 300px)',
-              height: '95dvh',
+              height: 'height: calc(100vh - 109px);',
               width: "95%",
             }}
           >
@@ -472,6 +471,9 @@ function Immersive() {
                 const avatarUrl = item?.sender?.photoUrl;
                 const initial = getInitial(name);
                 const isFirstMessage = index === 0;
+                 const nameColors = ["#6FCF97", "#219653", "#F2C94C","#F2994A","#F0F0F1","#EB5757"];
+            // Pick a random color for each message render
+             const randomColor = nameColors[Math.floor(Math.random() * nameColors.length)];
 
                 return (
                   <Box
@@ -485,7 +487,7 @@ function Immersive() {
                       mb: 2,
                     }}
                     style={{
-                      marginBottom: "10px",
+                      marginBottom: "7px",
                     }}
                   >
                     <Box
@@ -517,7 +519,7 @@ function Immersive() {
                               width: 30,
                               height: 30,
                               borderRadius: "50%",
-                              backgroundColor: getColorFromName(name),
+                              backgroundColor: getColorFromName(randomColor),
                               color: "white",
                               display: "flex",
                               alignItems: "center",
@@ -532,7 +534,7 @@ function Immersive() {
                         )}
                         <Box
                           sx={{
-                            color: "rgba(255, 255, 255, 0.5)",
+                            color: randomColor,
                             fontWeight: 600,
                             fontSize: "14px",
                           }}
