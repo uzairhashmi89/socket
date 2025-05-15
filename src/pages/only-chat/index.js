@@ -64,7 +64,8 @@ function OnlyChat() {
   useEffect(() => {
     socket.on('disconnect', () => {
       console.log('Disconnected');
-      onDisconnect();
+      
+
   })
   }, []);
   // Aimal code end
@@ -428,72 +429,76 @@ function OnlyChat() {
                   marginBottom: "7px",
                 }}
               >
-                <Box
-                  style={{
-                    width: "99%",
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                >
-                  {/* Top row: Avatar + Username */}
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    {avatarUrl ? (
-                      <Box
-                        component="img"
-                        src={avatarUrl}
-                        alt={name}
-                        sx={{
-                          width: 30,
-                          height: 30,
-                          borderRadius: "50%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    ) : (
-                      <Box
-                        sx={{
-                          width: 30,
-                          height: 30,
-                          borderRadius: "50%",
-                          backgroundColor: getColorFromName(randomColor),
-                          color: "white",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontWeight: "500",
-                          fontSize: "1rem",
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        {initial}
-                      </Box>
-                    )}
-                    <Box
-                      sx={{
-                        color: randomColor,
-                        fontWeight: 600,
-                        fontSize:"16px"
-                      }}
-                    >
-                      {name}
-                    </Box>
-                  </Box>
-
-                  {/* Message line */}
-                  {item?.type === "text" ? (
-                    <Box sx={{ pl: "5px" }}>{item?.message}</Box>
-                  ) : (
-                    <Box sx={{ pl: "5px" }}>
-                      <img
-                        src={
-                          "https://media.giphy.com/media/" +
-                          (item.giphy && item.giphy.id) +
-                          "/giphy.gif"
-                        }
-                      />
-                    </Box>
-                  )}
-                </Box>
+               <Box
+                                                 style={{
+                                                   width: "99%",
+                                                   display: "flex",
+                                                   flexDirection: item?.type === "text" ? "row" : "column", // ← key line
+                                                   alignItems: item?.type === "text" ? "center" : "flex-start", // for better vertical alignment
+                                                   gap: "5px", // optional spacing
+                                                 }}
+                                               >
+                                                 {/* Top row: Avatar + Username */}
+                                                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                                   {avatarUrl ? (
+                                                     <Box
+                                                       component="img"
+                                                       src={avatarUrl}
+                                                       alt={name}
+                                                       sx={{
+                                                         width: 30,
+                                                         height: 30,
+                                                         borderRadius: "50%",
+                                                         objectFit: "cover",
+                                                       }}
+                                                     />
+                                                   ) : (
+                                                     <Box
+                                                       sx={{
+                                                         width: 30,
+                                                         height: 30,
+                                                         borderRadius: "50%",
+                                                         backgroundColor: getColorFromName(randomColor),
+                                                         color: "white",
+                                                         display: "flex",
+                                                         alignItems: "center",
+                                                         justifyContent: "center",
+                                                         fontWeight: "500",
+                                                         fontSize: "1rem",
+                                                         textTransform: "uppercase",
+                                                       }}
+                                                     >
+                                                       {initial}
+                                                     </Box>
+                                                   )}
+                                                   <Box
+                                                     sx={{
+                                                       color: randomColor,
+                                                       fontWeight: 500,
+                                                       fontSize: "13.5px",
+                                                     }}
+                                                   >
+                                                     {name}
+                                                   </Box>
+                                                 </Box>
+                                   
+                                                 {/* Message or Giphy */}
+                                                 {item?.type === "text" ? (
+                                                   <Box sx={{ fontSize: "13.5px", pl: "2px" }}>{item?.message}</Box>
+                                                 ) : (
+                                                   <Box style={{ width: "100%", display: "flex", justifyContent: "flex-start" }}>
+                                                     <img
+                                                       src={
+                                                         "https://media.giphy.com/media/" +
+                                                         (item.giphy && item.giphy.id) +
+                                                         "/giphy.gif"
+                                                       }
+                                                       width={250}
+                                                       style={{ borderRadius: "8px" }}
+                                                     />
+                                                   </Box>
+                                     )}
+                                       </Box>
                 {/* Optional Ad */}
                 {/* {renderChatAd(index)} */}
               </Box>
