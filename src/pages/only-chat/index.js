@@ -12,6 +12,8 @@ import Editor, { PluginEditorProps } from "@draft-js-plugins/editor";
 import createEmojiPlugin, { defaultTheme } from "@draft-js-plugins/emoji";
 import { ChatBubble } from "@mui/icons-material";
 import { GiphyModal } from "../../Components/GiphyModal";
+import QrCode from "../../Components/QrCode";
+import UserIcon from "../../assets/user-icon.png"
 
 const socket = io("https://api.staging-new.boltplus.tv", {
   path: "/public-socket/",
@@ -38,6 +40,36 @@ function OnlyChat() {
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
+   // Aimal code start
+  const [connectedUsersCount, setConnectedUsersCount] = useState(null);
+  useEffect(() => {
+    socket.on("viewer", (data) => {
+      console.log("Viewer event received:", data);
+  
+      // If data is an array like [{ viewers: 3 }]
+      if (Array.isArray(data) && data[0]?.viewers !== undefined) {
+        setConnectedUsersCount(data[0].viewers);
+      }
+  
+      // If data is just { viewers: 3 }
+      else if (data?.viewers !== undefined) {
+        setConnectedUsersCount(data.viewers);
+      }
+    });
+  
+    return () => {
+      socket.off("viewer");
+    };
+  }, []);
+  useEffect(() => {
+    socket.on('disconnect', () => {
+      console.log('Disconnected');
+      onDisconnect();
+  })
+  }, []);
+  // Aimal code end
+
+
 
   useEffect(() => {
     socket.on("connect", () => {
@@ -318,6 +350,7 @@ function OnlyChat() {
 
   return (
     <Box className="chat-ui">
+       <div className="gradient-bg"></div>
       <Box
         className="main-chat"
         sx={{
@@ -325,23 +358,39 @@ function OnlyChat() {
           flexDirection: "column",
           flex: 1,
           p: 2,
-          backgroundColor: "#0b0c2a",
+          backgroundColor: "#333333",
           color: "white",
           opacity: 1,
           position: "",
+          width:"auto",
         }}
       >
         <div
           style={{
             position: "fixed",
             top: 0,
-            background: "#0b0c2a",
+            left:0,
+            background: "linear-gradient(to bottom, rgba(38, 40, 37, 1) 40%, rgba(38, 40, 37, 0) 95%)",
             width: "100%",
+            height: "100px",
+            marginTop:"5px",
+            display: "flex",
+            alignItems: "baseline",
+            gap: "20px",
+            padding: "5px",
+            justifyContent: "space-around",
           }}
         >
           <button className="static-chat-button">
             <ChatBubble /> Chat
           </button>
+          <div className="connected-users-count" style={{ display: "flex", alignItems: "center",gap:"5px" }}>
+            {/* <SupervisorAccountIcon size="large"/> */}
+            <img src={UserIcon} alt="Bolt Logo" style={{ width: "20px", height: "20px" }} />
+              <span style={{ color: "white",fontSize:"12px" }}>
+                 {connectedUsersCount}
+              </span>
+            </div>
         </div>
         <Box
           ref={scrollableContainerRef}
@@ -350,7 +399,7 @@ function OnlyChat() {
             flexDirection: "column-reverse",
             overflowY: "auto",
             mt: "auto",
-            p: "55px 10px 65px",
+            p: "55px 10px 10px",
             scrollBehavior: "smooth",
           }}
           className="message-container"
@@ -420,7 +469,7 @@ function OnlyChat() {
                       sx={{
                         color: "rgba(255, 255, 255, 0.5)",
                         fontWeight: 600,
-                        fontSize: "16px",
+                        fontSize:"16px"
                       }}
                     >
                       {name}
@@ -449,6 +498,9 @@ function OnlyChat() {
           })}
 
           <div ref={messagesEndRef} />
+        </Box>
+        <Box className="qr-code-wrapper" style={{background: "#F0F0F11A",width: "30%",marginLeft: '0',marginRight: '0'}}>
+          <QrCode />
         </Box>
         <Box
           sx={{

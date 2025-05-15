@@ -12,7 +12,9 @@ import createEmojiPlugin, { defaultTheme } from "@draft-js-plugins/emoji";
 import { ChatBubble } from "@mui/icons-material";
 import { GiphyModal } from "../../Components/GiphyModal";
 import RadioPlayer from "../Immersive/Component/RadioPlayer";
-
+import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
+import QrCode from "../../Components/QrCode";
+import UserIcon from "../../assets/user-icon.png"
 const socket = io("https://api.staging-new.boltplus.tv", {
   path: "/public-socket/",
   transports: ["websocket"], // optionally add 'polling' if needed
@@ -38,6 +40,36 @@ function Chat() {
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
+// Aimal code Start
+const [connectedUsersCount, setConnectedUsersCount] = useState(null);
+
+useEffect(() => {
+  socket.on("viewer", (data) => {
+    console.log("Viewer event received:", data);
+
+    // If data is an array like [{ viewers: 3 }]
+    if (Array.isArray(data) && data[0]?.viewers !== undefined) {
+      setConnectedUsersCount(data[0].viewers);
+    }
+
+    // If data is just { viewers: 3 }
+    else if (data?.viewers !== undefined) {
+      setConnectedUsersCount(data.viewers);
+    }
+  });
+
+  return () => {
+    socket.off("viewer");
+  };
+}, []);
+useEffect(() => {
+  socket.on('disconnect', () => {
+    console.log('Disconnected');
+    onDisconnect();
+})
+}, []);
+// Aimal code end
+
 
   useEffect(() => {
     socket.on("connect", () => {
@@ -48,7 +80,7 @@ function Chat() {
     });
 
     socket.on("message", (message) => {
-      console.log("message", message);
+      console.log("message", message.sender);
       setMessages((prev) => [message, ...prev]);
     });
 
@@ -63,7 +95,7 @@ function Chat() {
       socket.disconnect();
     };
   }, []);
-  console.log("input", input);
+  // console.log("input", input);
   const sendMessage = () => {
     if (input?.message) {
       const payload = {
@@ -146,6 +178,11 @@ function Chat() {
         }
 
         const data = await response.json();
+        // const senders = data.map(item => item.sender);
+        // console.log('senders', senders);
+        // const uniqueSenders = [...new Set(senders)];
+        // console.log('uniqueSenders', uniqueSenders);
+        
         setMessages(data);
       } catch (error) {
         console.error("Error during fetch:", error);
@@ -320,7 +357,7 @@ function Chat() {
 
   return (
     <Box className="chat-ui">
-      
+      <div className="gradient-bg"></div>
       <RadioPlayer url={TestVideo} />
       <Box
         className="main-chat"
@@ -328,8 +365,11 @@ function Chat() {
           display: "flex",
           flexDirection: "column",
           flex: 1,
-          p: 2,
-          backgroundColor: "#0b0c2a",
+          pt:2,
+          pb:2,
+          pl:0,
+          // pr:2,
+          // background:"linear-gradient(to bottom, rgba(38, 40, 37, 1) 0%, rgba(38, 40, 37, 0) 95%)",
           color: "white",
           opacity: 1,
           position: "",
@@ -339,13 +379,28 @@ function Chat() {
           style={{
             position: "fixed",
             top: 0,
-            background: "#0b0c2a",
+            background: "linear-gradient(to bottom, rgba(38, 40, 37, 1) 40%, rgba(38, 40, 37, 0) 95%)",
+            // backgroundColor: "red",.
             width: "100%",
+            marginTop:"5px",
+            display: "flex",
+            alignItems: "baseline",
+            gap: "20px",
+            padding: "5px",
+            // borderBottom:'1px solid #F0F0F11A',
+            height: "100px",
           }}
         >
           <button className="static-chat-button">
             <ChatBubble /> Chat
           </button>
+            <div className="connected-users-count" style={{ display: "flex", alignItems: "center",gap:"5px" }}>
+            {/* <SupervisorAccountIcon size="large"/> */}
+            <img src={UserIcon} alt="Bolt Logo" style={{ width: "20px", height: "20px" }} />
+              <span style={{ color: "white",fontSize:"12px" }}>
+                 {connectedUsersCount}
+              </span>
+            </div>
         </div>
         <Box
           ref={scrollableContainerRef}
@@ -354,7 +409,7 @@ function Chat() {
             flexDirection: "column-reverse",
             overflowY: "auto",
             mt: "auto",
-            p: "55px 10px 65px",
+            p: "55px 10px 15px",
             scrollBehavior: "smooth",
           }}
           className="message-container"
@@ -373,11 +428,11 @@ function Chat() {
                 sx={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: 0.5,
-                  mb: 2,
+                  gap: 0.3,
+                  mb: 1,
                 }}
                 style={{
-                  marginBottom: "10px",
+                  marginBottom: "5px",
                 }}
               >
                 <Box
@@ -423,8 +478,8 @@ function Chat() {
                     <Box
                       sx={{
                         color: "rgba(255, 255, 255, 0.5)",
-                        fontWeight: 600,
-                        fontSize: "16px",
+                        fontWeight: 500,
+                        fontSize:"13.5px"
                       }}
                     >
                       {name}
@@ -433,7 +488,7 @@ function Chat() {
 
                   {/* Message line */}
                   {item?.type === "text" ? (
-                    <Box sx={{ pl: "5px" }}>{item?.message}</Box>
+                    <Box sx={{ pl: "5px",fontSize:"13.5px" }}>{item?.message}</Box>
                   ) : (
                     <Box sx={{ pl: "5px" }}>
                       <img
@@ -455,13 +510,16 @@ function Chat() {
 
           <div ref={messagesEndRef} />
         </Box>
+        <Box className="qr-code-wrapper">
+          <QrCode />
+        </Box>
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
             padding: "1rem 10px",
-            backgroundColor: "#0b0c2a",
+            // backgroundColor: "#0b0c2a",
             borderTop: "1px solid rgba(255, 255, 255, 0.1)",
             position: "absolute",
             bottom: 0,
@@ -569,7 +627,7 @@ function Chat() {
       </Box>
 
       {!isSettingUsername && username && (
-        <Box sx={{ position: "fixed", top: 10, right: 10, zIndex: 5 }}>
+        <Box sx={{ position: "fixed", top: 10, right: 10, zIndex: 99999999999 }}>
           <Button variant="outlined" onClick={() => setIsSettingUsername(true)}>
             Edit Username
           </Button>

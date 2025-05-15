@@ -16,6 +16,10 @@ import { useFocusable } from "@noriginmedia/norigin-spatial-navigation";
 import PhoneAndroidIcon from "@mui/icons-material/PhoneAndroid";
 import { QRCode } from "react-qrcode-logo";
 import RadioPlayer from "./Component/RadioPlayer";
+import QrCode from "../../Components/QrCode";
+import UserIcon from "../../assets/user-icon.png"
+
+
 
 const socket = io("https://api.staging-new.boltplus.tv", {
   path: "/public-socket/",
@@ -42,7 +46,34 @@ function Immersive() {
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
-
+   // Aimal code start
+   const [connectedUsersCount, setConnectedUsersCount] = useState(null);
+   useEffect(() => {
+     socket.on("viewer", (data) => {
+       console.log("Viewer event received:", data);
+   
+       // If data is an array like [{ viewers: 3 }]
+       if (Array.isArray(data) && data[0]?.viewers !== undefined) {
+         setConnectedUsersCount(data[0].viewers);
+       }
+   
+       // If data is just { viewers: 3 }
+       else if (data?.viewers !== undefined) {
+         setConnectedUsersCount(data.viewers);
+       }
+     });
+   
+     return () => {
+       socket.off("viewer");
+     };
+   }, []);
+   useEffect(() => {
+     socket.on('disconnect', () => {
+       console.log('Disconnected');
+       onDisconnect();
+   })
+   }, []);
+   // Aimal code end
   useEffect(() => {
     socket.on("connect", () => {
       console.log("[Client] Connected:", socket.id);
@@ -339,6 +370,7 @@ function Immersive() {
 
   return (
     <Box className="stream-impressive">
+      <div className="gradient-bg"></div>
       <RadioPlayer url={TestVideo} width="100%"/>
       <Box
         className="main-chat immersive_chat"
@@ -354,14 +386,14 @@ function Immersive() {
           right: "0",
           bottom: "0",
           height: '100vh',
-          borderLeft: "1px solid gray",
+          // borderLeft: "1px solid gray",
         }}
       >
         <div
-          style={{ background: "rgb(18 16 49 / 50%)" }}
+          // style={{ background: "rgb(18 16 49 / 50%)" }}
           className="stream-impressive font-poppins flex-1 flex flex-col w-[100%] overflow-auto no-scrollbar mt-6"
         >
-          <div className="self-center">
+          {/* <div className="self-center">
             <div className=" mt-[18px] mb-[34px] flex flex-col items-center space-y-[33px]">
               <p className="show-qr font-medium text-2xl leading-[30px] text-white-85 text-center">
                 Scan the QR code with Bolt+ app
@@ -379,8 +411,9 @@ function Immersive() {
                 />
               </div>
             </div>
-          </div>
-          <hr className="hr" />
+          </div> */}
+        
+          {/* <hr className="hr" /> */}
           <Box
             className="main-chat scanQR"
             sx={{
@@ -391,10 +424,37 @@ function Immersive() {
               backgroundColor: "transparent",
               color: "white",
               opacity: 1,
-              height: 'calc(100vh - 300px)',
+              // height: 'calc(100vh - 300px)',
+              height: '95dvh',
               width: "95%",
             }}
           >
+              <div
+          style={{
+            // position: "fixed",
+            marginTop:"-10px",
+            
+            background: "linear-gradient(to bottom, rgba(38, 40, 37, 1) 40%, rgba(38, 40, 37, 0) 95%)",
+            width: "auto",
+            height: "100px",
+            display: "flex",
+            alignItems: "baseline",
+            gap: "0px",
+            padding: "5px",
+            justifyContent: "space-around",
+          }}
+        >
+          <button className="static-chat-button">
+            <ChatBubble /> Chat
+          </button>
+          <div className="connected-users-count" style={{ display: "flex", alignItems: "center",gap:"5px" }}>
+            {/* <SupervisorAccountIcon size="large"/> */}
+            <img src={UserIcon} alt="Bolt Logo" style={{ width: "20px", height: "20px" }} />
+              <span style={{ color: "white",fontSize:"12px" }}>
+                 {connectedUsersCount}
+              </span>
+            </div>
+              </div>
             <Box
               ref={scrollableContainerRef}
               sx={{
@@ -474,7 +534,7 @@ function Immersive() {
                           sx={{
                             color: "rgba(255, 255, 255, 0.5)",
                             fontWeight: 600,
-                            fontSize: "16px",
+                            fontSize: "14px",
                           }}
                         >
                           {name}
@@ -483,7 +543,7 @@ function Immersive() {
 
                       {/* Message line */}
                       {item?.type === "text" ? (
-                        <Box sx={{ pl: "5px" }}>{item?.message}</Box>
+                        <Box sx={{ pl: "5px",fontSize: "14px" }}>{item?.message}</Box>
                       ) : (
                         <Box sx={{ pl: "5px" }}>
                           <img
@@ -504,6 +564,9 @@ function Immersive() {
               })}
 
               <div ref={messagesEndRef} />
+            </Box>
+            <Box className="qr-code-wrapper" style={{background: "#F0F0F11A",width: "85%",margin: '0'}}>
+              <QrCode />
             </Box>
           </Box>
         </div>
