@@ -14,6 +14,7 @@ import { ChatBubble } from "@mui/icons-material";
 import { GiphyModal } from "../../Components/GiphyModal";
 import QrCode from "../../Components/QrCode";
 import UserIcon from "../../assets/user-icon.png"
+import VerifiedIcon from '@mui/icons-material/Verified';
 
 const socket = io("https://api.staging-new.boltplus.tv", {
   path: "/public-socket/",
@@ -40,23 +41,23 @@ function OnlyChat() {
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
-   // Aimal code start
+  // Aimal code start
   const [connectedUsersCount, setConnectedUsersCount] = useState(null);
   useEffect(() => {
     socket.on("viewer", (data) => {
       console.log("Viewer event received:", data);
-  
+
       // If data is an array like [{ viewers: 3 }]
       if (Array.isArray(data) && data[0]?.viewers !== undefined) {
         setConnectedUsersCount(data[0].viewers);
       }
-  
+
       // If data is just { viewers: 3 }
       else if (data?.viewers !== undefined) {
         setConnectedUsersCount(data.viewers);
       }
     });
-  
+
     return () => {
       socket.off("viewer");
     };
@@ -64,9 +65,9 @@ function OnlyChat() {
   useEffect(() => {
     socket.on('disconnect', () => {
       console.log('Disconnected');
-      
 
-  })
+
+    })
   }, []);
   // Aimal code end
 
@@ -351,7 +352,7 @@ function OnlyChat() {
 
   return (
     <Box className="chat-ui">
-       <div className="gradient-bg"></div>
+      <div className="gradient-bg"></div>
       <Box
         className="main-chat"
         sx={{
@@ -363,18 +364,19 @@ function OnlyChat() {
           color: "white",
           opacity: 1,
           position: "",
-          width:"auto",
+          width: "auto",
+          height: '88vh !important',
         }}
       >
         <div
           style={{
             position: "fixed",
             top: 0,
-            left:0,
+            left: 0,
             background: "linear-gradient(to bottom, rgba(38, 40, 37, 1) 40%, rgba(38, 40, 37, 0) 95%)",
             width: "100%",
             height: "100px",
-            marginTop:"5px",
+            marginTop: "5px",
             display: "flex",
             alignItems: "baseline",
             gap: "20px",
@@ -385,13 +387,13 @@ function OnlyChat() {
           <button className="static-chat-button">
             <ChatBubble /> Chat
           </button>
-          <div className="connected-users-count" style={{ display: "flex", alignItems: "center",gap:"5px" }}>
+          <div className="connected-users-count" style={{ display: "flex", alignItems: "center", gap: "5px" }}>
             {/* <SupervisorAccountIcon size="large"/> */}
             <img src={UserIcon} alt="Bolt Logo" style={{ width: "20px", height: "20px" }} />
-              <span style={{ color: "white",fontSize:"12px" }}>
-                 {connectedUsersCount}
-              </span>
-            </div>
+            <span style={{ color: "white", fontSize: "12px" }}>
+              {connectedUsersCount}
+            </span>
+          </div>
         </div>
         <Box
           ref={scrollableContainerRef}
@@ -410,9 +412,9 @@ function OnlyChat() {
             const avatarUrl = item?.sender?.photoUrl;
             const initial = getInitial(name);
             const isFirstMessage = index === 0;
-             const nameColors = ["#6FCF97", "#219653", "#F2C94C","#F2994A","#F0F0F1","#EB5757"];
+            const nameColors = ["#6FCF97", "#219653", "#F2C94C", "#F2994A", "#F0F0F1", "#EB5757"];
             // Pick a random color for each message render
-             const randomColor = nameColors[Math.floor(Math.random() * nameColors.length)];
+            const randomColor = nameColors[Math.floor(Math.random() * nameColors.length)];
 
             return (
               <Box
@@ -422,83 +424,165 @@ function OnlyChat() {
                 sx={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: 0.5,
+                  gap: '10px 0',
                   mb: 2,
                 }}
                 style={{
                   marginBottom: "7px",
                 }}
               >
-               <Box
-                                                 style={{
-                                                   width: "99%",
-                                                   display: "flex",
-                                                   flexDirection: item?.type === "text" ? "row" : "column", // ← key line
-                                                   alignItems: item?.type === "text" ? "center" : "flex-start", // for better vertical alignment
-                                                   gap: "5px", // optional spacing
-                                                 }}
-                                               >
-                                                 {/* Top row: Avatar + Username */}
-                                                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                                   {avatarUrl ? (
-                                                     <Box
-                                                       component="img"
-                                                       src={avatarUrl}
-                                                       alt={name}
-                                                       sx={{
-                                                         width: 30,
-                                                         height: 30,
-                                                         borderRadius: "50%",
-                                                         objectFit: "cover",
-                                                       }}
-                                                     />
-                                                   ) : (
-                                                     <Box
-                                                       sx={{
-                                                         width: 30,
-                                                         height: 30,
-                                                         borderRadius: "50%",
-                                                         backgroundColor: getColorFromName(randomColor),
-                                                         color: "white",
-                                                         display: "flex",
-                                                         alignItems: "center",
-                                                         justifyContent: "center",
-                                                         fontWeight: "500",
-                                                         fontSize: "1rem",
-                                                         textTransform: "uppercase",
-                                                       }}
-                                                     >
-                                                       {initial}
-                                                     </Box>
-                                                   )}
-                                                   <Box
-                                                     sx={{
-                                                       color: randomColor,
-                                                       fontWeight: 500,
-                                                       fontSize: "13.5px",
-                                                     }}
-                                                   >
-                                                     {name}
-                                                   </Box>
-                                                 </Box>
-                                   
-                                                 {/* Message or Giphy */}
-                                                 {item?.type === "text" ? (
-                                                   <Box sx={{ fontSize: "13.5px", pl: "2px" }}>{item?.message}</Box>
-                                                 ) : (
-                                                   <Box style={{ width: "100%", display: "flex", justifyContent: "flex-start" }}>
-                                                     <img
-                                                       src={
-                                                         "https://media.giphy.com/media/" +
-                                                         (item.giphy && item.giphy.id) +
-                                                         "/giphy.gif"
-                                                       }
-                                                       width={250}
-                                                       style={{ borderRadius: "8px" }}
-                                                     />
-                                                   </Box>
-                                     )}
-                                       </Box>
+                {/* For channel Heading */}
+                  <Box
+                  style={{
+                    width: "fit-content",
+                    display: "flex",
+                    flexDirection: item?.type === "text" ? "row" : "column", // ← key line
+                    alignItems: item?.type === "text" ? "baseline" : "flex-start", // for better vertical alignment
+                    gap: "5px", // optional spacing
+                    background: 'rgba(240, 240, 241, 0.1)',
+                    padding: "10px",
+                    borderRadius: "4px",
+
+              }}
+            >
+              
+              {/* Top row: Avatar + Username */}
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                {avatarUrl ? (
+                  <Box
+                    component="img"
+                    src={avatarUrl}
+                    alt={name}
+                    sx={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : (
+                  <Box
+                    sx={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: "50%",
+                      backgroundColor: 'red',
+                      color: "white",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontWeight: "500",
+                      fontSize: "1rem",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    T
+                  </Box>
+                )}
+                <Box
+                  sx={{
+                    color: '#fff',
+                    fontWeight: 600,
+                    fontSize: "13.5px",
+                    textTransform:"capitalize",
+                    textWrap: 'nowrap'
+                  }}
+                >
+                  {/* {name} */}
+                  TVC News <VerifiedIcon sx={{ fontSize: "12px", color: "#6FCF97", marginLeft: "5px", color: '#43A2F2' }} />
+                </Box>
+              </Box>
+              
+              {/* Message or Giphy */}
+              {item?.type === "text" ? (
+                <Box sx={{ fontSize: "13.5px", pl: "2px",pr:'15px', lineHeight: '20px', fontWeight:'400', textTransform:"capitalize" }}>{/* item?.message */}🔴 LIVE: TVC News – Breaking Updates & Discussion</Box>
+              ) : (
+                <Box style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+                  <img
+                    src={
+                      "https://media.giphy.com/media/" +
+                      (item.giphy && item.giphy.id) +
+                      "/giphy.gif"
+                    }
+                    width={250}
+                    style={{ borderRadius: "8px" }}
+                  />
+                </Box>
+  )}
+                </Box>
+                {/* for channle heading end */}
+                <Box
+                  style={{
+                    width: "99%",
+                    display: "flex",
+                    flexDirection: item?.type === "text" ? "row" : "column", // ← key line
+                    alignItems: item?.type === "text" ? "center" : "flex-start", // for better vertical alignment
+                    gap: "5px", // optional spacing
+                     padding: "5px 0px 5px 10px",
+                  }}
+                >
+                  {/* Top row: Avatar + Username */}
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    {avatarUrl ? (
+                      <Box
+                        component="img"
+                        src={avatarUrl}
+                        alt={name}
+                        sx={{
+                          width: 30,
+                          height: 30,
+                          borderRadius: "50%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    ) : (
+                      <Box
+                        sx={{
+                          width: 30,
+                          height: 30,
+                          borderRadius: "50%",
+                          backgroundColor: getColorFromName(randomColor),
+                          color: "white",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontWeight: "500",
+                          fontSize: "1rem",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {initial}
+                      </Box>
+                    )}
+                    <Box
+                      sx={{
+                        color: randomColor,
+                        fontWeight: 500,
+                        fontSize: "13.5px",
+                        textTransform: "capitalize",
+                      }}
+                    >
+                      {name}
+                    </Box>
+                  </Box>
+
+                  {/* Message or Giphy */}
+                  {item?.type === "text" ? (
+                    <Box sx={{ fontSize: "13.5px", pl: "2px", textTransform: "capitalize", }}>{item?.message}</Box>
+                  ) : (
+                    <Box style={{ width: "100%", display: "flex", justifyContent: "flex-start" }}>
+                      <img
+                        src={
+                          "https://media.giphy.com/media/" +
+                          (item.giphy && item.giphy.id) +
+                          "/giphy.gif"
+                        }
+                        width={250}
+                        style={{ borderRadius: "8px" }}
+                      />
+                    </Box>
+                  )}
+                </Box>
                 {/* Optional Ad */}
                 {/* {renderChatAd(index)} */}
               </Box>
@@ -507,7 +591,7 @@ function OnlyChat() {
 
           <div ref={messagesEndRef} />
         </Box>
-        <Box className="qr-code-wrapper" style={{background: "#F0F0F11A",width: "30%",marginLeft: '0',marginRight: '0',marginBottom:'30px'}}>
+        <Box className="qr-code-wrapper" style={{ background: "#F0F0F11A", width: "30%", marginLeft: '0', marginRight: '0', marginBottom: '30px' }}>
           <QrCode />
         </Box>
         <Box
@@ -593,11 +677,11 @@ function OnlyChat() {
           gap: 2,
         }}
       >
-               
+
         <Typography variant="h6" sx={{ color: "white" }}>
           Set Username
         </Typography>
-               
+
         <TextField
           label="Username"
           variant="outlined"
@@ -617,7 +701,7 @@ function OnlyChat() {
             },
           }}
         />
-               
+
         <Button variant="contained" onClick={handleSaveUsername}>
           Save
         </Button>

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactPlayer from 'react-player';
-
+import Bgimage from '../../assets/TVC News Screenshotat 1.png'
 
 const RadioPlayer = ({ url }) => {
   return (
@@ -14,7 +14,7 @@ const RadioPlayer = ({ url }) => {
       }}
       className='video-player'
       >
-      <ReactPlayer
+      {/* <ReactPlayer
         width="100%"
         height="100%"
         url={url}
@@ -27,7 +27,8 @@ const RadioPlayer = ({ url }) => {
               forceHLS: true,
             },
           }}
-        />
+        /> */}
+        <img src={Bgimage} alt={Bgimage} style={{width: '100%', height: '100%',ojectFit: 'cover'}} />
     </div>
   );
 };

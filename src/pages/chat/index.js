@@ -11,10 +11,12 @@ import Editor  from "@draft-js-plugins/editor";
 import createEmojiPlugin, { defaultTheme } from "@draft-js-plugins/emoji";
 import { ChatBubble } from "@mui/icons-material";
 import { GiphyModal } from "../../Components/GiphyModal";
-import RadioPlayer from "../Immersive/Component/RadioPlayer";
+// import RadioPlayer from "../Immersive/Component/RadioPlayer";
+import RadioPlayer from "./RadioPlayer";
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import QrCode from "../../Components/QrCode";
 import UserIcon from "../../assets/user-icon.png"
+import VerifiedIcon from '@mui/icons-material/Verified';
 const socket = io("https://api.staging-new.boltplus.tv", {
   path: "/public-socket/",
   transports: ["websocket"], // optionally add 'polling' if needed
@@ -355,8 +357,8 @@ useEffect(() => {
 
   return (
     <Box className="chat-ui">
-      <div className="gradient-bg"></div>
-      <RadioPlayer url={TestVideo} />
+      <div className="gradient-bg" style={{height: '100%'}}></div>
+      <RadioPlayer />
       <Box
         className="main-chat"
         sx={{
@@ -375,9 +377,7 @@ useEffect(() => {
       >
         <div
           style={{
-            position: "fixed",
-            top: 0,
-            background: "linear-gradient(to bottom, rgba(38, 40, 37, 1) 40%, rgba(38, 40, 37, 0) 95%)",
+            background: "linear-gradient(to bottom, rgba(38, 40, 37, 1) 7%, rgba(38, 40, 37, 0) 95%)",
             // backgroundColor: "red",.
             width: "100%",
             marginTop:"0px",
@@ -407,8 +407,9 @@ useEffect(() => {
             flexDirection: "column-reverse",
             overflowY: "auto",
             mt: "auto",
-            p: "55px 10px 15px",
+            p: "0px 10px 15px",
             scrollBehavior: "smooth",
+            gap: '7px 0'
           }}
           className="message-container"
         >
@@ -428,23 +429,104 @@ useEffect(() => {
                 sx={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: 0.3,
+                  gap: '10px 0',
                   mb: 1,
                 }}
                 style={{
                   marginBottom: "5px",
                 }}
               >
-                
-                <Box
-              style={{
-                width: "99%",
-                display: "flex",
-                flexDirection: item?.type === "text" ? "row" : "column", // ← key line
-                alignItems: item?.type === "text" ? "center" : "flex-start", // for better vertical alignment
-                gap: "5px", // optional spacing
+                {/* For channel Heading */}
+                  <Box
+                  style={{
+                    width: "99%",
+                    display: "flex",
+                    flexDirection: item?.type === "text" ? "row" : "column", // ← key line
+                    alignItems: item?.type === "text" ? "baseline" : "flex-start", // for better vertical alignment
+                    gap: "5px", // optional spacing
+                    background: 'rgba(240, 240, 241, 0.1)',
+                    padding: "5px 0px 5px 10px",
+                    borderRadius: "4px",
+
               }}
             >
+              
+              {/* Top row: Avatar + Username */}
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                {avatarUrl ? (
+                  <Box
+                    component="img"
+                    src={avatarUrl}
+                    alt={name}
+                    sx={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : (
+                  <Box
+                    sx={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: "50%",
+                      backgroundColor: 'red',
+                      color: "white",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontWeight: "500",
+                      fontSize: "1rem",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    T
+                  </Box>
+                )}
+                <Box
+                  sx={{
+                    color: '#fff',
+                    fontWeight: 600,
+                    fontSize: "13.5px",
+                    textTransform:"capitalize",
+                    textWrap: 'nowrap'
+                  }}
+                >
+                  {/* {name} */}
+                  TVC News <VerifiedIcon sx={{ fontSize: "12px", color: "#6FCF97", marginLeft: "5px", color: '#43A2F2' }} />
+                </Box>
+              </Box>
+              
+              {/* Message or Giphy */}
+              {item?.type === "text" ? (
+                <Box sx={{ fontSize: "13.5px", pl: "2px",pr:'15px', lineHeight: '20px', fontWeight:'400', textTransform:"capitalize" }}>{/* item?.message */}🔴 LIVE: TVC News – Breaking Updates & Discussion</Box>
+              ) : (
+                <Box style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+                  <img
+                    src={
+                      "https://media.giphy.com/media/" +
+                      (item.giphy && item.giphy.id) +
+                      "/giphy.gif"
+                    }
+                    width={250}
+                    style={{ borderRadius: "8px" }}
+                  />
+                </Box>
+  )}
+                </Box>
+                {/* for channle heading end */}
+                <Box
+                  style={{
+                    width: "99%",
+                    display: "flex",
+                    flexDirection: item?.type === "text" ? "row" : "column", // ← key line
+                    alignItems: item?.type === "text" ? "baseline" : "flex-start", // for better vertical alignment
+                    gap: "5px", // optional spacing
+                     padding: "5px 10px 5px 10px",
+              }}
+            >
+              
               {/* Top row: Avatar + Username */}
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 {avatarUrl ? (
@@ -481,17 +563,18 @@ useEffect(() => {
                 <Box
                   sx={{
                     color: randomColor,
-                    fontWeight: 500,
+                    fontWeight: 600,
                     fontSize: "13.5px",
+                    textTransform:"capitalize"
                   }}
                 >
                   {name}
                 </Box>
               </Box>
-
+              
               {/* Message or Giphy */}
               {item?.type === "text" ? (
-                <Box sx={{ fontSize: "13.5px", pl: "2px" }}>{item?.message}</Box>
+                <Box sx={{ fontSize: "13.5px", pl: "2px",pr: '1.5px', lineHeight: '20px', fontWeight:'400', textTransform:"capitalize" }}>{item?.message}</Box>
               ) : (
                 <Box style={{ width: "100%", display: "flex", justifyContent: "center" }}>
                   <img

@@ -86,7 +86,7 @@ border: 1px solid rgb(81, 81, 81);
     background: linear-gradient(to left, rgba(38, 40, 37, 1) 0%, rgba(38, 40, 37, 0) 100%); */
   }
   .gradient-bg{
-    background: linear-gradient(to left, rgba(38, 40, 37, 1) 0%, rgba(38, 40, 37, 0) 100%);
+    background: linear-gradient(to left, rgba(38, 40, 37, 1) 5%, rgba(38, 40, 37, 0) 95%);
     position: absolute;
     top: 0;
     left: 0;
@@ -100,11 +100,11 @@ border: 1px solid rgb(81, 81, 81);
     z-index: 2;
   }
   .main-chat{
-    width: 25%;
+    width: 27%;
     margin-left: auto;
-    height: calc(100vh - 109px);
+    height: calc(100vh - 165px);
     overflow-y: hidden;
-    min-height: calc(100vh - 80px);
+   height: calc(100vh - 165px);
     position: relative;
     z-index: 999999999999;
     /* background: linear-gradient(to bottom, rgba(38, 40, 37, 1) 0%, rgba(38, 40, 37, 0) 95%); */
@@ -325,21 +325,25 @@ border: 1px solid rgb(81, 81, 81);
   z-index: 1;
 }
 .qr-code-wrapper{
-  /* position: absolute; */
+  
   
   display: flex;
   
   z-index: 2;
   background-color: #333333;
-  padding: 20px;
-  width: 80%;
+  padding:20px;
+  width: 87%;
   margin: 0 auto;
   margin-bottom: 70px;
   border-radius: 10px;
+  margin-right: 10px;
 }
 .qr-code-main{
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
+}
+.qr-code-main h2{
+  margin: 0 0 10px 0;
 }
