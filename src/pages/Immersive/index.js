@@ -371,7 +371,7 @@ function Immersive() {
 
   return (
     <Box className="stream-impressive">
-      <div className="gradient-bg"></div>
+      <div className="gradient-bg" style={{height: '100% !important'}}></div>
       <RadioPlayer url={TestVideo} width="100%"/>
       <Box
         className="main-chat immersive_chat"
@@ -434,7 +434,7 @@ function Immersive() {
             // position: "fixed",
             marginTop:"-10px",
             
-            background: "linear-gradient(to bottom, rgba(38, 40, 37, 1) 2%, rgba(38, 40, 37, 0) 95%)",
+            // background: "linear-gradient(to bottom, rgba(38, 40, 37, 1) 2%, rgba(38, 40, 37, 0) 95%)",
             width: "auto",
             height: "100px",
             display: "flex",
@@ -494,7 +494,7 @@ function Immersive() {
                     {/* For channel Heading */}
                   <Box
                   style={{
-                    width: "fit-content",
+                    width: "auto",
                     display: "flex",
                     flexDirection: item?.type === "text" ? "row" : "column", // ← key line
                     alignItems: item?.type === "text" ? "baseline" : "flex-start", // for better vertical alignment
@@ -653,7 +653,7 @@ function Immersive() {
 
               <div ref={messagesEndRef} />
             </Box>
-            <Box className="qr-code-wrapper" style={{background: "#F0F0F11A",width: "89%",margin: '0'}}>
+            <Box className="qr-code-wrapper" style={{background: "#333333",width: "89%",margin: '0'}}>
               <QrCode />
             </Box>
           </Box>

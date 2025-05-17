@@ -86,7 +86,10 @@ border: 1px solid rgb(81, 81, 81);
     background: linear-gradient(to left, rgba(38, 40, 37, 1) 0%, rgba(38, 40, 37, 0) 100%); */
   }
   .gradient-bg{
-    background: linear-gradient(to left, rgba(38, 40, 37, 1) 5%, rgba(38, 40, 37, 0) 95%);
+    /* background: linear-gradient(to left, rgba(38, 40, 37, 1) 5%, rgba(38, 40, 37, 0) 95%); */
+    background-image: url('../src/assets/bg-overlay3.png');
+    background-repeat: no-repeat;
+    background-size: cover;
     position: absolute;
     top: 0;
     left: 0;
@@ -101,6 +104,7 @@ border: 1px solid rgb(81, 81, 81);
   }
   .main-chat{
     width: 27%;
+    padding: 0 5px;
     margin-left: auto;
     height: calc(100vh - 165px);
     overflow-y: hidden;
@@ -125,7 +129,6 @@ border: 1px solid rgb(81, 81, 81);
     justify-content: center;
     align-items: center;
     gap: 0 10px;
-    margin-bottom: 10px;
     font-weight: 600;
     border: none;
     outline: none;
@@ -142,10 +145,22 @@ border: 1px solid rgb(81, 81, 81);
 }
   @media only screen and (max-width: 1199px) {
     .video-player {
-      width: 62%;
+      width: 100%;
+    }
+    .main-chat{
+      width: 40%;
     }
   }
-
+@media only screen and (max-width: 991.5px){
+.video-player{
+position: static;
+height: auto !important;
+}
+.main-chat{
+      width: 100%;
+      background-color: #333333 !important;
+    }
+}
   @media only screen and (max-width: 768.5px) {
 
     .immersive_chat {
@@ -176,9 +191,6 @@ border: 1px solid rgb(81, 81, 81);
   }
   .send-message-input{
     padding: 10px !important;
-  }
-  .video-player{
-    height: 100% !important;
   }
 }
 
@@ -332,11 +344,10 @@ border: 1px solid rgb(81, 81, 81);
   z-index: 2;
   background-color: #333333;
   padding:20px;
-  width: 87%;
+  width: 89%;
   margin: 0 auto;
   margin-bottom: 70px;
   border-radius: 10px;
-  margin-right: 10px;
 }
 .qr-code-main{
   display: flex;

@@ -368,8 +368,6 @@ useEffect(() => {
           pt:2,
           pb:2,
           pl:0,
-          // pr:2,
-          // background:"linear-gradient(to bottom, rgba(38, 40, 37, 1) 0%, rgba(38, 40, 37, 0) 95%)",
           color: "white",
           opacity: 1,
           position: "",
@@ -377,12 +375,12 @@ useEffect(() => {
       >
         <div
           style={{
-            background: "linear-gradient(to bottom, rgba(38, 40, 37, 1) 7%, rgba(38, 40, 37, 0) 95%)",
+            // background: "linear-gradient(to bottom, rgba(38, 40, 37, 1) 7%, rgba(38, 40, 37, 0) 95%)",
             // backgroundColor: "red",.
-            width: "100%",
-            marginTop:"0px",
+            width: "auto",
+            marginTop:"-10px",
             display: "flex",
-            alignItems: "baseline",
+            alignItems: "center",
             gap: "20px",
             padding: "5px",
             // borderBottom:'1px solid #F0F0F11A',
