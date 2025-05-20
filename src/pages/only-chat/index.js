@@ -373,9 +373,9 @@ function OnlyChat() {
             position: "fixed",
             top: 0,
             left: 0,
-            background: "linear-gradient(to bottom, rgba(38, 40, 37, 1) 40%, rgba(38, 40, 37, 0) 95%)",
+            // background: "linear-gradient(to bottom, rgba(38, 40, 37, 1) 40%, rgba(38, 40, 37, 0) 95%)",
             width: "100%",
-            height: "100px",
+            height: "30px",
             marginTop: "5px",
             display: "flex",
             alignItems: "baseline",
@@ -395,6 +395,63 @@ function OnlyChat() {
             </span>
           </div>
         </div>
+        <Box sx={{ marginTop: '40px', display: "flex", alignItems: "baseline", gap: 1, background: 'rgba(240, 240, 241, 0.1)', padding: '10px 10px 10px 20px', borderRadius: "4px", width: 'fit-content' }}>
+          <Box
+            sx={{
+              color: "#fff",
+              fontWeight: 600,
+              fontSize: "13.5px",
+              textTransform: "capitalize",
+              textWrap: "nowrap",
+              display: "flex",
+              alignItems: "center",
+              gap: "0 5px",
+
+
+            }}
+          >
+            <Box
+              sx={{
+                width: 30,
+                height: 30,
+                borderRadius: "50%",
+                backgroundColor: "red",
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: "500",
+                fontSize: "1rem",
+                textTransform: "uppercase",
+              }}
+            >
+              T
+            </Box>
+            {/* {name} */}
+            TVC News{" "}
+            <VerifiedIcon
+              sx={{
+                fontSize: "12px",
+                color: "#6FCF97",
+                marginLeft: "5px",
+                color: "#43A2F2",
+              }}
+            />
+          </Box>
+          <Box
+            sx={{
+              fontSize: "13.5px",
+              pl: "2px",
+              pr: "15px",
+              lineHeight: "20px",
+              fontWeight: "400",
+              textTransform: "capitalize",
+            }}
+          >
+            {/* item?.message */}🔴 LIVE: TVC News – Breaking Updates &
+            Discussion
+          </Box>
+        </Box>
         <Box
           ref={scrollableContainerRef}
           sx={{
@@ -402,7 +459,7 @@ function OnlyChat() {
             flexDirection: "column-reverse",
             overflowY: "auto",
             mt: "auto",
-            p: "55px 10px 10px",
+            p: "5px 10px 10px",
             scrollBehavior: "smooth",
           }}
           className="message-container"
@@ -432,84 +489,7 @@ function OnlyChat() {
                 }}
               >
                 {/* For channel Heading */}
-                  <Box
-                  style={{
-                    width: "fit-content",
-                    display: "flex",
-                    flexDirection: item?.type === "text" ? "row" : "column", // ← key line
-                    alignItems: item?.type === "text" ? "baseline" : "flex-start", // for better vertical alignment
-                    gap: "5px", // optional spacing
-                    background: 'rgba(240, 240, 241, 0.1)',
-                    padding: "10px",
-                    borderRadius: "4px",
 
-              }}
-            >
-              
-              {/* Top row: Avatar + Username */}
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                {avatarUrl ? (
-                  <Box
-                    component="img"
-                    src={avatarUrl}
-                    alt={name}
-                    sx={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: "50%",
-                      objectFit: "cover",
-                    }}
-                  />
-                ) : (
-                  <Box
-                    sx={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: "50%",
-                      backgroundColor: 'red',
-                      color: "white",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontWeight: "500",
-                      fontSize: "1rem",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    T
-                  </Box>
-                )}
-                <Box
-                  sx={{
-                    color: '#fff',
-                    fontWeight: 600,
-                    fontSize: "13.5px",
-                    textTransform:"capitalize",
-                    textWrap: 'nowrap'
-                  }}
-                >
-                  {/* {name} */}
-                  TVC News <VerifiedIcon sx={{ fontSize: "12px", color: "#6FCF97", marginLeft: "5px", color: '#43A2F2' }} />
-                </Box>
-              </Box>
-              
-              {/* Message or Giphy */}
-              {item?.type === "text" ? (
-                <Box sx={{ fontSize: "13.5px", pl: "2px",pr:'15px', lineHeight: '20px', fontWeight:'400', textTransform:"capitalize" }}>{/* item?.message */}🔴 LIVE: TVC News – Breaking Updates & Discussion</Box>
-              ) : (
-                <Box style={{ width: "100%", display: "flex", justifyContent: "center" }}>
-                  <img
-                    src={
-                      "https://media.giphy.com/media/" +
-                      (item.giphy && item.giphy.id) +
-                      "/giphy.gif"
-                    }
-                    width={250}
-                    style={{ borderRadius: "8px" }}
-                  />
-                </Box>
-  )}
-                </Box>
                 {/* for channle heading end */}
                 <Box
                   style={{
@@ -518,7 +498,7 @@ function OnlyChat() {
                     flexDirection: item?.type === "text" ? "row" : "column", // ← key line
                     alignItems: item?.type === "text" ? "center" : "flex-start", // for better vertical alignment
                     gap: "5px", // optional spacing
-                     padding: "5px 0px 5px 10px",
+                    padding: "5px 0px 5px 10px",
                   }}
                 >
                   {/* Top row: Avatar + Username */}
@@ -600,13 +580,13 @@ function OnlyChat() {
             alignItems: "center",
             justifyContent: "space-between",
             padding: "1rem 10px",
-            backgroundColor: "#0b0c2a",
+            // backgroundColor: "#0b0c2a",
             borderTop: "1px solid rgba(255, 255, 255, 0.1)",
             position: "fixed",
             bottom: 0,
             right: 0,
             width: "100%",
-            opacity: 0.95,
+            opacity: 1,
           }}
           className="send-message-input editor"
         >

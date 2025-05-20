@@ -47,34 +47,34 @@ function Immersive() {
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
-   // Aimal code start
-   const [connectedUsersCount, setConnectedUsersCount] = useState(null);
-   useEffect(() => {
-     socket.on("viewer", (data) => {
-       console.log("Viewer event received:", data);
-   
-       // If data is an array like [{ viewers: 3 }]
-       if (Array.isArray(data) && data[0]?.viewers !== undefined) {
-         setConnectedUsersCount(data[0].viewers);
-       }
-   
-       // If data is just { viewers: 3 }
-       else if (data?.viewers !== undefined) {
-         setConnectedUsersCount(data.viewers);
-       }
-     });
-   
-     return () => {
-       socket.off("viewer");
-     };
-   }, []);
-   useEffect(() => {
-     socket.on('disconnect', () => {
-       console.log('Disconnected');
-       
-   })
-   }, []);
-   // Aimal code end
+  // Aimal code start
+  const [connectedUsersCount, setConnectedUsersCount] = useState(null);
+  useEffect(() => {
+    socket.on("viewer", (data) => {
+      console.log("Viewer event received:", data);
+
+      // If data is an array like [{ viewers: 3 }]
+      if (Array.isArray(data) && data[0]?.viewers !== undefined) {
+        setConnectedUsersCount(data[0].viewers);
+      }
+
+      // If data is just { viewers: 3 }
+      else if (data?.viewers !== undefined) {
+        setConnectedUsersCount(data.viewers);
+      }
+    });
+
+    return () => {
+      socket.off("viewer");
+    };
+  }, []);
+  useEffect(() => {
+    socket.on('disconnect', () => {
+      console.log('Disconnected');
+
+    })
+  }, []);
+  // Aimal code end
   useEffect(() => {
     socket.on("connect", () => {
       console.log("[Client] Connected:", socket.id);
@@ -371,8 +371,8 @@ function Immersive() {
 
   return (
     <Box className="stream-impressive">
-      <div className="gradient-bg" style={{height: '100% !important'}}></div>
-      <RadioPlayer url={TestVideo} width="100%"/>
+      <div className="gradient-bg" style={{ height: '100% !important' }}></div>
+      <RadioPlayer url={TestVideo} width="100%" />
       <Box
         className="main-chat immersive_chat"
         sx={{
@@ -413,7 +413,7 @@ function Immersive() {
               </div>
             </div>
           </div> */}
-        
+
           {/* <hr className="hr" /> */}
           <Box
             className="main-chat scanQR"
@@ -429,32 +429,89 @@ function Immersive() {
               width: "95%",
             }}
           >
-              <div
-          style={{
-            // position: "fixed",
-            marginTop:"-10px",
-            
-            // background: "linear-gradient(to bottom, rgba(38, 40, 37, 1) 2%, rgba(38, 40, 37, 0) 95%)",
-            width: "auto",
-            height: "100px",
-            display: "flex",
-            alignItems: "baseline",
-            gap: "0px",
-            padding: "5px",
-            justifyContent: "space-around",
-          }}
-        >
-          <button className="static-chat-button">
-            <ChatBubble /> Chat
-          </button>
-          <div className="connected-users-count" style={{ display: "flex", alignItems: "center",gap:"5px" }}>
-            {/* <SupervisorAccountIcon size="large"/> */}
-            <img src={UserIcon} alt="Bolt Logo" style={{ width: "20px", height: "20px" }} />
-              <span style={{ color: "white",fontSize:"12px" }}>
-                 {connectedUsersCount}
-              </span>
-            </div>
+            <div
+              style={{
+                // position: "fixed",
+                marginTop: "-10px",
+
+                // background: "linear-gradient(to bottom, rgba(38, 40, 37, 1) 2%, rgba(38, 40, 37, 0) 95%)",
+                width: "auto",
+                height: "100px",
+                display: "flex",
+                alignItems: "baseline",
+                gap: "0px",
+                padding: "5px",
+                justifyContent: "space-around",
+              }}
+            >
+              <button className="static-chat-button">
+                <ChatBubble /> Chat
+              </button>
+              <div className="connected-users-count" style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                {/* <SupervisorAccountIcon size="large"/> */}
+                <img src={UserIcon} alt="Bolt Logo" style={{ width: "20px", height: "20px" }} />
+                <span style={{ color: "white", fontSize: "12px" }}>
+                  {connectedUsersCount}
+                </span>
               </div>
+            </div>
+            <Box sx={{ display: "flex", alignItems: "baseline", gap: 1, background: 'rgba(240, 240, 241, 0.1)', padding: '5px 0 5px 10px', borderRadius: "4px" }}>
+              <Box
+                sx={{
+                  color: "#fff",
+                  fontWeight: 600,
+                  fontSize: "13.5px",
+                  textTransform: "capitalize",
+                  textWrap: "nowrap",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0 5px",
+
+
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: "50%",
+                    backgroundColor: "red",
+                    color: "white",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontWeight: "500",
+                    fontSize: "1rem",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  T
+                </Box>
+                {/* {name} */}
+                TVC News{" "}
+                <VerifiedIcon
+                  sx={{
+                    fontSize: "12px",
+                    color: "#6FCF97",
+                    marginLeft: "5px",
+                    color: "#43A2F2",
+                  }}
+                />
+              </Box>
+              <Box
+                sx={{
+                  fontSize: "13.5px",
+                  pl: "2px",
+                  pr: "5px",
+                  lineHeight: "20px",
+                  fontWeight: "400",
+                  textTransform: "capitalize",
+                }}
+              >
+                {/* item?.message */}🔴 LIVE: TVC News – Breaking Updates &
+                Discussion
+              </Box>
+            </Box>
             <Box
               ref={scrollableContainerRef}
               sx={{
@@ -472,9 +529,9 @@ function Immersive() {
                 const avatarUrl = item?.sender?.photoUrl;
                 const initial = getInitial(name);
                 const isFirstMessage = index === 0;
-                 const nameColors = ["#6FCF97", "#219653", "#F2C94C","#F2994A","#F0F0F1","#EB5757"];
-            // Pick a random color for each message render
-             const randomColor = nameColors[Math.floor(Math.random() * nameColors.length)];
+                const nameColors = ["#6FCF97", "#219653", "#F2C94C", "#F2994A", "#F0F0F1", "#EB5757"];
+                // Pick a random color for each message render
+                const randomColor = nameColors[Math.floor(Math.random() * nameColors.length)];
 
                 return (
                   <Box
@@ -491,160 +548,80 @@ function Immersive() {
                       marginBottom: "7px",
                     }}
                   >
-                    {/* For channel Heading */}
-                  <Box
-                  style={{
-                    width: "auto",
-                    display: "flex",
-                    flexDirection: item?.type === "text" ? "row" : "column", // ← key line
-                    alignItems: item?.type === "text" ? "baseline" : "flex-start", // for better vertical alignment
-                    gap: "5px", // optional spacing
-                    background: 'rgba(240, 240, 241, 0.1)',
-                    padding: "10px 0 5px 10px",
-                    borderRadius: "4px",
+                    <Box
+                      style={{
+                        width: "99%",
+                        display: "flex",
+                        flexDirection: item?.type === "text" ? "row" : "column", // ← key line
+                        alignItems: item?.type === "text" ? "baseline" : "flex-start", // for better vertical alignment
+                        gap: "5px", // optional spacing
+                        padding: "5px 10px 5px 10px",
+                      }}
+                    >
 
-              }}
-            >
-              
-              {/* Top row: Avatar + Username */}
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                {avatarUrl ? (
-                  <Box
-                    component="img"
-                    src={avatarUrl}
-                    alt={name}
-                    sx={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: "50%",
-                      objectFit: "cover",
-                    }}
-                  />
-                ) : (
-                  <Box
-                    sx={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: "50%",
-                      backgroundColor: 'red',
-                      color: "white",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontWeight: "500",
-                      fontSize: "1rem",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    T
-                  </Box>
-                )}
-                <Box
-                  sx={{
-                    color: '#fff',
-                    fontWeight: 600,
-                    fontSize: "13.5px",
-                    textTransform:"capitalize",
-                    textWrap: 'nowrap'
-                  }}
-                >
-                  {/* {name} */}
-                  TVC News <VerifiedIcon sx={{ fontSize: "12px", color: "#6FCF97", marginLeft: "5px", color: '#43A2F2' }} />
-                </Box>
-              </Box>
-              
-              {/* Message or Giphy */}
-              {item?.type === "text" ? (
-                <Box sx={{ fontSize: "13.5px", pl: "2px",pr:'9px', lineHeight: '20px', fontWeight:'400', textTransform:"capitalize" }}>{/* item?.message */}🔴 LIVE: TVC News – Breaking Updates & Discussion</Box>
-              ) : (
-                <Box style={{ width: "100%", display: "flex", justifyContent: "center" }}>
-                  <img
-                    src={
-                      "https://media.giphy.com/media/" +
-                      (item.giphy && item.giphy.id) +
-                      "/giphy.gif"
-                    }
-                    width={250}
-                    style={{ borderRadius: "8px" }}
-                  />
-                </Box>
-  )}
-                </Box>
-                {/* for channle heading end */}
-                     <Box
-                                      style={{
-                                        width: "99%",
-                                        display: "flex",
-                                        flexDirection: item?.type === "text" ? "row" : "column", // ← key line
-                                        alignItems: item?.type === "text" ? "baseline" : "flex-start", // for better vertical alignment
-                                        gap: "5px", // optional spacing
-                                         padding: "5px 10px 5px 10px",
-                                  }}
-                                >
-                                  
-                                  {/* Top row: Avatar + Username */}
-                                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                    {avatarUrl ? (
-                                      <Box
-                                        component="img"
-                                        src={avatarUrl}
-                                        alt={name}
-                                        sx={{
-                                          width: 30,
-                                          height: 30,
-                                          borderRadius: "50%",
-                                          objectFit: "cover",
-                                        }}
-                                      />
-                                    ) : (
-                                      <Box
-                                        sx={{
-                                          width: 30,
-                                          height: 30,
-                                          borderRadius: "50%",
-                                          backgroundColor: getColorFromName(randomColor),
-                                          color: "white",
-                                          display: "flex",
-                                          alignItems: "center",
-                                          justifyContent: "center",
-                                          fontWeight: "500",
-                                          fontSize: "1rem",
-                                          textTransform: "uppercase",
-                                        }}
-                                      >
-                                        {initial}
-                                      </Box>
-                                    )}
-                                    <Box
-                                      sx={{
-                                        color: randomColor,
-                                        fontWeight: 600,
-                                        fontSize: "13.5px",
-                                        textTransform:"capitalize"
-                                      }}
-                                    >
-                                      {name}
-                                    </Box>
-                                  </Box>
-                                  
-                                  {/* Message or Giphy */}
-                                  {item?.type === "text" ? (
-                                    <Box sx={{ fontSize: "13.5px", pl: "2px",pr: '1.5px', lineHeight: '20px', fontWeight:'400', textTransform:"capitalize" }}>{item?.message}</Box>
-                                  ) : (
-                                    <Box style={{ width: "100%", display: "flex", justifyContent: "center" }}>
-                                      <img
-                                        src={
-                                          "https://media.giphy.com/media/" +
-                                          (item.giphy && item.giphy.id) +
-                                          "/giphy.gif"
-                                        }
-                                        width={250}
-                                        style={{ borderRadius: "8px" }}
-                                      />
-                                    </Box>
+                      {/* Top row: Avatar + Username */}
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        {avatarUrl ? (
+                          <Box
+                            component="img"
+                            src={avatarUrl}
+                            alt={name}
+                            sx={{
+                              width: 30,
+                              height: 30,
+                              borderRadius: "50%",
+                              objectFit: "cover",
+                            }}
+                          />
+                        ) : (
+                          <Box
+                            sx={{
+                              width: 30,
+                              height: 30,
+                              borderRadius: "50%",
+                              backgroundColor: getColorFromName(randomColor),
+                              color: "white",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontWeight: "500",
+                              fontSize: "1rem",
+                              textTransform: "uppercase",
+                            }}
+                          >
+                            {initial}
+                          </Box>
+                        )}
+                        <Box
+                          sx={{
+                            color: randomColor,
+                            fontWeight: 600,
+                            fontSize: "13.5px",
+                            textTransform: "capitalize"
+                          }}
+                        >
+                          {name}
+                        </Box>
+                      </Box>
+
+                      {/* Message or Giphy */}
+                      {item?.type === "text" ? (
+                        <Box sx={{ fontSize: "13.5px", pl: "2px", pr: '1.5px', lineHeight: '20px', fontWeight: '400', textTransform: "capitalize" }}>{item?.message}</Box>
+                      ) : (
+                        <Box style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+                          <img
+                            src={
+                              "https://media.giphy.com/media/" +
+                              (item.giphy && item.giphy.id) +
+                              "/giphy.gif"
+                            }
+                            width={250}
+                            style={{ borderRadius: "8px" }}
+                          />
+                        </Box>
                       )}
-                                    </Box>
-                    
+                    </Box>
+
                     {/* Optional Ad */}
                     {/* {renderChatAd(index)} */}
                   </Box>
@@ -653,7 +630,7 @@ function Immersive() {
 
               <div ref={messagesEndRef} />
             </Box>
-            <Box className="qr-code-wrapper" style={{background: "#333333",width: "89%",margin: '0'}}>
+            <Box className="qr-code-wrapper" style={{ background: "#333333", width: "89%", margin: '0' }}>
               <QrCode />
             </Box>
           </Box>

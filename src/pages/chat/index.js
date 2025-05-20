@@ -1,22 +1,18 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import { io } from "socket.io-client";
-import {
-  ContentState,
-  convertToRaw,
-  EditorState,
-} from "draft-js";
+import { ContentState, convertToRaw, EditorState } from "draft-js";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import Editor  from "@draft-js-plugins/editor";
+import Editor from "@draft-js-plugins/editor";
 import createEmojiPlugin, { defaultTheme } from "@draft-js-plugins/emoji";
 import { ChatBubble } from "@mui/icons-material";
 import { GiphyModal } from "../../Components/GiphyModal";
 // import RadioPlayer from "../Immersive/Component/RadioPlayer";
 import RadioPlayer from "./RadioPlayer";
-import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
+import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 import QrCode from "../../Components/QrCode";
-import UserIcon from "../../assets/user-icon.png"
-import VerifiedIcon from '@mui/icons-material/Verified';
+import UserIcon from "../../assets/user-icon.png";
+import VerifiedIcon from "@mui/icons-material/Verified";
 const socket = io("https://api.staging-new.boltplus.tv", {
   path: "/public-socket/",
   transports: ["websocket"], // optionally add 'polling' if needed
@@ -42,35 +38,34 @@ function Chat() {
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
-// Aimal code Start
-const [connectedUsersCount, setConnectedUsersCount] = useState(null);
+  // Aimal code Start
+  const [connectedUsersCount, setConnectedUsersCount] = useState(null);
 
-useEffect(() => {
-  socket.on("viewer", (data) => {
-    console.log("Viewer event received:", data);
+  useEffect(() => {
+    socket.on("viewer", (data) => {
+      console.log("Viewer event received:", data);
 
-    // If data is an array like [{ viewers: 3 }]
-    if (Array.isArray(data) && data[0]?.viewers !== undefined) {
-      setConnectedUsersCount(data[0].viewers);
-    }
+      // If data is an array like [{ viewers: 3 }]
+      if (Array.isArray(data) && data[0]?.viewers !== undefined) {
+        setConnectedUsersCount(data[0].viewers);
+      }
 
-    // If data is just { viewers: 3 }
-    else if (data?.viewers !== undefined) {
-      setConnectedUsersCount(data.viewers);
-    }
-  });
+      // If data is just { viewers: 3 }
+      else if (data?.viewers !== undefined) {
+        setConnectedUsersCount(data.viewers);
+      }
+    });
 
-  return () => {
-    socket.off("viewer");
-  };
-}, []);
-useEffect(() => {
-  socket.on('disconnect', () => {
-    console.log('Disconnected');
-})
-}, []);
-// Aimal code end
-
+    return () => {
+      socket.off("viewer");
+    };
+  }, []);
+  useEffect(() => {
+    socket.on("disconnect", () => {
+      console.log("Disconnected");
+    });
+  }, []);
+  // Aimal code end
 
   useEffect(() => {
     socket.on("connect", () => {
@@ -183,7 +178,7 @@ useEffect(() => {
         // console.log('senders', senders);
         // const uniqueSenders = [...new Set(senders)];
         // console.log('uniqueSenders', uniqueSenders);
-        
+
         setMessages(data);
       } catch (error) {
         console.error("Error during fetch:", error);
@@ -235,7 +230,8 @@ useEffect(() => {
     }
     return null;
   };
-  const TestVideo = "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8";
+  const TestVideo =
+    "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8";
 
   const [username, setUsername] = useState(
     localStorage.getItem("userName") || ""
@@ -357,7 +353,7 @@ useEffect(() => {
 
   return (
     <Box className="chat-ui">
-      <div className="gradient-bg" style={{height: '100%'}}></div>
+      <div className="gradient-bg" style={{ height: "100%" }}></div>
       <RadioPlayer />
       <Box
         className="main-chat"
@@ -365,9 +361,9 @@ useEffect(() => {
           display: "flex",
           flexDirection: "column",
           flex: 1,
-          pt:2,
-          pb:2,
-          pl:0,
+          pt: 2,
+          pb: 2,
+          pl: 0,
           color: "white",
           opacity: 1,
           position: "",
@@ -378,7 +374,7 @@ useEffect(() => {
             // background: "linear-gradient(to bottom, rgba(38, 40, 37, 1) 7%, rgba(38, 40, 37, 0) 95%)",
             // backgroundColor: "red",.
             width: "auto",
-            marginTop:"-10px",
+            marginTop: "-10px",
             display: "flex",
             alignItems: "center",
             gap: "20px",
@@ -390,14 +386,78 @@ useEffect(() => {
           <button className="static-chat-button">
             <ChatBubble /> Chat
           </button>
-            <div className="connected-users-count" style={{ display: "flex", alignItems: "center",gap:"5px" }}>
+          <div
+            className="connected-users-count"
+            style={{ display: "flex", alignItems: "center", gap: "5px" }}
+          >
             {/* <SupervisorAccountIcon size="large"/> */}
-            <img src={UserIcon} alt="Bolt Logo" style={{ width: "20px", height: "20px" }} />
-              <span style={{ color: "white",fontSize:"12px" }}>
-                 {connectedUsersCount}
-              </span>
-            </div>
+            <img
+              src={UserIcon}
+              alt="Bolt Logo"
+              style={{ width: "20px", height: "20px" }}
+            />
+            <span style={{ color: "white", fontSize: "12px" }}>
+              {connectedUsersCount}
+            </span>
+          </div>
         </div>
+        <Box sx={{ display: "flex", alignItems: "baseline", gap: 1, background: 'rgba(240, 240, 241, 0.1)', padding: '5px 0 5px 19px', borderRadius: "4px" }}>
+          <Box
+            sx={{
+              color: "#fff",
+              fontWeight: 600,
+              fontSize: "13.5px",
+              textTransform: "capitalize",
+              textWrap: "nowrap",
+              display: "flex",
+              alignItems: "center",
+              gap: "0 5px",
+
+
+            }}
+          >
+            <Box
+              sx={{
+                width: 30,
+                height: 30,
+                borderRadius: "50%",
+                backgroundColor: "red",
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: "500",
+                fontSize: "1rem",
+                textTransform: "uppercase",
+              }}
+            >
+              T
+            </Box>
+            {/* {name} */}
+            TVC News{" "}
+            <VerifiedIcon
+              sx={{
+                fontSize: "12px",
+                color: "#6FCF97",
+                marginLeft: "5px",
+                color: "#43A2F2",
+              }}
+            />
+          </Box>
+          <Box
+            sx={{
+              fontSize: "13.5px",
+              pl: "2px",
+              pr: "5px",
+              lineHeight: "20px",
+              fontWeight: "400",
+              textTransform: "capitalize",
+            }}
+          >
+            {/* item?.message */}🔴 LIVE: TVC News – Breaking Updates &
+            Discussion
+          </Box>
+        </Box>
         <Box
           ref={scrollableContainerRef}
           sx={{
@@ -407,7 +467,7 @@ useEffect(() => {
             mt: "auto",
             p: "0px 10px 15px",
             scrollBehavior: "smooth",
-            gap: '7px 0'
+            gap: "7px 0",
           }}
           className="message-container"
         >
@@ -416,9 +476,17 @@ useEffect(() => {
             const avatarUrl = item?.sender?.photoUrl;
             const initial = getInitial(name);
             const isFirstMessage = index === 0;
-            const nameColors = ["#6FCF97", "#219653", "#F2C94C","#F2994A","#F0F0F1","#EB5757"];
+            const nameColors = [
+              "#6FCF97",
+              "#219653",
+              "#F2C94C",
+              "#F2994A",
+              "#F0F0F1",
+              "#EB5757",
+            ];
             // Pick a random color for each message render
-             const randomColor = nameColors[Math.floor(Math.random() * nameColors.length)];
+            const randomColor =
+              nameColors[Math.floor(Math.random() * nameColors.length)];
             return (
               <Box
                 className="message"
@@ -427,7 +495,7 @@ useEffect(() => {
                 sx={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: '10px 0',
+                  gap: "10px 0",
                   mb: 1,
                 }}
                 style={{
@@ -435,157 +503,97 @@ useEffect(() => {
                 }}
               >
                 {/* For channel Heading */}
-                  <Box
-                  style={{
-                    width: "99%",
-                    display: "flex",
-                    flexDirection: item?.type === "text" ? "row" : "column", // ← key line
-                    alignItems: item?.type === "text" ? "baseline" : "flex-start", // for better vertical alignment
-                    gap: "5px", // optional spacing
-                    background: 'rgba(240, 240, 241, 0.1)',
-                    padding: "5px 0px 5px 10px",
-                    borderRadius: "4px",
 
-              }}
-            >
-              
-              {/* Top row: Avatar + Username */}
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                {avatarUrl ? (
-                  <Box
-                    component="img"
-                    src={avatarUrl}
-                    alt={name}
-                    sx={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: "50%",
-                      objectFit: "cover",
-                    }}
-                  />
-                ) : (
-                  <Box
-                    sx={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: "50%",
-                      backgroundColor: 'red',
-                      color: "white",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontWeight: "500",
-                      fontSize: "1rem",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    T
-                  </Box>
-                )}
-                <Box
-                  sx={{
-                    color: '#fff',
-                    fontWeight: 600,
-                    fontSize: "13.5px",
-                    textTransform:"capitalize",
-                    textWrap: 'nowrap'
-                  }}
-                >
-                  {/* {name} */}
-                  TVC News <VerifiedIcon sx={{ fontSize: "12px", color: "#6FCF97", marginLeft: "5px", color: '#43A2F2' }} />
-                </Box>
-              </Box>
-              
-              {/* Message or Giphy */}
-              {item?.type === "text" ? (
-                <Box sx={{ fontSize: "13.5px", pl: "2px",pr:'15px', lineHeight: '20px', fontWeight:'400', textTransform:"capitalize" }}>{/* item?.message */}🔴 LIVE: TVC News – Breaking Updates & Discussion</Box>
-              ) : (
-                <Box style={{ width: "100%", display: "flex", justifyContent: "center" }}>
-                  <img
-                    src={
-                      "https://media.giphy.com/media/" +
-                      (item.giphy && item.giphy.id) +
-                      "/giphy.gif"
-                    }
-                    width={250}
-                    style={{ borderRadius: "8px" }}
-                  />
-                </Box>
-  )}
-                </Box>
                 {/* for channle heading end */}
                 <Box
                   style={{
                     width: "99%",
                     display: "flex",
                     flexDirection: item?.type === "text" ? "row" : "column", // ← key line
-                    alignItems: item?.type === "text" ? "baseline" : "flex-start", // for better vertical alignment
+                    alignItems:
+                      item?.type === "text" ? "baseline" : "flex-start", // for better vertical alignment
                     gap: "5px", // optional spacing
-                     padding: "5px 10px 5px 10px",
-              }}
-            >
-              
-              {/* Top row: Avatar + Username */}
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                {avatarUrl ? (
-                  <Box
-                    component="img"
-                    src={avatarUrl}
-                    alt={name}
-                    sx={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: "50%",
-                      objectFit: "cover",
-                    }}
-                  />
-                ) : (
-                  <Box
-                    sx={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: "50%",
-                      backgroundColor: getColorFromName(randomColor),
-                      color: "white",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontWeight: "500",
-                      fontSize: "1rem",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {initial}
-                  </Box>
-                )}
-                <Box
-                  sx={{
-                    color: randomColor,
-                    fontWeight: 600,
-                    fontSize: "13.5px",
-                    textTransform:"capitalize"
+                    padding: "5px 10px 5px 10px",
                   }}
                 >
-                  {name}
-                </Box>
-              </Box>
-              
-              {/* Message or Giphy */}
-              {item?.type === "text" ? (
-                <Box sx={{ fontSize: "13.5px", pl: "2px",pr: '1.5px', lineHeight: '20px', fontWeight:'400', textTransform:"capitalize" }}>{item?.message}</Box>
-              ) : (
-                <Box style={{ width: "100%", display: "flex", justifyContent: "center" }}>
-                  <img
-                    src={
-                      "https://media.giphy.com/media/" +
-                      (item.giphy && item.giphy.id) +
-                      "/giphy.gif"
-                    }
-                    width={250}
-                    style={{ borderRadius: "8px" }}
-                  />
-                </Box>
-  )}
+                  {/* Top row: Avatar + Username */}
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    {avatarUrl ? (
+                      <Box
+                        component="img"
+                        src={avatarUrl}
+                        alt={name}
+                        sx={{
+                          width: 30,
+                          height: 30,
+                          borderRadius: "50%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    ) : (
+                      <Box
+                        sx={{
+                          width: 30,
+                          height: 30,
+                          borderRadius: "50%",
+                          backgroundColor: getColorFromName(randomColor),
+                          color: "white",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontWeight: "500",
+                          fontSize: "1rem",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {initial}
+                      </Box>
+                    )}
+                    <Box
+                      sx={{
+                        color: randomColor,
+                        fontWeight: 600,
+                        fontSize: "13.5px",
+                        textTransform: "capitalize",
+                      }}
+                    >
+                      {name}
+                    </Box>
+                  </Box>
+
+                  {/* Message or Giphy */}
+                  {item?.type === "text" ? (
+                    <Box
+                      sx={{
+                        fontSize: "13.5px",
+                        pl: "2px",
+                        pr: "1.5px",
+                        lineHeight: "20px",
+                        fontWeight: "400",
+                        textTransform: "capitalize",
+                      }}
+                    >
+                      {item?.message}
+                    </Box>
+                  ) : (
+                    <Box
+                      style={{
+                        width: "100%",
+                        display: "flex",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <img
+                        src={
+                          "https://media.giphy.com/media/" +
+                          (item.giphy && item.giphy.id) +
+                          "/giphy.gif"
+                        }
+                        width={250}
+                        style={{ borderRadius: "8px" }}
+                      />
+                    </Box>
+                  )}
                 </Box>
 
                 {/* Optional Ad */}
@@ -682,11 +690,11 @@ useEffect(() => {
           gap: 2,
         }}
       >
-               
+
         <Typography variant="h6" sx={{ color: "white" }}>
           Set Username
         </Typography>
-               
+
         <TextField
           label="Username"
           variant="outlined"
@@ -706,14 +714,16 @@ useEffect(() => {
             },
           }}
         />
-               
+
         <Button variant="contained" onClick={handleSaveUsername}>
           Save
         </Button>
       </Box>
 
       {!isSettingUsername && username && (
-        <Box sx={{ position: "fixed", top: 10, right: 10, zIndex: 99999999999 }}>
+        <Box
+          sx={{ position: "fixed", top: 10, right: 10, zIndex: 99999999999 }}
+        >
           <Button variant="outlined" onClick={() => setIsSettingUsername(true)}>
             Edit Username
           </Button>
