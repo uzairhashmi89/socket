@@ -351,7 +351,7 @@ function OnlyChat() {
   const [showGiphyModal, setShowGiphyModal] = useState(false);
 
   return (
-    <Box className="chat-ui">
+    <Box className="chat-ui" sx={{ backgroundColor: "#333333" }}>
       <div className="gradient-bg"></div>
       <Box
         className="main-chat"
@@ -365,8 +365,14 @@ function OnlyChat() {
           opacity: 1,
           position: "",
           width: "auto",
-          height: '88vh !important',
+          height: {
+            lg: "88vh !important",
+            md: "88vh !important",
+            sm: "97vh !important",
+            xs: "100vh !important",
+          },
         }}
+        s
       >
         <div
           style={{
@@ -395,7 +401,7 @@ function OnlyChat() {
             </span>
           </div>
         </div>
-        <Box sx={{ marginTop: '40px', display: "flex", alignItems: "baseline", gap: 1, background: 'rgba(240, 240, 241, 0.1)', padding: '10px 10px 10px 20px', borderRadius: "4px", width: 'fit-content' }}>
+        <Box sx={{ marginTop: {lg: '40px',md: '40px',sm:'70px',xs: '70px'}, display: "flex", alignItems: "baseline", gap: 1, background: 'rgba(240, 240, 241, 0.1)', padding: '10px 10px 10px 20px', borderRadius: "4px", width: 'fit-content' }}>
           <Box
             sx={{
               color: "#fff",
@@ -571,7 +577,7 @@ function OnlyChat() {
 
           <div ref={messagesEndRef} />
         </Box>
-        <Box className="qr-code-wrapper" style={{ background: "#F0F0F11A", width: "30%", marginLeft: '0', marginRight: '0', marginBottom: '30px' }}>
+        <Box className="qr-code-wrapper" sx={{width:{lg: '30%',md: '30%',sm: '50%',xs: '84.2%'},marginLeft:{lg: 0,md:0,sm: '10px !important',xs: '10px !important'},marginBottom:{lg:'30px',md: '50px',sm:'80px',xs:'80px'}}} style={{ background: "#F0F0F11A", marginLeft: '0', marginRight: '0' }}>
           <QrCode />
         </Box>
         <Box

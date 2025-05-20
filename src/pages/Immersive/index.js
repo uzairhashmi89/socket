@@ -386,14 +386,19 @@ function Immersive() {
           position: "absolute",
           right: "0",
           bottom: "0",
-          height: '100vh',
+          height: {
+            lg: '100vh',
+            md: '100vh',
+            sm: 'auto',
+            xs: 'auto'
+          },
           // borderLeft: "1px solid gray",
         }}
       >
-        <div
+        <Box
           // style={{ background: "rgb(18 16 49 / 50%)" }}
           className="stream-impressive font-poppins flex-1 flex flex-col w-[100%] overflow-auto no-scrollbar mt-6"
-        >
+        sx={{height: { xs: '100vh', md: '100vh',sm:'auto',xs:'auto' }}}>
           {/* <div className="self-center">
             <div className=" mt-[18px] mb-[34px] flex flex-col items-center space-y-[33px]">
               <p className="show-qr font-medium text-2xl leading-[30px] text-white-85 text-center">
@@ -630,11 +635,11 @@ function Immersive() {
 
               <div ref={messagesEndRef} />
             </Box>
-            <Box className="qr-code-wrapper" style={{ background: "#333333", width: "89%", margin: '0' }}>
+            <Box className="qr-code-wrapper" style={{ background: "#333333", width: "89%", margin: '0' }} sx={{marginBottom:{xs: "0px", md: "0px"}}}>
               <QrCode />
             </Box>
           </Box>
-        </div>
+        </Box>
       </Box>
     </Box>
   );
