@@ -366,10 +366,10 @@ function OnlyChat() {
           position: "",
           width: "auto",
           height: {
-            lg: "88dvh !important",
-            md: "88dvh !important",
-            sm: "97dvh !important",
-            xs: "100dvh !important",
+           lg: "95.4dvh !important",
+            md: "95.4dvh !important",
+            sm: "100% !important",
+            xs: "100% !important",
           },
         }}
       >
@@ -378,7 +378,7 @@ function OnlyChat() {
             position: "fixed",
             top: 0,
             left: 0,
-            // background: "linear-gradient(to bottom, rgba(38, 40, 37, 1) 40%, rgba(38, 40, 37, 0) 95%)",
+            backgroundColor: "#333333",
             width: "100%",
             height: "30px",
             marginTop: "5px",
