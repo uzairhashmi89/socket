@@ -353,7 +353,7 @@ function LiveChatImmersive() {
   return (
     <Box className="chat-ui" sx={{ backgroundColor: "#333333" }}>
       <div className="gradient-bg"></div>
-      <Box
+       <Box
         className="main-chat"
         sx={{
           display: "flex",
@@ -366,27 +366,39 @@ function LiveChatImmersive() {
           position: "",
           width: "auto",
           height: {
-            lg: "95.4dvh !important",
-            md: "95.4dvh !important",
+            lg: "96dvh !important",
+            md: "98dvh !important",
             sm: "100% !important",
             xs: "100% !important",
           },
         }}
       >
-        <div
+        <Box
           style={{
             position: "fixed",
             top: 0,
             left: 0,
-            background: "#333333",
+            background: "#333",
             width: "100%",
-            height: "30px",
-            marginTop: "5px",
             display: "flex",
             alignItems: "baseline",
             gap: "20px",
             padding: "5px",
             justifyContent: "space-around",
+          }}
+          sx={{
+            marginTop:{
+              lg:'5px',
+              md:'5px',
+              sm:'0px',
+              xs:'0px',
+            },
+            height:{
+              lg: "30px",
+              md: "30px",
+              sm: "50px",
+              xs: "50px",
+            }
           }}
         >
           <button className="static-chat-button">
@@ -399,8 +411,8 @@ function LiveChatImmersive() {
               {connectedUsersCount}
             </span>
           </div>
-        </div>
-        <Box sx={{ marginTop: {lg: '40px',md: '40px',sm:'70px',xs: '70px'}, display: "flex", alignItems: "baseline", gap: 1, background: 'rgba(240, 240, 241, 0.1)', padding: '10px 10px 10px 20px', borderRadius: "4px", width: 'fit-content' }}>
+        </Box>
+        <Box sx={{ marginTop: {lg: '40px',md: '40px',sm:'58px',xs: '58px'}, display: "flex", alignItems: "baseline", gap: 1, background: {lg:'rgba(240, 240, 241, 0.1)',md:'rgba(240, 240, 241, 0.1)',sm:'#333',xs:'#333'}, padding: '10px 10px 10px 20px', borderRadius: "4px", width: 'fit-content', position:{lg:'static',md: 'static',sm: 'fixed',xs:'fixed'}, }}>
           <Box
             sx={{
               color: "#fff",
@@ -447,7 +459,7 @@ function LiveChatImmersive() {
             sx={{
               fontSize: "13.5px",
               pl: "2px",
-              pr: "15px",
+              pr: "5px",
               lineHeight: "20px",
               fontWeight: "400",
               textTransform: "capitalize",
@@ -457,6 +469,7 @@ function LiveChatImmersive() {
             Discussion
           </Box>
         </Box>
+        {/* tvs news end */}
         <Box
           ref={scrollableContainerRef}
           sx={{
@@ -576,7 +589,7 @@ function LiveChatImmersive() {
 
           <div ref={messagesEndRef} />
         </Box>
-        <Box className="qr-code-wrapper" sx={{width:{lg: '30%',md: '30%',sm: '50%',xs: '84.2%'},marginLeft:{lg: 0,md:0,sm: '10px !important',xs: '10px !important'}}} style={{ background: "#F0F0F11A", marginLeft: '0', marginRight: '0',marginBottom: '0' }}>
+        <Box className="qr-code-wrapper" sx={{width:{lg: '30%',md: '30%',sm: '50%',xs: '84.2%'},marginLeft:{lg: 0,md:0,sm: '10px !important',xs: '10px !important'},zIndex:{lg:'2',md:'2',xs:'0',sm:'0'},marginBottom:{lg:'20px',md: '20px',sm:'10px',xs:'10px'}}} style={{ background: "#F0F0F11A", marginLeft: '0', marginRight: '0' }}>
           <QrCode />
         </Box>
         {/* <Box
