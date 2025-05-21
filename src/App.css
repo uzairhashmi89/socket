@@ -12,7 +12,7 @@ box-sizing: border-box;
     font-family: "Instrument Sans";
     color: rgb(235, 235, 235);
     font-size: 16px;
-    height: 100vh;
+    height: 100dvh;
     overflow-y: auto;
 }
 .self-center{
@@ -113,6 +113,7 @@ border: 1px solid rgb(81, 81, 81);
     z-index: 999999999999;
     /* background: linear-gradient(to bottom, rgba(38, 40, 37, 1) 0%, rgba(38, 40, 37, 0) 95%); */
   }
+  
   .scanQR {
     width: 96%;
     height: calc(100vh - 128px);
@@ -195,7 +196,9 @@ height: auto !important;
 }
 
 
-
+/* .message-container {
+  min-height: 78vh;
+} */
 
 
 

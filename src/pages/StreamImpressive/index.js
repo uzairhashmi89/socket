@@ -78,11 +78,13 @@ function LiveChatImmersive() {
       console.log("[Client] Connected:", socket.id);
       if (localStorage.getItem("userName")) {
         emitJoin(localStorage.getItem("userName"));
+      }else {
+        emitJoin("guest");
       }
     });
 
     socket.on("message", (message) => {
-      console.log("message", message);
+      console.log("message-----", message);
       setMessages((prev) => [message, ...prev]);
     });
 
@@ -353,7 +355,7 @@ function LiveChatImmersive() {
   return (
     <Box className="chat-ui" sx={{ backgroundColor: "#333333" }}>
       <div className="gradient-bg"></div>
-      <Box
+       <Box
         className="main-chat"
         sx={{
           display: "flex",
@@ -366,27 +368,39 @@ function LiveChatImmersive() {
           position: "",
           width: "auto",
           height: {
-            lg: "95.4vh !important",
-            md: "95.4vh !important",
-            sm: "100vh !important",
-            xs: "100vh !important",
+            lg: "96dvh !important",
+            md: "98dvh !important",
+            sm: "100% !important",
+            xs: "100% !important",
           },
         }}
       >
-        <div
+        <Box
           style={{
             position: "fixed",
             top: 0,
             left: 0,
-            // background: "linear-gradient(to bottom, rgba(38, 40, 37, 1) 40%, rgba(38, 40, 37, 0) 95%)",
+            background: "#333",
             width: "100%",
-            height: "30px",
-            marginTop: "5px",
             display: "flex",
             alignItems: "baseline",
             gap: "20px",
             padding: "5px",
             justifyContent: "space-around",
+          }}
+          sx={{
+            marginTop:{
+              lg:'5px',
+              md:'5px',
+              sm:'0px',
+              xs:'0px',
+            },
+            height:{
+              lg: "30px",
+              md: "30px",
+              sm: "50px",
+              xs: "50px",
+            }
           }}
         >
           <button className="static-chat-button">
@@ -399,8 +413,8 @@ function LiveChatImmersive() {
               {connectedUsersCount}
             </span>
           </div>
-        </div>
-        <Box sx={{ marginTop: {lg: '40px',md: '40px',sm:'70px',xs: '70px'}, display: "flex", alignItems: "baseline", gap: 1, background: 'rgba(240, 240, 241, 0.1)', padding: '10px 10px 10px 20px', borderRadius: "4px", width: 'fit-content' }}>
+        </Box>
+        <Box sx={{ marginTop: {lg: '40px',md: '40px',sm:'58px',xs: '58px'}, display: "flex", alignItems: "baseline", gap: 1, background: {lg:'rgba(240, 240, 241, 0.1)',md:'rgba(240, 240, 241, 0.1)',sm:'#333',xs:'#333'}, padding: '10px 10px 10px 20px', borderRadius: "4px", width: 'fit-content', position:{lg:'static',md: 'static',sm: 'fixed',xs:'fixed'}, }}>
           <Box
             sx={{
               color: "#fff",
@@ -447,7 +461,7 @@ function LiveChatImmersive() {
             sx={{
               fontSize: "13.5px",
               pl: "2px",
-              pr: "15px",
+              pr: "5px",
               lineHeight: "20px",
               fontWeight: "400",
               textTransform: "capitalize",
@@ -457,6 +471,7 @@ function LiveChatImmersive() {
             Discussion
           </Box>
         </Box>
+        {/* tvs news end */}
         <Box
           ref={scrollableContainerRef}
           sx={{
@@ -477,7 +492,7 @@ function LiveChatImmersive() {
             const nameColors = ["#6FCF97", "#219653", "#F2C94C", "#F2994A", "#F0F0F1", "#EB5757"];
             // Pick a random color for each message render
             const randomColor = nameColors[Math.floor(Math.random() * nameColors.length)];
-
+            
             return (
               <Box
                 className="message chat-input"
@@ -576,7 +591,7 @@ function LiveChatImmersive() {
 
           <div ref={messagesEndRef} />
         </Box>
-        <Box className="qr-code-wrapper" sx={{width:{lg: '30%',md: '30%',sm: '50%',xs: '84.2%'},marginLeft:{lg: 0,md:0,sm: '10px !important',xs: '10px !important'}}} style={{ background: "#F0F0F11A", marginLeft: '0', marginRight: '0',marginBottom: '0' }}>
+        <Box className="qr-code-wrapper" sx={{width:{lg: '30%',md: '30%',sm: '50%',xs: '84.2%'},marginLeft:{lg: 0,md:0,sm: '10px !important',xs: '10px !important'},zIndex:{lg:'2',md:'2',xs:'0',sm:'0'},marginBottom:{lg:'20px',md: '20px',sm:'10px',xs:'10px'}}} style={{ background: "#F0F0F11A", marginLeft: '0', marginRight: '0' }}>
           <QrCode />
         </Box>
         {/* <Box
@@ -647,67 +662,8 @@ function LiveChatImmersive() {
           </Button>
         </Box> */}
       </Box>
-      <Box
-        sx={{
-          position: "fixed", // Example positioning
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          zIndex: 10, // Ensure it's above chat content
-          backgroundColor: "rgba(0,0,0,0.8)",
-          padding: 3,
-          borderRadius: 2,
-          display: isSettingUsername ? "flex" : "none", // Show/hide based on state
-          flexDirection: "column",
-          gap: 2,
-        }}
-      >
 
-        <Typography variant="h6" sx={{ color: "white" }}>
-          Set Username
-        </Typography>
-
-        <TextField
-          label="Username"
-          variant="outlined"
-          value={username} // Use the username state
-          onChange={(e) => setUsername(e.target.value)}
-          InputLabelProps={{ style: { color: "rgba(255,255,255,0.7)" } }} // Style label
-          InputProps={{ style: { color: "white" } }} // Style input text
-          sx={{
-            "& .MuiOutlinedInput-notchedOutline": {
-              borderColor: "rgba(255,255,255,0.3)",
-            },
-            "&:hover .MuiOutlinedInput-notchedOutline": {
-              borderColor: "rgba(255,255,255,0.5)",
-            },
-            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-              borderColor: "rgba(255,255,255,0.7)",
-            },
-          }}
-        />
-
-        <Button variant="contained" onClick={handleSaveUsername}>
-          Save
-        </Button>
-      </Box>
-
-      {/* {!isSettingUsername && username && (
-        <Box sx={{ position: "fixed", top: 10, right: 10, zIndex: 5 }}>
-          <Button variant="outlined" onClick={() => setIsSettingUsername(true)}>
-            Edit Username
-          </Button>
-        </Box>
-      )}
-      {!isSettingUsername && !username && (
-        <Box sx={{ position: "fixed", top: 10, right: 10, zIndex: 5 }}>
-          <Button variant="outlined" onClick={() => setIsSettingUsername(true)}>
-            Set Username
-          </Button>
-        </Box>
-      )}
-
-      <GiphyModal
+     {/* <GiphyModal
         open={showGiphyModal}
         inputPlaceholder="Type something..."
         initialEditorState={editorState}

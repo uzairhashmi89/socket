@@ -72,6 +72,8 @@ function Chat() {
       console.log("[Client] Connected:", socket.id);
       if (localStorage.getItem("userName")) {
         emitJoin(localStorage.getItem("userName"));
+      } else {
+        emitJoin("guest");
       }
     });
 
@@ -254,13 +256,17 @@ function Chat() {
         emitJoin(trimmedUsername);
       }
     } else {
-      console.warn("Username cannot be empty."); // Optionally provide feedback to the user
+      if (socket.connected) {
+        emitJoin('guest');
+      }
+       // Optionally provide feedback to the user
     }
   };
 
   const emitJoin = (currentUsername) => {
+    console.log("emitJoin", currentUsername);
     const userPayload = {
-      username: currentUsername,
+      username: currentUsername ?? 'guest',
     };
 
     const payload = {
@@ -401,24 +407,7 @@ function Chat() {
             </span>
           </div>
         </div>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <Box
-            sx={{
-              width: 30,
-              height: 30,
-              borderRadius: "50%",
-              backgroundColor: "red",
-              color: "white",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontWeight: "500",
-              fontSize: "1rem",
-              textTransform: "uppercase",
-            }}
-          >
-            T
-          </Box>
+        <Box sx={{ display: "flex", alignItems: "baseline", gap: 1, background: 'rgba(240, 240, 241, 0.1)', padding: '5px 0 5px 19px', borderRadius: "4px" }}>
           <Box
             sx={{
               color: "#fff",
@@ -426,8 +415,30 @@ function Chat() {
               fontSize: "13.5px",
               textTransform: "capitalize",
               textWrap: "nowrap",
+              display: "flex",
+              alignItems: "center",
+              gap: "0 5px",
+
+
             }}
           >
+            <Box
+              sx={{
+                width: 30,
+                height: 30,
+                borderRadius: "50%",
+                backgroundColor: "red",
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: "500",
+                fontSize: "1rem",
+                textTransform: "uppercase",
+              }}
+            >
+              T
+            </Box>
             {/* {name} */}
             TVC News{" "}
             <VerifiedIcon
@@ -443,7 +454,7 @@ function Chat() {
             sx={{
               fontSize: "13.5px",
               pl: "2px",
-              pr: "15px",
+              pr: "5px",
               lineHeight: "20px",
               fontWeight: "400",
               textTransform: "capitalize",
@@ -498,56 +509,7 @@ function Chat() {
                 }}
               >
                 {/* For channel Heading */}
-                <Box
-                  style={{
-                    width: "99%",
-                    display: "flex",
-                    flexDirection: item?.type === "text" ? "row" : "column", // ← key line
-                    alignItems:
-                      item?.type === "text" ? "baseline" : "flex-start", // for better vertical alignment
-                    gap: "5px", // optional spacing
-                    background: "rgba(240, 240, 241, 0.1)",
-                    padding: "5px 0px 5px 10px",
-                    borderRadius: "4px",
-                  }}
-                >
-                  {/* Top row: Avatar + Username */}
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    {avatarUrl && (
-                      <Box
-                        component="img"
-                        src={avatarUrl}
-                        alt={name}
-                        sx={{
-                          width: 30,
-                          height: 30,
-                          borderRadius: "50%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    )}
-                  </Box>
 
-                  <Box
-                    style={{
-                      width: "100%",
-                      display: "flex",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <img
-                      src={
-                        "https://media.giphy.com/media/" +
-                        (item.giphy && item.giphy.id) +
-                        "/giphy.gif"
-                      }
-                      width={250}
-                      style={{ borderRadius: "8px" }}
-                    />
-                  </Box>
-
-                  {/* Message or Giphy */}
-                </Box>
                 {/* for channle heading end */}
                 <Box
                   style={{
@@ -725,7 +687,7 @@ function Chat() {
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          zIndex: 10, // Ensure it's above chat content
+          zIndex: 9999999999, // Ensure it's above chat content
           backgroundColor: "rgba(0,0,0,0.8)",
           padding: 3,
           borderRadius: 2,
@@ -734,11 +696,11 @@ function Chat() {
           gap: 2,
         }}
       >
-               
+
         <Typography variant="h6" sx={{ color: "white" }}>
           Set Username
         </Typography>
-               
+
         <TextField
           label="Username"
           variant="outlined"
@@ -758,7 +720,7 @@ function Chat() {
             },
           }}
         />
-               
+
         <Button variant="contained" onClick={handleSaveUsername}>
           Save
         </Button>
@@ -774,7 +736,7 @@ function Chat() {
         </Box>
       )}
       {!isSettingUsername && !username && (
-        <Box sx={{ position: "fixed", top: 10, right: 10, zIndex: 5 }}>
+        <Box sx={{ position: "fixed", top: 10, right: 10, zIndex: 99999999999 }}>
           <Button variant="outlined" onClick={() => setIsSettingUsername(true)}>
             Set Username
           </Button>
