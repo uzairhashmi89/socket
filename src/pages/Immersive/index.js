@@ -547,10 +547,10 @@ function Immersive() {
                       display: "flex",
                       flexDirection: "column",
                       gap: '10px 0',
-                      mb: 2,
+                      
                     }}
                     style={{
-                      marginBottom: "7px",
+                      marginBottom: "5px",
                     }}
                   >
                     <Box

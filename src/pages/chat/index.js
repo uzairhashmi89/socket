@@ -467,7 +467,7 @@ function Chat() {
             mt: "auto",
             p: "0px 10px 15px",
             scrollBehavior: "smooth",
-            gap: "7px 0",
+            gap: "0",
           }}
           className="message-container"
         >
