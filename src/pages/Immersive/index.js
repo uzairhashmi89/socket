@@ -387,8 +387,8 @@ function Immersive() {
           right: "0",
           bottom: "0",
           height: {
-            lg: '100vh',
-            md: '100vh',
+            lg: '100dvh',
+            md: '100dvh',
             sm: 'auto',
             xs: 'auto'
           },
@@ -398,7 +398,7 @@ function Immersive() {
         <Box
           // style={{ background: "rgb(18 16 49 / 50%)" }}
           className="stream-impressive font-poppins flex-1 flex flex-col w-[100%] overflow-auto no-scrollbar mt-6"
-        sx={{height: { xs: '100vh', md: '100vh',sm:'auto',xs:'auto' }}}>
+        sx={{height: { xs: '100dvh', md: '100dvh',sm:'auto',xs:'auto' }}}>
           {/* <div className="self-center">
             <div className=" mt-[18px] mb-[34px] flex flex-col items-center space-y-[33px]">
               <p className="show-qr font-medium text-2xl leading-[30px] text-white-85 text-center">

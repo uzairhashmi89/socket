@@ -366,10 +366,10 @@ function OnlyChat() {
           position: "",
           width: "auto",
           height: {
-            lg: "88vh !important",
-            md: "88vh !important",
-            sm: "97vh !important",
-            xs: "100vh !important",
+            lg: "88dvh !important",
+            md: "88dvh !important",
+            sm: "97dvh !important",
+            xs: "100dvh !important",
           },
         }}
       >

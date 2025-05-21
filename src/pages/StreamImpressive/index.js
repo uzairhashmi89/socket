@@ -366,10 +366,10 @@ function LiveChatImmersive() {
           position: "",
           width: "auto",
           height: {
-            lg: "95.4vh !important",
-            md: "95.4vh !important",
-            sm: "100vh !important",
-            xs: "100vh !important",
+            lg: "95.4dvh !important",
+            md: "95.4dvh !important",
+            sm: "100dvh !important",
+            xs: "100dvh !important",
           },
         }}
       >
