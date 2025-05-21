@@ -425,10 +425,10 @@ function OnlyChat() {
                   display: "flex",
                   flexDirection: "column",
                   gap: '10px 0',
-                  mb: 2,
+                  
                 }}
                 style={{
-                  marginBottom: "7px",
+                  marginBottom: "5px",
                 }}
               >
                 {/* For channel Heading */}
@@ -568,9 +568,9 @@ function OnlyChat() {
 
                   {/* Message or Giphy */}
                   {item?.type === "text" ? (
-                    <Box sx={{ fontSize: "13.5px", pl: "2px", textTransform: "capitalize", }}>{item?.message}</Box>
+                    <Box sx={{ fontSize: "13.5px", pl: "2px", textTransform: "capitalize" }}>{item?.message}</Box>
                   ) : (
-                    <Box style={{ width: "100%", display: "flex", justifyContent: "flex-start" }}>
+                    <Box style={{ width: "100%", display: "flex", justifyContent: "flex-start" }} sx={{pt:'5px'}}>
                       <img
                         src={
                           "https://media.giphy.com/media/" +
