@@ -71,7 +71,58 @@ function OnlyChat() {
   }, []);
   // Aimal code end
 
+// --- START: Changes for consistent colors ---
+  // Use useRef to store a mapping of sender names to their assigned colors
+  const userColorsMap = useRef({});
 
+  // Define a set of appealing and distinct colors
+  const nameColors = useMemo(() => [
+    "#219653", // Darker Green
+    "#F2C94C", // Yellow
+    "#F2994A", // Orange
+    "#6FCF97", // Green
+    "#EB5757", // Red
+    "#8C52FF", // Purple
+    "#00BCD4", // Cyan
+    "#FF7043", // Coral
+    "#4DD0E1", // Light Blue
+    "#FFD54F", // Amber
+    "#C0CA33", // Lime
+    "#7CB342", // Light Green
+    "#9E9E9E", // Grey
+  ], []); // Memoize this array so it doesn't change on every render
+
+  // Function to get or assign a unique color for a given sender
+  const getConsistentSenderColor = (senderName) => {
+    // If the sender already has a color, return it
+    if (userColorsMap.current[senderName]) {
+      return userColorsMap.current[senderName];
+    }
+
+    // If not, assign a new unique color from the available pool
+    const assignedColorsCount = Object.keys(userColorsMap.current).length;
+    let newColor;
+
+    if (assignedColorsCount < nameColors.length) {
+      // Assign a unique color if available
+      newColor = nameColors[assignedColorsCount];
+    } else {
+      // If all unique colors are used, start cycling through them again
+      // This ensures we always have a color, even with many users,
+      // but colors might repeat for different users after the initial pool is exhausted.
+      newColor = nameColors[assignedColorsCount % nameColors.length];
+    }
+
+    // Store the new color for this sender
+    userColorsMap.current[senderName] = newColor;
+    return newColor;
+  };
+
+  // The getColorFromName utility function is no longer needed in this specific way
+  // because getConsistentSenderColor directly returns the final color string.
+  // We can simplify it or remove it if not used elsewhere.
+  const getColorFromName = (color) => color; // Now it just returns the color passed to it
+  // --- END: Changes for consistent colors ---
 
   useEffect(() => {
     socket.on("connect", () => {
@@ -204,15 +255,6 @@ function OnlyChat() {
   const getInitial = (name) => {
     if (!name) return "";
     return name.trim()[0].toUpperCase();
-  };
-
-  // Utility: Get color from name
-  const getColorFromName = (name) => {
-    const colors = ["#F44336", "#2196F3", "#FF9800", "#4CAF50", "#9C27B0"];
-    const hash = name
-      .split("")
-      .reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return colors[hash % colors.length];
   };
 
   // Render ads every 8th message
@@ -488,10 +530,7 @@ function OnlyChat() {
             const avatarUrl = item?.sender?.photoUrl;
             const initial = getInitial(name);
             const isFirstMessage = index === 0;
-            const nameColors = ["#6FCF97", "#219653", "#F2C94C", "#F2994A", "#F0F0F1", "#EB5757"];
-            // Pick a random color for each message render
-            const randomColor = nameColors[Math.floor(Math.random() * nameColors.length)];
-
+ const senderColor = getConsistentSenderColor(name);
             return (
               <Box
                 className="message chat-input"
@@ -540,7 +579,7 @@ function OnlyChat() {
                           width: 30,
                           height: 30,
                           borderRadius: "50%",
-                          backgroundColor: getColorFromName(randomColor),
+                          backgroundColor: getColorFromName(senderColor),
                           color: "white",
                           display: "flex",
                           alignItems: "center",
@@ -555,7 +594,7 @@ function OnlyChat() {
                     )}
                     <Box
                       sx={{
-                        color: randomColor,
+                        color: senderColor,
                         fontWeight: 500,
                         fontSize: "13.5px",
                         textTransform: "capitalize",

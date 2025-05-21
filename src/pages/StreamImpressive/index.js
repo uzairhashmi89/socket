@@ -71,6 +71,58 @@ function LiveChatImmersive() {
   }, []);
   // Aimal code end
 
+  // --- START: Changes for consistent colors ---
+  // Use useRef to store a mapping of sender names to their assigned colors
+  const userColorsMap = useRef({});
+
+  // Define a set of appealing and distinct colors
+  const nameColors = useMemo(() => [
+    "#219653", // Darker Green
+    "#F2C94C", // Yellow
+    "#F2994A", // Orange
+    "#6FCF97", // Green
+    "#EB5757", // Red
+    "#8C52FF", // Purple
+    "#00BCD4", // Cyan
+    "#FF7043", // Coral
+    "#4DD0E1", // Light Blue
+    "#FFD54F", // Amber
+    "#C0CA33", // Lime
+    "#7CB342", // Light Green
+    "#9E9E9E", // Grey
+  ], []); // Memoize this array so it doesn't change on every render
+
+  // Function to get or assign a unique color for a given sender
+  const getConsistentSenderColor = (senderName) => {
+    // If the sender already has a color, return it
+    if (userColorsMap.current[senderName]) {
+      return userColorsMap.current[senderName];
+    }
+
+    // If not, assign a new unique color from the available pool
+    const assignedColorsCount = Object.keys(userColorsMap.current).length;
+    let newColor;
+
+    if (assignedColorsCount < nameColors.length) {
+      // Assign a unique color if available
+      newColor = nameColors[assignedColorsCount];
+    } else {
+      // If all unique colors are used, start cycling through them again
+      // This ensures we always have a color, even with many users,
+      // but colors might repeat for different users after the initial pool is exhausted.
+      newColor = nameColors[assignedColorsCount % nameColors.length];
+    }
+
+    // Store the new color for this sender
+    userColorsMap.current[senderName] = newColor;
+    return newColor;
+  };
+
+  // The getColorFromName utility function is no longer needed in this specific way
+  // because getConsistentSenderColor directly returns the final color string.
+  // We can simplify it or remove it if not used elsewhere.
+  const getColorFromName = (color) => color; // Now it just returns the color passed to it
+  // --- END: Changes for consistent colors ---
 
 
   useEffect(() => {
@@ -204,15 +256,6 @@ function LiveChatImmersive() {
   const getInitial = (name) => {
     if (!name) return "";
     return name.trim()[0].toUpperCase();
-  };
-
-  // Utility: Get color from name
-  const getColorFromName = (name) => {
-    const colors = ["#F44336", "#2196F3", "#FF9800", "#4CAF50", "#9C27B0"];
-    const hash = name
-      .split("")
-      .reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return colors[hash % colors.length];
   };
 
   // Render ads every 8th message
@@ -353,327 +396,327 @@ function LiveChatImmersive() {
   const [showGiphyModal, setShowGiphyModal] = useState(false);
 
   return (
-    <Box className="chat-ui" sx={{ backgroundColor: "#333333" }}>
+    <Box className="chat-ui" sx={{ backgroundColor: "#333" }}>
       <div className="gradient-bg"></div>
-       <Box
-        className="main-chat"
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          flex: 1,
-          p: 2,
-          backgroundColor: "#333333",
-          color: "white",
-          opacity: 1,
-          position: "",
-          width: "auto",
-          height: {
-            lg: "96dvh !important",
-            md: "98dvh !important",
-            sm: "100% !important",
-            xs: "100% !important",
-          },
-        }}
-      >
-        <Box
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            background: "#333",
-            width: "100%",
-            display: "flex",
-            alignItems: "baseline",
-            gap: "20px",
-            padding: "5px",
-            justifyContent: "space-around",
-          }}
-          sx={{
-            marginTop:{
-              lg:'5px',
-              md:'5px',
-              sm:'0px',
-              xs:'0px',
-            },
-            height:{
-              lg: "30px",
-              md: "30px",
-              sm: "50px",
-              xs: "50px",
-            }
-          }}
-        >
-          <button className="static-chat-button">
-            <ChatBubble /> Chat
-          </button>
-          <div className="connected-users-count" style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-            {/* <SupervisorAccountIcon size="large"/> */}
-            <img src={UserIcon} alt="Bolt Logo" style={{ width: "20px", height: "20px" }} />
-            <span style={{ color: "white", fontSize: "12px" }}>
-              {connectedUsersCount}
-            </span>
-          </div>
-        </Box>
-        <Box sx={{ marginTop: {lg: '40px',md: '40px',sm:'58px',xs: '58px'}, display: "flex", alignItems: "baseline", gap: 1, background: {lg:'rgba(240, 240, 241, 0.1)',md:'rgba(240, 240, 241, 0.1)',sm:'#333',xs:'#333'}, padding: '10px 10px 10px 20px', borderRadius: "4px", width: 'fit-content', position:{lg:'static',md: 'static',sm: 'fixed',xs:'fixed'}, }}>
-          <Box
-            sx={{
-              color: "#fff",
-              fontWeight: 600,
-              fontSize: "13.5px",
-              textTransform: "capitalize",
-              textWrap: "nowrap",
-              display: "flex",
-              alignItems: "center",
-              gap: "0 5px",
+         <Box
+         className="main-chat"
+         sx={{
+           display: "flex",
+           flexDirection: "column",
+           flex: 1,
+           p: 2,
+           backgroundColor: "#333",
+           color: "white",
+           opacity: 1,
+           position: "",
+           width: "auto",
+           height: {
+             lg: "96dvh !important",
+             md: "98dvh !important",
+             sm: "100% !important",
+             xs: "100% !important",
+           },
+         }}
+       >
+         <Box
+           style={{
+             position: "fixed",
+             top: 0,
+             left: 0,
+             background: "#000",
+             width: "100%",
+             display: "flex",
+             alignItems: "baseline",
+             gap: "20px",
+             padding: "5px",
+             justifyContent: "space-around",
+           }}
+           sx={{
+             marginTop:{
+               lg:'5px',
+               md:'5px',
+               sm:'0px',
+               xs:'0px',
+             },
+             height:{
+               lg: "41px",
+               md: "41px",
+               sm: "50px",
+               xs: "50px",
+             }
+           }}
+         >
+           <button className="static-chat-button">
+             <ChatBubble /> Chat
+           </button>
+           <div className="connected-users-count" style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+             {/* <SupervisorAccountIcon size="large"/> */}
+             <img src={UserIcon} alt="Bolt Logo" style={{ width: "20px", height: "20px" }} />
+             <span style={{ color: "white", fontSize: "12px" }}>
+               {connectedUsersCount}
+             </span>
+           </div>
+         </Box>
+         <Box sx={{ marginTop: {lg: '40px',md: '40px',sm:'58px',xs: '58px'}, display: "flex", alignItems: "baseline", gap: 1, background: '#000', padding: '10px 10px 10px 20px', borderRadius: "4px", width: 'fit-content', position:{lg:'static',md: 'static',sm: 'fixed',xs:'fixed'}, }}>
+           <Box
+             sx={{
+               color: "#fff",
+               fontWeight: 600,
+               fontSize: "13.5px",
+               textTransform: "capitalize",
+               textWrap: "nowrap",
+               display: "flex",
+               alignItems: "center",
+               gap: "0 5px",
 
 
-            }}
-          >
-            <Box
-              sx={{
-                width: 30,
-                height: 30,
-                borderRadius: "50%",
-                backgroundColor: "red",
-                color: "white",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: "500",
-                fontSize: "1rem",
-                textTransform: "uppercase",
-              }}
-            >
-              T
-            </Box>
-            {/* {name} */}
-            TVC News{" "}
-            <VerifiedIcon
-              sx={{
-                fontSize: "12px",
-                color: "#6FCF97",
-                marginLeft: "5px",
-                color: "#43A2F2",
-              }}
-            />
-          </Box>
-          <Box
-            sx={{
-              fontSize: "13.5px",
-              pl: "2px",
-              pr: "5px",
-              lineHeight: "20px",
-              fontWeight: "400",
-              textTransform: "capitalize",
-            }}
-          >
-            {/* item?.message */}🔴 LIVE: TVC News – Breaking Updates &
-            Discussion
-          </Box>
-        </Box>
-        {/* tvs news end */}
-        <Box
-          ref={scrollableContainerRef}
-          sx={{
-            display: "flex",
-            flexDirection: "column-reverse",
-            overflowY: "auto",
-            mt: "auto",
-            p: "5px 10px 10px",
-            scrollBehavior: "smooth",
-          }}
-          className="message-container"
-        >
-          {messages?.map((item, index) => {
-            const name = item?.sender || "User";
-            const avatarUrl = item?.sender?.photoUrl;
-            const initial = getInitial(name);
-            const isFirstMessage = index === 0;
-            const nameColors = ["#6FCF97", "#219653", "#F2C94C", "#F2994A", "#F0F0F1", "#EB5757"];
-            // Pick a random color for each message render
-            const randomColor = nameColors[Math.floor(Math.random() * nameColors.length)];
-            
-            return (
-              <Box
-                className="message chat-input"
-                key={index}
-                ref={isFirstMessage ? firstMessageRef : null}
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: '10px 0',
-                  
-                }}
-                style={{
-                  marginBottom: "5px",
-                }}
-              >
-                {/* For channel Heading */}
+             }}
+           >
+             <Box
+               sx={{
+                 width: 30,
+                 height: 30,
+                 borderRadius: "50%",
+                 backgroundColor: "red",
+                 color: "white",
+                 display: "flex",
+                 alignItems: "center",
+                 justifyContent: "center",
+                 fontWeight: "500",
+                 fontSize: "1rem",
+                 textTransform: "uppercase",
+               }}
+             >
+               T
+             </Box>
+             {/* {name} */}
+             TVC News{" "}
+             <VerifiedIcon
+               sx={{
+                 fontSize: "12px",
+                 color: "#6FCF97",
+                 marginLeft: "5px",
+                 color: "#43A2F2",
+               }}
+             />
+           </Box>
+           <Box
+             sx={{
+               fontSize: "13.5px",
+               pl: "2px",
+               pr: "5px",
+               lineHeight: "20px",
+               fontWeight: "400",
+               textTransform: "capitalize",
+             }}
+           >
+             {/* item?.message */}🔴 LIVE: TVC News – Breaking Updates &
+             Discussion
+           </Box>
+         </Box>
+         {/* tvs news end */}
+         <Box
+           ref={scrollableContainerRef}
+           sx={{
+             display: "flex",
+             flexDirection: "column-reverse",
+             overflowY: "auto",
+             mt: "auto",
+             p: "5px 10px 10px",
+             scrollBehavior: "smooth",
+           }}
+           className="message-container"
+         >
+           {messages?.map((item, index) => {
+             const name = item?.sender || "User";
+             const avatarUrl = item?.sender?.photoUrl;
+             const initial = getInitial(name);
+             const isFirstMessage = index === 0;
 
-                {/* for channle heading end */}
-                <Box
-                  style={{
-                    width: "99%",
-                    display: "flex",
-                    flexDirection: item?.type === "text" ? "row" : "column", // ← key line
-                    alignItems: item?.type === "text" ? "center" : "flex-start", // for better vertical alignment
-                    gap: "5px", // optional spacing
-                    padding: "5px 0px 5px 10px",
-                  }}
-                >
-                  {/* Top row: Avatar + Username */}
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    {avatarUrl ? (
-                      <Box
-                        component="img"
-                        src={avatarUrl}
-                        alt={name}
-                        sx={{
-                          width: 30,
-                          height: 30,
-                          borderRadius: "50%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    ) : (
-                      <Box
-                        sx={{
-                          width: 30,
-                          height: 30,
-                          borderRadius: "50%",
-                          backgroundColor: getColorFromName(randomColor),
-                          color: "white",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontWeight: "500",
-                          fontSize: "1rem",
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        {initial}
-                      </Box>
-                    )}
-                    <Box
-                      sx={{
-                        color: randomColor,
-                        fontWeight: 500,
-                        fontSize: "13.5px",
-                        textTransform: "capitalize",
-                      }}
-                    >
-                      {name}
-                    </Box>
-                  </Box>
+             // --- START: Use the new consistent color logic ---
+             const senderColor = getConsistentSenderColor(name);
+             // --- END: Use the new consistent color logic ---
 
-                  {/* Message or Giphy */}
-                  {item?.type === "text" ? (
-                    <Box sx={{ fontSize: "13.5px", pl: "2px", textTransform: "capitalize" }}>{item?.message}</Box>
-                  ) : (
-                    <Box style={{ width: "100%", display: "flex", justifyContent: "flex-start" }} sx={{pt:'5px'}}>
-                      <img
-                        src={
-                          "https://media.giphy.com/media/" +
-                          (item.giphy && item.giphy.id) +
-                          "/giphy.gif"
-                        }
-                        width={250}
-                        style={{ borderRadius: "8px" }}
-                      />
-                    </Box>
-                  )}
-                </Box>
-                {/* Optional Ad */}
-                {/* {renderChatAd(index)} */}
-              </Box>
-            );
-          })}
+             return (
+               <Box
+                 className="message chat-input"
+                 key={index}
+                 ref={isFirstMessage ? firstMessageRef : null}
+                 sx={{
+                   display: "flex",
+                   flexDirection: "column",
+                   gap: '10px 0',
+                 }}
+                 style={{
+                   marginBottom: "5px",
+                 }}
+               >
+                 {/* For channel Heading */}
 
-          <div ref={messagesEndRef} />
-        </Box>
-        <Box className="qr-code-wrapper" sx={{width:{lg: '30%',md: '30%',sm: '50%',xs: '84.2%'},marginLeft:{lg: 0,md:0,sm: '10px !important',xs: '10px !important'},zIndex:{lg:'2',md:'2',xs:'0',sm:'0'},marginBottom:{lg:'20px',md: '20px',sm:'10px',xs:'10px'}}} style={{ background: "#F0F0F11A", marginLeft: '0', marginRight: '0' }}>
-          <QrCode />
-        </Box>
-        {/* <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "1rem 10px",
-            // backgroundColor: "#0b0c2a",
-            borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-            position: "fixed",
-            bottom: 0,
-            right: 0,
-            width: "100%",
-            opacity: 1,
-          }}
-          className="send-message-input editor"
-        >
-          <Editor
-            editorState={editorState}
-            onChange={setEditorState}
-            plugins={plugins}
-            handleKeyCommand={handleKeyCommand}
-            placeholder="Type something..."
-          />
-          <EmojiSuggestions />
-          <EmojiSelect closeOnEmojiSelect />
-          <button
-            onClick={sendMessage}
-            style={{
-              width: "50px",
-              height: "50px",
-              background:
-                "linear-gradient(93.56deg, rgb(101, 53, 233) 4.6%, rgb(78, 51, 233) 96.96%)",
-              border: "1px solid rgb(101, 53, 233)",
-              outline: 0,
-              borderRadius: "8px",
-              color: "white",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <SendIcon />
-          </button>
+                 {/* for channle heading end */}
+                 <Box
+                   style={{
+                     width: "99%",
+                     display: "flex",
+                     flexDirection: item?.type === "text" ? "row" : "column", // ← key line
+                     alignItems: item?.type === "text" ? "center" : "flex-start", // for better vertical alignment
+                     gap: "5px", // optional spacing
+                     padding: "5px 0px 5px 10px",
+                   }}
+                 >
+                   {/* Top row: Avatar + Username */}
+                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                     {avatarUrl ? (
+                       <Box
+                         component="img"
+                         src={avatarUrl}
+                         alt={name}
+                         sx={{
+                           width: 30,
+                           height: 30,
+                           borderRadius: "50%",
+                           objectFit: "cover",
+                         }}
+                       />
+                     ) : (
+                       <Box
+                         sx={{
+                           width: 30,
+                           height: 30,
+                           borderRadius: "50%",
+                           backgroundColor: getColorFromName(senderColor), // Use the assigned senderColor
+                           color: "white",
+                           display: "flex",
+                           alignItems: "center",
+                           justifyContent: "center",
+                           fontWeight: "500",
+                           fontSize: "1rem",
+                           textTransform: "uppercase",
+                         }}
+                       >
+                         {initial}
+                       </Box>
+                     )}
+                     <Box
+                       sx={{
+                         color: senderColor, // Use the assigned senderColor
+                         fontWeight: 500,
+                         fontSize: "13.5px",
+                         textTransform: "capitalize",
+                       }}
+                     >
+                       {name}
+                     </Box>
+                   </Box>
 
-          <Button
-            className="chat-gif-icon"
-            size="small"
-            onClick={() => setShowGiphyModal(true)}
-            sx={{
-              borderStyle: "solid",
-              height: 18,
-              minWidth: 40,
-              pl: 0,
-              pr: 0,
-              borderColor: "white",
-              borderWidth: 1,
-              color: "white",
-              fontSize: 12,
-              position: "absolute",
-              right: 105,
-              top: 32,
-            }}
-          >
-            GIF
-          </Button>
-        </Box> */}
-      </Box>
+                   {/* Message or Giphy */}
+                   {item?.type === "text" ? (
+                     <Box sx={{ fontSize: "13.5px", pl: "2px", textTransform: "capitalize" }}>{item?.message}</Box>
+                   ) : (
+                     <Box style={{ width: "100%", display: "flex", justifyContent: "flex-start" }} sx={{pt:'5px'}}>
+                       <img
+                         src={
+                           "https://media.giphy.com/media/" +
+                           (item.giphy && item.giphy.id) +
+                           "/giphy.gif"
+                         }
+                         width={250}
+                         style={{ borderRadius: "8px" }}
+                       />
+                     </Box>
+                   )}
+                 </Box>
+                 {/* Optional Ad */}
+                 {/* {renderChatAd(index)} */}
+               </Box>
+             );
+           })}
 
-     {/* <GiphyModal
-        open={showGiphyModal}
-        inputPlaceholder="Type something..."
-        initialEditorState={editorState}
-        onClose={() => setShowGiphyModal(false)}
-        onSelectItem={(data) => {
-          sendGiphy(data);
-        }}
-      /> */}
-    </Box>
-  );
-}
+           <div ref={messagesEndRef} />
+         </Box>
+         <Box className="qr-code-wrapper" sx={{width:{lg: '30%',md: '30%',sm: '50%',xs: '84.2%'},marginLeft:{lg: 0,md:0,sm: '10px !important',xs: '10px !important'},zIndex:{lg:'2',md:'2',xs:'0',sm:'0'},marginBottom:{lg:'20px',md: '20px',sm:'10px',xs:'10px'}}} style={{ background: "#000", marginLeft: '0', marginRight: '0' }}>
+           <QrCode />
+         </Box>
+         {/* <Box
+           sx={{
+             display: "flex",
+             alignItems: "center",
+             justifyContent: "space-between",
+             padding: "1rem 10px",
+             // backgroundColor: "#0b0c2a",
+             borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+             position: "fixed",
+             bottom: 0,
+             right: 0,
+             width: "100%",
+             opacity: 1,
+           }}
+           className="send-message-input editor"
+         >
+           <Editor
+             editorState={editorState}
+             onChange={setEditorState}
+             plugins={plugins}
+             handleKeyCommand={handleKeyCommand}
+             placeholder="Type something..."
+           />
+           <EmojiSuggestions />
+           <EmojiSelect closeOnEmojiSelect />
+           <button
+             onClick={sendMessage}
+             style={{
+               width: "50px",
+               height: "50px",
+               background:
+                 "linear-gradient(93.56deg, rgb(101, 53, 233) 4.6%, rgb(78, 51, 233) 96.96%)",
+               border: "1px solid rgb(101, 53, 233)",
+               outline: 0,
+               borderRadius: "8px",
+               color: "white",
+               cursor: "pointer",
+               display: "flex",
+               alignItems: "center",
+               justifyContent: "center",
+             }}
+           >
+             <SendIcon />
+           </button>
 
-export default LiveChatImmersive;
+           <Button
+             className="chat-gif-icon"
+             size="small"
+             onClick={() => setShowGiphyModal(true)}
+             sx={{
+               borderStyle: "solid",
+               height: 18,
+               minWidth: 40,
+               pl: 0,
+               pr: 0,
+               borderColor: "white",
+               borderWidth: 1,
+               color: "white",
+               fontSize: 12,
+               position: "absolute",
+               right: 105,
+               top: 32,
+             }}
+           >
+             GIF
+           </Button>
+         </Box> */}
+       </Box>
+
+       {/* <GiphyModal
+         open={showGiphyModal}
+         inputPlaceholder="Type something..."
+         initialEditorState={editorState}
+         onClose={() => setShowGiphyModal(false)}
+         onSelectItem={(data) => {
+           sendGiphy(data);
+         }}
+       /> */}
+     </Box>
+   );
+ }
+
+ export default LiveChatImmersive;
