@@ -12,9 +12,9 @@ import Editor, { PluginEditorProps } from "@draft-js-plugins/editor";
 import createEmojiPlugin, { defaultTheme } from "@draft-js-plugins/emoji";
 import { ChatBubble } from "@mui/icons-material";
 import { GiphyModal } from "../../Components/GiphyModal";
-import { useFocusable } from "@noriginmedia/norigin-spatial-navigation";
-import PhoneAndroidIcon from "@mui/icons-material/PhoneAndroid";
-import { QRCode } from "react-qrcode-logo";
+import QrCode from "../../Components/QrCode";
+import UserIcon from "../../assets/user-icon.png"
+import VerifiedIcon from '@mui/icons-material/Verified';
 
 const socket = io("https://api.staging-new.boltplus.tv", {
   path: "/public-socket/",
@@ -41,6 +41,37 @@ function LiveChatImmersive() {
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
+  // Aimal code start
+  const [connectedUsersCount, setConnectedUsersCount] = useState(null);
+  useEffect(() => {
+    socket.on("viewer", (data) => {
+      console.log("Viewer event received:", data);
+
+      // If data is an array like [{ viewers: 3 }]
+      if (Array.isArray(data) && data[0]?.viewers !== undefined) {
+        setConnectedUsersCount(data[0].viewers);
+      }
+
+      // If data is just { viewers: 3 }
+      else if (data?.viewers !== undefined) {
+        setConnectedUsersCount(data.viewers);
+      }
+    });
+
+    return () => {
+      socket.off("viewer");
+    };
+  }, []);
+  useEffect(() => {
+    socket.on('disconnect', () => {
+      console.log('Disconnected');
+
+
+    })
+  }, []);
+  // Aimal code end
+
+
 
   useEffect(() => {
     socket.on("connect", () => {
@@ -317,85 +348,115 @@ function LiveChatImmersive() {
     onChangeText(editorData?.blocks?.map((item) => item.text)?.join("\n"));
   }, [editorState]);
 
-  const [showQR, setShowQR] = useState(false);
-
-  const handleClick = () => {
-    setShowQR(!showQR);
-    setTimeout(() => {
-      setShowQR(false);
-    }, 30000);
-  };
-
-  const { ref, focused } = useFocusable({
-    onEnterPress: handleClick,
-    onArrowPress: (direction) => {
-      return !(direction === "left" || direction === "right");
-    },
-  });
+  const [showGiphyModal, setShowGiphyModal] = useState(false);
 
   return (
-    <Box className="stream-impressive">
-      <div className="self-center">
-        {showQR && (
-          <div className=" mt-[18px] mb-[34px] flex flex-col items-center space-y-[33px]">
-            <p className="show-qr font-medium text-2xl leading-[30px] text-white-85 text-center">
-              Scan the QR code with Bolt+ app
-              <br /> to connect your mobile
-            </p>
-            <div className="qr-code rounded-[25px] overflow-hidden">
-              <QRCode
-                removeQrCodeBehindLogo
-                size={250}
-                quietZone={25}
-                eyeRadius={15}
-                logoPadding={10}
-                fgColor="#4449e3"
-                value="https://tvcnews.boltplus.tv/only-chat"
-              />
-            </div>
-            <button
-              className="cancel-btn"
-              ref={ref}
-              onClick={handleClick}
-              // className={clsx(
-              //   "bg-white-12 py-[10px] pl-7 pr-5 rounded-lg flex items-center hover:bg-white-base/30",
-              //   focused && "bg-white-85",
-              //   focused && "text-primary-gray",
-              //   !focused && "text-white-base"
-              // )}
-            >
-              Cancel
-            </button>
-          </div>
-        )}
-        {!showQR && (
-          <button
-            className="scan-qr font-medium text-white-85"
-            ref={ref}
-            onClick={handleClick}
-            // className={clsx(
-            //   "bg-white-12 py-[10px] pl-7 pr-5 rounded-lg flex items-center space-x-[18px] hover:bg-white-base/30",
-            //   focused && "bg-white-base/30"
-            // )}
-          >
-            <PhoneAndroidIcon /> Scan Qr to start chatting
-          </button>
-        )}
-      </div>
-      <hr className="hr" />
+    <Box className="chat-ui" sx={{ backgroundColor: "#333333" }}>
+      <div className="gradient-bg"></div>
       <Box
-        className="main-chat scanQR"
+        className="main-chat"
         sx={{
           display: "flex",
           flexDirection: "column",
           flex: 1,
           p: 2,
-          backgroundColor: "#0b0c2a",
+          backgroundColor: "#333333",
           color: "white",
           opacity: 1,
           position: "",
+          width: "auto",
+          height: {
+            lg: "95.4vh !important",
+            md: "95.4vh !important",
+            sm: "100vh !important",
+            xs: "100vh !important",
+          },
         }}
       >
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            // background: "linear-gradient(to bottom, rgba(38, 40, 37, 1) 40%, rgba(38, 40, 37, 0) 95%)",
+            width: "100%",
+            height: "30px",
+            marginTop: "5px",
+            display: "flex",
+            alignItems: "baseline",
+            gap: "20px",
+            padding: "5px",
+            justifyContent: "space-around",
+          }}
+        >
+          <button className="static-chat-button">
+            <ChatBubble /> Chat
+          </button>
+          <div className="connected-users-count" style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+            {/* <SupervisorAccountIcon size="large"/> */}
+            <img src={UserIcon} alt="Bolt Logo" style={{ width: "20px", height: "20px" }} />
+            <span style={{ color: "white", fontSize: "12px" }}>
+              {connectedUsersCount}
+            </span>
+          </div>
+        </div>
+        <Box sx={{ marginTop: {lg: '40px',md: '40px',sm:'70px',xs: '70px'}, display: "flex", alignItems: "baseline", gap: 1, background: 'rgba(240, 240, 241, 0.1)', padding: '10px 10px 10px 20px', borderRadius: "4px", width: 'fit-content' }}>
+          <Box
+            sx={{
+              color: "#fff",
+              fontWeight: 600,
+              fontSize: "13.5px",
+              textTransform: "capitalize",
+              textWrap: "nowrap",
+              display: "flex",
+              alignItems: "center",
+              gap: "0 5px",
+
+
+            }}
+          >
+            <Box
+              sx={{
+                width: 30,
+                height: 30,
+                borderRadius: "50%",
+                backgroundColor: "red",
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: "500",
+                fontSize: "1rem",
+                textTransform: "uppercase",
+              }}
+            >
+              T
+            </Box>
+            {/* {name} */}
+            TVC News{" "}
+            <VerifiedIcon
+              sx={{
+                fontSize: "12px",
+                color: "#6FCF97",
+                marginLeft: "5px",
+                color: "#43A2F2",
+              }}
+            />
+          </Box>
+          <Box
+            sx={{
+              fontSize: "13.5px",
+              pl: "2px",
+              pr: "15px",
+              lineHeight: "20px",
+              fontWeight: "400",
+              textTransform: "capitalize",
+            }}
+          >
+            {/* item?.message */}🔴 LIVE: TVC News – Breaking Updates &
+            Discussion
+          </Box>
+        </Box>
         <Box
           ref={scrollableContainerRef}
           sx={{
@@ -403,7 +464,7 @@ function LiveChatImmersive() {
             flexDirection: "column-reverse",
             overflowY: "auto",
             mt: "auto",
-            p: "0",
+            p: "5px 10px 10px",
             scrollBehavior: "smooth",
           }}
           className="message-container"
@@ -413,6 +474,9 @@ function LiveChatImmersive() {
             const avatarUrl = item?.sender?.photoUrl;
             const initial = getInitial(name);
             const isFirstMessage = index === 0;
+            const nameColors = ["#6FCF97", "#219653", "#F2C94C", "#F2994A", "#F0F0F1", "#EB5757"];
+            // Pick a random color for each message render
+            const randomColor = nameColors[Math.floor(Math.random() * nameColors.length)];
 
             return (
               <Box
@@ -422,18 +486,24 @@ function LiveChatImmersive() {
                 sx={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: 0.5,
-                  mb: 2,
+                  gap: '10px 0',
+                  
                 }}
                 style={{
-                  marginBottom: "10px",
+                  marginBottom: "5px",
                 }}
               >
+                {/* For channel Heading */}
+
+                {/* for channle heading end */}
                 <Box
                   style={{
                     width: "99%",
                     display: "flex",
-                    alignItems: "center",
+                    flexDirection: item?.type === "text" ? "row" : "column", // ← key line
+                    alignItems: item?.type === "text" ? "center" : "flex-start", // for better vertical alignment
+                    gap: "5px", // optional spacing
+                    padding: "5px 0px 5px 10px",
                   }}
                 >
                   {/* Top row: Avatar + Username */}
@@ -456,7 +526,7 @@ function LiveChatImmersive() {
                           width: 30,
                           height: 30,
                           borderRadius: "50%",
-                          backgroundColor: getColorFromName(name),
+                          backgroundColor: getColorFromName(randomColor),
                           color: "white",
                           display: "flex",
                           alignItems: "center",
@@ -471,26 +541,29 @@ function LiveChatImmersive() {
                     )}
                     <Box
                       sx={{
-                        color: "rgba(255, 255, 255, 0.5)",
-                        fontWeight: 600,
-                        fontSize: "16px",
+                        color: randomColor,
+                        fontWeight: 500,
+                        fontSize: "13.5px",
+                        textTransform: "capitalize",
                       }}
                     >
                       {name}
                     </Box>
                   </Box>
 
-                  {/* Message line */}
+                  {/* Message or Giphy */}
                   {item?.type === "text" ? (
-                    <Box sx={{ pl: "5px" }}>{item?.message}</Box>
+                    <Box sx={{ fontSize: "13.5px", pl: "2px", textTransform: "capitalize" }}>{item?.message}</Box>
                   ) : (
-                    <Box sx={{ pl: "5px" }}>
+                    <Box style={{ width: "100%", display: "flex", justifyContent: "flex-start" }} sx={{pt:'5px'}}>
                       <img
                         src={
                           "https://media.giphy.com/media/" +
                           (item.giphy && item.giphy.id) +
                           "/giphy.gif"
                         }
+                        width={250}
+                        style={{ borderRadius: "8px" }}
                       />
                     </Box>
                   )}
@@ -503,7 +576,146 @@ function LiveChatImmersive() {
 
           <div ref={messagesEndRef} />
         </Box>
+        <Box className="qr-code-wrapper" sx={{width:{lg: '30%',md: '30%',sm: '50%',xs: '84.2%'},marginLeft:{lg: 0,md:0,sm: '10px !important',xs: '10px !important'}}} style={{ background: "#F0F0F11A", marginLeft: '0', marginRight: '0',marginBottom: '0' }}>
+          <QrCode />
+        </Box>
+        {/* <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "1rem 10px",
+            // backgroundColor: "#0b0c2a",
+            borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+            position: "fixed",
+            bottom: 0,
+            right: 0,
+            width: "100%",
+            opacity: 1,
+          }}
+          className="send-message-input editor"
+        >
+          <Editor
+            editorState={editorState}
+            onChange={setEditorState}
+            plugins={plugins}
+            handleKeyCommand={handleKeyCommand}
+            placeholder="Type something..."
+          />
+          <EmojiSuggestions />
+          <EmojiSelect closeOnEmojiSelect />
+          <button
+            onClick={sendMessage}
+            style={{
+              width: "50px",
+              height: "50px",
+              background:
+                "linear-gradient(93.56deg, rgb(101, 53, 233) 4.6%, rgb(78, 51, 233) 96.96%)",
+              border: "1px solid rgb(101, 53, 233)",
+              outline: 0,
+              borderRadius: "8px",
+              color: "white",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <SendIcon />
+          </button>
+
+          <Button
+            className="chat-gif-icon"
+            size="small"
+            onClick={() => setShowGiphyModal(true)}
+            sx={{
+              borderStyle: "solid",
+              height: 18,
+              minWidth: 40,
+              pl: 0,
+              pr: 0,
+              borderColor: "white",
+              borderWidth: 1,
+              color: "white",
+              fontSize: 12,
+              position: "absolute",
+              right: 105,
+              top: 32,
+            }}
+          >
+            GIF
+          </Button>
+        </Box> */}
       </Box>
+      <Box
+        sx={{
+          position: "fixed", // Example positioning
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          zIndex: 10, // Ensure it's above chat content
+          backgroundColor: "rgba(0,0,0,0.8)",
+          padding: 3,
+          borderRadius: 2,
+          display: isSettingUsername ? "flex" : "none", // Show/hide based on state
+          flexDirection: "column",
+          gap: 2,
+        }}
+      >
+
+        <Typography variant="h6" sx={{ color: "white" }}>
+          Set Username
+        </Typography>
+
+        <TextField
+          label="Username"
+          variant="outlined"
+          value={username} // Use the username state
+          onChange={(e) => setUsername(e.target.value)}
+          InputLabelProps={{ style: { color: "rgba(255,255,255,0.7)" } }} // Style label
+          InputProps={{ style: { color: "white" } }} // Style input text
+          sx={{
+            "& .MuiOutlinedInput-notchedOutline": {
+              borderColor: "rgba(255,255,255,0.3)",
+            },
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: "rgba(255,255,255,0.5)",
+            },
+            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+              borderColor: "rgba(255,255,255,0.7)",
+            },
+          }}
+        />
+
+        <Button variant="contained" onClick={handleSaveUsername}>
+          Save
+        </Button>
+      </Box>
+
+      {/* {!isSettingUsername && username && (
+        <Box sx={{ position: "fixed", top: 10, right: 10, zIndex: 5 }}>
+          <Button variant="outlined" onClick={() => setIsSettingUsername(true)}>
+            Edit Username
+          </Button>
+        </Box>
+      )}
+      {!isSettingUsername && !username && (
+        <Box sx={{ position: "fixed", top: 10, right: 10, zIndex: 5 }}>
+          <Button variant="outlined" onClick={() => setIsSettingUsername(true)}>
+            Set Username
+          </Button>
+        </Box>
+      )}
+
+      <GiphyModal
+        open={showGiphyModal}
+        inputPlaceholder="Type something..."
+        initialEditorState={editorState}
+        onClose={() => setShowGiphyModal(false)}
+        onSelectItem={(data) => {
+          sendGiphy(data);
+        }}
+      /> */}
     </Box>
   );
 }
