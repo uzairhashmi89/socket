@@ -7,6 +7,7 @@ import Editor from "@draft-js-plugins/editor";
 import createEmojiPlugin, { defaultTheme } from "@draft-js-plugins/emoji";
 import { ChatBubble } from "@mui/icons-material";
 import { GiphyModal } from "../../Components/GiphyModal";
+import HideImageOutlinedIcon from '@mui/icons-material/HideImageOutlined';
 // import RadioPlayer from "../Immersive/Component/RadioPlayer";
 import RadioPlayer from "./RadioPlayer";
 import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
@@ -68,11 +69,12 @@ function Chat() {
   // Aimal code end
 
   // --- START: Changes for consistent colors ---
-    // Use useRef to store a mapping of sender names to their assigned colors
-    const userColorsMap = useRef({});
-  
-    // Define a set of appealing and distinct colors
-    const nameColors = useMemo(() => [
+  // Use useRef to store a mapping of sender names to their assigned colors
+  const userColorsMap = useRef({});
+
+  // Define a set of appealing and distinct colors
+  const nameColors = useMemo(
+    () => [
       "#219653", // Darker Green
       "#F2C94C", // Yellow
       "#F2994A", // Orange
@@ -86,39 +88,41 @@ function Chat() {
       "#C0CA33", // Lime
       "#7CB342", // Light Green
       "#9E9E9E", // Grey
-    ], []); // Memoize this array so it doesn't change on every render
-  
-    // Function to get or assign a unique color for a given sender
-    const getConsistentSenderColor = (senderName) => {
-      // If the sender already has a color, return it
-      if (userColorsMap.current[senderName]) {
-        return userColorsMap.current[senderName];
-      }
-  
-      // If not, assign a new unique color from the available pool
-      const assignedColorsCount = Object.keys(userColorsMap.current).length;
-      let newColor;
-  
-      if (assignedColorsCount < nameColors.length) {
-        // Assign a unique color if available
-        newColor = nameColors[assignedColorsCount];
-      } else {
-        // If all unique colors are used, start cycling through them again
-        // This ensures we always have a color, even with many users,
-        // but colors might repeat for different users after the initial pool is exhausted.
-        newColor = nameColors[assignedColorsCount % nameColors.length];
-      }
-  
-      // Store the new color for this sender
-      userColorsMap.current[senderName] = newColor;
-      return newColor;
-    };
-  
-    // The getColorFromName utility function is no longer needed in this specific way
-    // because getConsistentSenderColor directly returns the final color string.
-    // We can simplify it or remove it if not used elsewhere.
-    const getColorFromName = (color) => color; // Now it just returns the color passed to it
-    // --- END: Changes for consistent colors ---
+    ],
+    []
+  ); // Memoize this array so it doesn't change on every render
+
+  // Function to get or assign a unique color for a given sender
+  const getConsistentSenderColor = (senderName) => {
+    // If the sender already has a color, return it
+    if (userColorsMap.current[senderName]) {
+      return userColorsMap.current[senderName];
+    }
+
+    // If not, assign a new unique color from the available pool
+    const assignedColorsCount = Object.keys(userColorsMap.current).length;
+    let newColor;
+
+    if (assignedColorsCount < nameColors.length) {
+      // Assign a unique color if available
+      newColor = nameColors[assignedColorsCount];
+    } else {
+      // If all unique colors are used, start cycling through them again
+      // This ensures we always have a color, even with many users,
+      // but colors might repeat for different users after the initial pool is exhausted.
+      newColor = nameColors[assignedColorsCount % nameColors.length];
+    }
+
+    // Store the new color for this sender
+    userColorsMap.current[senderName] = newColor;
+    return newColor;
+  };
+
+  // The getColorFromName utility function is no longer needed in this specific way
+  // because getConsistentSenderColor directly returns the final color string.
+  // We can simplify it or remove it if not used elsewhere.
+  const getColorFromName = (color) => color; // Now it just returns the color passed to it
+  // --- END: Changes for consistent colors ---
 
   useEffect(() => {
     socket.on("connect", () => {
@@ -287,6 +291,19 @@ function Chat() {
     !localStorage.getItem("userName")
   );
 
+  const [profileImage, setProfileImage] = useState(null);
+
+  const handleImageUpload = () => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileImage(reader.result); // Set the base64 image data
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSaveUsername = () => {
     const trimmedUsername = username.trim();
     if (trimmedUsername) {
@@ -301,16 +318,16 @@ function Chat() {
       }
     } else {
       if (socket.connected) {
-        emitJoin('guest');
+        emitJoin("guest");
       }
-       // Optionally provide feedback to the user
+      // Optionally provide feedback to the user
     }
   };
 
   const emitJoin = (currentUsername) => {
     console.log("emitJoin", currentUsername);
     const userPayload = {
-      username: currentUsername ?? 'guest',
+      username: currentUsername ?? "guest",
     };
 
     const payload = {
@@ -451,7 +468,16 @@ function Chat() {
             </span>
           </div>
         </div>
-        <Box sx={{ display: "flex", alignItems: "baseline", gap: 1, background: '#333', padding: '5px 0 5px 19px', borderRadius: "4px" }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "baseline",
+            gap: 1,
+            background: "#333",
+            padding: "5px 0 5px 19px",
+            borderRadius: "4px",
+          }}
+        >
           <Box
             sx={{
               color: "#fff",
@@ -462,8 +488,6 @@ function Chat() {
               display: "flex",
               alignItems: "center",
               gap: "0 5px",
-
-
             }}
           >
             <Box
@@ -526,7 +550,7 @@ function Chat() {
             const avatarUrl = item?.sender?.photoUrl;
             const initial = getInitial(name);
             const isFirstMessage = index === 0;
-             const senderColor = getConsistentSenderColor(name);
+            const senderColor = getConsistentSenderColor(name);
             return (
               <Box
                 className="message"
@@ -730,10 +754,76 @@ function Chat() {
           gap: 2,
         }}
       >
-
-        <Typography variant="h6" sx={{ color: "white" }}>
-          Set Username
+        <Typography variant="h6" sx={{ color: "white", mb: 2 }}>
+          Set Profile
         </Typography>
+
+        {/* Display current image or placeholder */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Box
+            sx={{
+              width: 80,
+              height: 80,
+              borderRadius: "50%",
+              overflow: "hidden",
+              mb: 1,
+              border: "1px solid rgba(255,255,255,0.3)",
+            }}
+          >
+            {profileImage ? (
+              <img
+                src={profileImage}
+                alt="Profile"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            ) : (
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  backgroundColor: "rgba(255,255,255,0.1)",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  color: "rgba(255,255,255,0.7)",
+                  fontSize: "1.5rem",
+                }}
+              >
+                {username ? username.charAt(0).toUpperCase() : <HideImageOutlinedIcon />}
+              </Box>
+            )}
+          </Box>
+        </Box>
+
+        <Button
+          component="label"
+          variant="outlined"
+          sx={{ color: "white", borderColor: "rgba(255,255,255,0.3)", mb: 1 }}
+        >
+          Upload Image
+          <input
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={handleImageUpload}
+          />
+        </Button>
+
+        {/* {profileImage && (
+          <Button
+            variant="outlined"
+            sx={{ color: "white", borderColor: "rgba(255,255,255,0.3)", mb: 2 }}
+            onClick={handleImageUpload}
+          >
+            Edit Image
+          </Button>
+        )} */}
 
         <TextField
           label="Username"
@@ -752,6 +842,7 @@ function Chat() {
             "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
               borderColor: "rgba(255,255,255,0.7)",
             },
+            mb: 2,
           }}
         />
 
@@ -770,7 +861,9 @@ function Chat() {
         </Box>
       )}
       {!isSettingUsername && !username && (
-        <Box sx={{ position: "fixed", top: 10, right: 10, zIndex: 99999999999 }}>
+        <Box
+          sx={{ position: "fixed", top: 10, right: 10, zIndex: 99999999999 }}
+        >
           <Button variant="outlined" onClick={() => setIsSettingUsername(true)}>
             Set Username
           </Button>
