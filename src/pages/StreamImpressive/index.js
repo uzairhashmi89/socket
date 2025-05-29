@@ -396,7 +396,7 @@ function LiveChatImmersive() {
   const [showGiphyModal, setShowGiphyModal] = useState(false);
 
   return (
-    <Box className="chat-ui" sx={{ backgroundColor: "#333" }}>
+    <Box className="chat-ui" sx={{ backgroundColor: "#555" }}>
       <div className="gradient-bg"></div>
          <Box
          className="main-chat"
@@ -405,7 +405,7 @@ function LiveChatImmersive() {
            flexDirection: "column",
            flex: 1,
            p: 2,
-           backgroundColor: "#333",
+           backgroundColor: "#555",
            color: "white",
            opacity: 1,
            position: "",
@@ -423,7 +423,7 @@ function LiveChatImmersive() {
              position: "fixed",
              top: 0,
              left: 0,
-             background: "#000",
+             background: "#555",
              width: "100%",
              display: "flex",
              alignItems: "baseline",
@@ -551,9 +551,6 @@ function LiveChatImmersive() {
                    marginBottom: "5px",
                  }}
                >
-                 {/* For channel Heading */}
-
-                 {/* for channle heading end */}
                  <Box
                    style={{
                      width: "99%",
@@ -626,8 +623,6 @@ function LiveChatImmersive() {
                      </Box>
                    )}
                  </Box>
-                 {/* Optional Ad */}
-                 {/* {renderChatAd(index)} */}
                </Box>
              );
            })}
