@@ -129,6 +129,24 @@ body {
   outline: none;
   box-shadow: none;
 }
+.static-chat-button-stream {
+  background-color: transparent;
+  color: rgb(255, 255, 255);
+  width: 100px;
+  height: 45px;
+  border-radius: 10px;
+  font-family: Poppins;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0 10px;
+  font-weight: 800;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  font-size: 25px;
+  padding-left: 20px;
+}
 .message-container::-webkit-scrollbar {
   display: none;
 }
@@ -337,7 +355,6 @@ body {
 }
 .qr-code-wrapper {
   display: flex;
-
   z-index: 2;
   background-color: #333333;
   padding: 20px;
@@ -346,6 +363,13 @@ body {
   border-radius: 10px;
   border: 1px solid #cdcdcd;
   margin-left: 10px;
+}
+.qr-code-wrapper_stream {
+  display: flex;
+  z-index: 2;
+  width: 100%;
+  margin: 0 auto;
+  margin-bottom: 140px;
 }
 .qr-code-main {
   display: flex;

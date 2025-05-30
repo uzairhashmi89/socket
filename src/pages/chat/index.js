@@ -54,6 +54,8 @@ function Chat() {
       console.log("[Client] Connected:", socket.id);
       if (localStorage.getItem("userName")) {
         emitJoin(localStorage.getItem("userName"));
+      }else{
+        emitJoin('Guest');
       }
     });
 

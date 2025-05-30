@@ -4,7 +4,7 @@ import { ContentState, convertToRaw, EditorState } from "draft-js";
 import { Box } from "@mui/material";
 import { ChatBubble } from "@mui/icons-material";
 import QrCode from "../../Components/QrCode";
-import UserIcon from "../../assets/user-icon.png";
+import UserIcon from "../../assets/mdi_account-online.svg";
 import VerifiedIcon from "@mui/icons-material/Verified";
 
 const socket = io("https://api.staging-new.boltplus.tv", {
@@ -53,6 +53,8 @@ function StreamImpressive() {
       console.log("[Client] Connected:", socket.id);
       if (localStorage.getItem("userName")) {
         emitJoin(localStorage.getItem("userName"));
+      }else{
+        emitJoin('Guest');
       }
     });
 
@@ -215,12 +217,11 @@ function StreamImpressive() {
             alignItems: "center",
             justifyContent: "space-between",
             gap: "20px",
-            padding: "5px 20px 5px 5px",
-            height: "40px",
+            padding: "15px",
           }}
         >
-          <button className="static-chat-button">
-            <ChatBubble /> Chat
+          <button className="static-chat-button-stream">
+            <ChatBubble style={{fontSize:"35px"}} /> Chat
           </button>
           <div
             className="connected-users-count"
@@ -229,9 +230,9 @@ function StreamImpressive() {
             <img
               src={UserIcon}
               alt="Bolt Logo"
-              style={{ width: "20px", height: "20px" }}
+              style={{ width: "35px", height: "35px" }}
             />
-            <span style={{ color: "white", fontSize: "12px" }}>
+            <span style={{ color: "white", fontSize: "25px" }}>
               {connectedUsersCount}
             </span>
           </div>
@@ -377,8 +378,8 @@ function StreamImpressive() {
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          fontWeight: "500",
-                          fontSize: "1rem",
+                          fontWeight: "800",
+                          fontSize: "20",
                           textTransform: "uppercase",
                         }}
                       >
@@ -388,8 +389,8 @@ function StreamImpressive() {
                     <Box
                       sx={{
                         color: randomColor,
-                        fontWeight: 600,
-                        fontSize: "13.5px",
+                        fontWeight: 800,
+                        fontSize: "20px",
                         textTransform: "capitalize",
                       }}
                     >
@@ -400,11 +401,11 @@ function StreamImpressive() {
                   {item?.type === "text" ? (
                     <Box
                       sx={{
-                        fontSize: "13.5px",
+                        fontSize: "20px",
                         pl: "2px",
                         pr: "1.5px",
                         lineHeight: "20px",
-                        fontWeight: "400",
+                        fontWeight: "800",
                         textTransform: "capitalize",
                       }}
                     >
@@ -435,8 +436,8 @@ function StreamImpressive() {
 
           <div ref={messagesEndRef} />
         </Box>
-        <Box className="qr-code-wrapper">
-          <QrCode />
+        <Box className="qr-code-wrapper_stream">
+          &nbsp;
         </Box>
       </Box>
     </Box>
