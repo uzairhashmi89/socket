@@ -394,8 +394,8 @@ function LiveChatImmersive() {
               xs:'0px',
             },
             height:{
-              lg: "30px",
-              md: "30px",
+              lg: "36px",
+              md: "36px",
               sm: "50px",
               xs: "50px",
             }
