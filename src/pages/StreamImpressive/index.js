@@ -366,8 +366,8 @@ function LiveChatImmersive() {
           position: "",
           width: "auto",
           height: {
-            lg: "96dvh !important",
-            md: "98dvh !important",
+            lg: "92dvh !important",
+            md: "92dvh !important",
             sm: "100% !important",
             xs: "100% !important",
           },
@@ -388,8 +388,8 @@ function LiveChatImmersive() {
           }}
           sx={{
             marginTop:{
-              lg:'5px',
-              md:'5px',
+              lg:'0',
+              md:'0',
               sm:'0px',
               xs:'0px',
             },
@@ -412,7 +412,7 @@ function LiveChatImmersive() {
             </span>
           </div>
         </Box>
-        <Box sx={{ marginTop: {lg: '40px',md: '40px',sm:'58px',xs: '58px'}, display: "flex", alignItems: "baseline", gap: 1, background: {lg:'rgba(240, 240, 241, 0.1)',md:'rgba(240, 240, 241, 0.1)',sm:'#333',xs:'#333'}, padding: '10px 10px 10px 20px', borderRadius: "4px", width: 'fit-content', position:{lg:'static',md: 'static',sm: 'fixed',xs:'fixed'}, }}>
+        <Box sx={{ marginTop: '12px', display: "flex", alignItems: "baseline", gap: 1, background: '#000', padding: '10px 10px 10px 20px', borderRadius: "4px", width: 'fit-content', position:{lg:'static',md: 'static',sm: 'fixed',xs:'fixed'}, }}>
           <Box
             sx={{
               color: "#fff",
@@ -589,7 +589,7 @@ function LiveChatImmersive() {
 
           <div ref={messagesEndRef} />
         </Box>
-        <Box className="qr-code-wrapper" sx={{width:{lg: '30%',md: '30%',sm: '50%',xs: '84.2%'},marginLeft:{lg: 0,md:0,sm: '10px !important',xs: '10px !important'},zIndex:{lg:'2',md:'2',xs:'0',sm:'0'},marginBottom:{lg:'20px',md: '20px',sm:'10px',xs:'10px'}}} style={{ background: "#F0F0F11A", marginLeft: '0', marginRight: '0' }}>
+        <Box className="qr-code-wrapper" sx={{width:{lg: '50%',md: '50%',sm: '50%',xs: '84.2%'},marginLeft:{lg: 0,md:0,sm: '10px !important',xs: '10px !important'},zIndex:{lg:'2',md:'2',xs:'0',sm:'0'},marginBottom:{lg:'20px',md: '20px',sm:'10px',xs:'10px'}}} style={{ background: "#F0F0F11A", marginLeft: '0', marginRight: '0' }}>
           <QrCode />
         </Box>
         {/* <Box
@@ -660,9 +660,10 @@ function LiveChatImmersive() {
           </Button>
         </Box> */}
       </Box>
-      <Box
+      {/* <Box
         sx={{
           position: "fixed", // Example positioning
+          display: 'none',
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
@@ -703,7 +704,7 @@ function LiveChatImmersive() {
         <Button variant="contained" onClick={handleSaveUsername}>
           Save
         </Button>
-      </Box>
+      </Box> */}
 
       {/* {!isSettingUsername && username && (
         <Box sx={{ position: "fixed", top: 10, right: 10, zIndex: 5 }}>
