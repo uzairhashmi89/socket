@@ -412,7 +412,7 @@ function LiveChatImmersive() {
             </span>
           </div>
         </Box>
-        <Box sx={{ marginTop: '12px', display: "flex", alignItems: "baseline", gap: 1, background: '#000', padding: '10px 10px 10px 20px', borderRadius: "4px", width: 'fit-content', position:{lg:'static',md: 'static',sm: 'fixed',xs:'fixed'}, }}>
+        <Box sx={{ marginTop: {lg:'12px', md: '12px', sm: '38px', xs: '38px'}, display: "flex", alignItems: "baseline", gap: 1, background: '#000', padding: '10px 10px 10px 20px', borderRadius: "4px", width: 'fit-content', position:{lg:'static',md: 'static',sm: 'fixed',xs:'fixed'}, }}>
           <Box
             sx={{
               color: "#fff",

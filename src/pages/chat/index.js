@@ -457,13 +457,25 @@ function Chat() {
           display: "flex",
           flexDirection: "column",
           flex: 1,
-          pt: 2,
+          pt: {
+            md: 2,
+            sm: 0
+          },
           pb: 2,
           pl: 0,
-          right: 20,
+          right: {
+            lg: 20,
+            md: 20,
+            sm: 0,
+            xs: 0,
+          },
           color: "white",
           opacity: 1,
           position: "",
+          background: {
+            sm: "rgba(38, 40, 37, 0.8)",
+            xs: "rgba(38, 40, 37, 0.8)",
+          }
         }}
       >
         <div
