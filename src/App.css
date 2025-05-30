@@ -80,13 +80,9 @@ border: 1px solid rgb(81, 81, 81);
   }
   .chat-ui{
     position: relative;
-    /* display: flex;
-    flex-direction: row; */
-    /* width: 100%;
-    background: linear-gradient(to left, rgba(38, 40, 37, 1) 0%, rgba(38, 40, 37, 0) 100%); */
+    
   }
   .gradient-bg{
-    /* background: linear-gradient(to left, rgba(38, 40, 37, 1) 5%, rgba(38, 40, 37, 0) 95%); */
     background-image: url('../src/assets/bg-overlay3.png');
     background-repeat: no-repeat;
     background-size: cover;
@@ -106,12 +102,14 @@ border: 1px solid rgb(81, 81, 81);
     width: 27%;
     padding: 0 5px;
     margin-left: auto;
-    height: calc(100vh - 165px);
+    height: calc(100vh - 205px);
     overflow-y: hidden;
-   height: calc(100vh - 165px);
     position: relative;
     z-index: 999999999999;
-    /* background: linear-gradient(to bottom, rgba(38, 40, 37, 1) 0%, rgba(38, 40, 37, 0) 95%); */
+    background-color: #262825E6 !important;
+    top: 20px;
+    right: 70px;
+    border-radius: 10px;
   }
   
   .scanQR {
@@ -142,7 +140,8 @@ border: 1px solid rgb(81, 81, 81);
     display: none;
   }
 .send-message-input, .editor{
-  background: linear-gradient(to bottom, rgba(38, 40, 37, 1) 100%, rgba(38, 40, 37, 0) 95%) !important;
+  /* background: linear-gradient(to bottom, rgba(38, 40, 37, 1) 100%, rgba(38, 40, 37, 0) 95%) !important; */
+  background-color: #3a3c39 !important;
 }
   @media only screen and (max-width: 1199px) {
     .video-player {
@@ -166,10 +165,6 @@ height: auto !important;
 
     .immersive_chat {
       position: static !important;
-    }
-
-    .immersive_chat .stream-impressive {
-      /* background-color: rgb(18 16 49) !important; */
     }
 
     .main-chat{
@@ -226,8 +221,8 @@ height: auto !important;
 
 .emojiSelect {
   position: absolute !important;
-  right: 60px !important;
-  top: 22px !important;
+  right: 72px !important;
+  top: 15px !important;
 }
 .emojiSelectButton {
   background: none !important;
@@ -347,10 +342,13 @@ height: auto !important;
   z-index: 2;
   background-color: #333333;
   padding:20px;
-  width: 89%;
+  width: 87%;
   margin: 0 auto;
-  margin-bottom: 70px;
+  margin-bottom: 61px;
   border-radius: 10px;
+  border: 1px solid #cdcdcd;
+  margin-left: 10px;
+  
 }
 .qr-code-main{
   display: flex;

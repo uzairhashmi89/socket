@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import { io } from "socket.io-client";
 import { ContentState, convertToRaw, EditorState } from "draft-js";
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Avatar, Box, Button, TextField, Typography } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import Editor from "@draft-js-plugins/editor";
 import createEmojiPlugin, { defaultTheme } from "@draft-js-plugins/emoji";
@@ -403,7 +403,7 @@ function Chat() {
 
   return (
     <Box className="chat-ui">
-      <div className="gradient-bg" style={{ height: "100%" }}></div>
+      {/* <div className="gradient-bg" style={{ height: "100%" }}></div> */}
       <RadioPlayer />
       <Box
         className="main-chat"
@@ -422,7 +422,7 @@ function Chat() {
         <div
           style={{
             // background: "linear-gradient(to bottom, rgba(38, 40, 37, 1) 7%, rgba(38, 40, 37, 0) 95%)",
-            background: "#333",
+            backgroundColor: "#2c3136",
             width: "auto",
             marginTop: "-10px",
             display: "flex",
@@ -430,7 +430,7 @@ function Chat() {
             gap: "20px",
             padding: "5px",
             // borderBottom:'1px solid #F0F0F11A',
-            height: "100px",
+            height: "40px",
           }}
         >
           <button className="static-chat-button">
@@ -651,9 +651,10 @@ function Chat() {
           sx={{
             display: "flex",
             alignItems: "center",
+            gap: '0 10px',
             justifyContent: "space-between",
             padding: "1rem 10px",
-            // backgroundColor: "#0b0c2a",
+            // backgroundColor: "red",
             borderTop: "1px solid rgba(255, 255, 255, 0.1)",
             position: "absolute",
             bottom: 0,
@@ -663,7 +664,18 @@ function Chat() {
           }}
           className="send-message-input editor with_video"
         >
-          <Editor
+          <Avatar
+              sx={{
+                width: 30,
+                height: 30,
+                backgroundColor: getColorFromName(username),
+                color: "white",
+                fontSize: "1rem",
+                textTransform: "uppercase",
+              }}
+              />
+          <Box sx={{background:'#5f5e5e', padding: '10px', width: '80%',borderRadius: '8px'}}>
+            <Editor
             editorState={editorState}
             onChange={setEditorState}
             plugins={plugins}
@@ -672,14 +684,16 @@ function Chat() {
           />
           <EmojiSuggestions />
           <EmojiSelect closeOnEmojiSelect />
+          </Box>
           <button
             onClick={sendMessage}
             style={{
               width: "50px",
-              height: "50px",
-              background:
-                "linear-gradient(93.56deg, rgb(101, 53, 233) 4.6%, rgb(78, 51, 233) 96.96%)",
-              border: "1px solid rgb(101, 53, 233)",
+              height: "40px",
+              // background:
+              //   "linear-gradient(93.56deg, rgb(101, 53, 233) 4.6%, rgb(78, 51, 233) 96.96%)",
+              backgroundColor: '#E0032C',
+              border: "1px solid #E0032C",
               outline: 0,
               borderRadius: "8px",
               color: "white",
@@ -707,8 +721,8 @@ function Chat() {
               color: "white",
               fontSize: 12,
               position: "absolute",
-              right: 105,
-              top: 32,
+              right: 113,
+              top: 27,
             }}
           >
             GIF
@@ -762,7 +776,7 @@ function Chat() {
 
       {!isSettingUsername && username && (
         <Box
-          sx={{ position: "fixed", top: 10, right: 10, zIndex: 99999999999 }}
+          sx={{ position: "fixed", top: 30, right: 80, zIndex: 99999999999 }}
         >
           <Button variant="outlined" onClick={() => setIsSettingUsername(true)}>
             Edit Username

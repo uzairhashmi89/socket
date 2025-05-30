@@ -443,6 +443,20 @@ function OnlyChat() {
               xs: "50px",
             }
           }}
+          sx={{
+            marginTop:{
+              lg:'5px',
+              md:'5px',
+              sm:'0px',
+              xs:'0px',
+            },
+            height:{
+              lg: "30px",
+              md: "30px",
+              sm: "50px",
+              xs: "50px",
+            }
+          }}
         >
           <button className="static-chat-button">
             <ChatBubble /> Chat
