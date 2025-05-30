@@ -162,6 +162,12 @@ body {
   }
 }
 @media only screen and (max-width: 768.5px) {
+  .emojiSelectButton {
+    margin-top: -5px !important;
+  }
+  .chat-gif-icon{
+    top: 21px !important;
+  }
   .immersive_chat {
     position: static !important;
   }

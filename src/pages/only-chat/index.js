@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from "react";
+import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { io } from "socket.io-client";
 import {
   ContentState,
@@ -6,7 +6,7 @@ import {
   DraftHandleValue,
   EditorState,
 } from "draft-js";
-import { Box, Button, TextField, Typography, Avatar } from "@mui/material";
+import { Box, Button, TextField, Typography, Avatar ,IconButton} from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import Editor, { PluginEditorProps } from "@draft-js-plugins/editor";
 import createEmojiPlugin, { defaultTheme } from "@draft-js-plugins/emoji";
@@ -15,6 +15,8 @@ import { GiphyModal } from "../../Components/GiphyModal";
 import QrCode from "../../Components/QrCode";
 import UserIcon from "../../assets/user-icon.png"
 import VerifiedIcon from '@mui/icons-material/Verified';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import logo from '../../assets/logo.png'
 
 const socket = io("https://api.staging-new.boltplus.tv", {
   path: "/public-socket/",
@@ -444,8 +446,8 @@ function OnlyChat() {
     }
   };
   return (
-    <Box className="chat-ui" sx={{ backgroundColor: "#333333" }}>
-      <div className="gradient-bg"></div>
+    <Box className="chat-ui" sx={{ backgroundColor: "#262825" }}>
+      {/* <div className="gradient-bg"></div> */}
       <Box
         className="main-chat"
         sx={{
@@ -453,28 +455,54 @@ function OnlyChat() {
           flexDirection: "column",
           flex: 1,
           p: 2,
-          backgroundColor: "#333333",
+          backgroundColor: "#262825 !important",
           color: "white",
           opacity: 1,
           position: "",
           width: "auto",
           height: {
-            lg: "92dvh !important",
-            md: "92dvh !important",
+            lg: "92.5dvh !important",
+            md: "95.5dvh !important",
             sm: "100% !important",
             xs: "100% !important",
           },
+          borderRadius: '0 !important'
         }}
       >
         <Box
-          style={{
+      display="flex"
+      justifyContent="space-between"
+      style={{
             position: "fixed",
             top: 0,
+            left: 0,
+            background: "#000",
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            padding: "4px 8px",
+            height: "50px",
+            justifyContent: "space-between",
+          }}
+    >
+      {/* Replace this with your actual logo */}
+      <Box component="img" src={logo} alt="View Media Logo" sx={{ height: 32 }} />
+
+      <IconButton>
+        <Avatar sx={{ bgcolor: 'white' }}>
+          <AccountCircleIcon sx={{ color: '#333' }} />
+        </Avatar>
+      </IconButton>
+    </Box>
+        <Box
+          style={{
+            position: "fixed",
+            top: 55,
             left: 0,
             background: "#333",
             width: "100%",
             display: "flex",
-            alignItems: "baseline",
+            alignItems: "center",
             gap: "20px",
             padding: "5px",
             justifyContent: "space-around",
@@ -505,7 +533,7 @@ function OnlyChat() {
             </span>
           </div>
         </Box>
-        <Box sx={{ marginTop: {lg:'12px', md: '12px', sm: '38px', xs: '38px'}, display: "flex", alignItems: "baseline", gap: 1, background: {lg:'rgba(240, 240, 241, 0.1)',md:'rgba(240, 240, 241, 0.1)',sm:'#333',xs:'#333'}, padding: '10px 10px 10px 20px', borderRadius: "4px", width: 'fit-content', position:{lg:'static',md: 'static',sm: 'fixed',xs:'fixed'}, }}>
+        <Box sx={{marginLeft: '-16px', marginTop: {lg:'66px', md: '88px', sm: '98px', xs: '110px'}, display: "flex", alignItems: "baseline", gap: 1, background: {lg:'#818181',md:'#818181',sm:'#818181',xs:'#818181'}, padding: '10px 10px 10px 20px', borderRadius: "4px", width: 'fit-content', position:{lg:'static',md: 'static',sm: 'fixed',xs:'fixed'}, }}>
           <Box
             sx={{
               color: "#fff",
@@ -682,26 +710,39 @@ function OnlyChat() {
 
           <div ref={messagesEndRef} />
         </Box>
-        <Box className="qr-code-wrapper" sx={{width:{lg: '50%',md: '50%',sm: '50%',xs: '84.2%'},marginLeft:{lg: 0,md:0,sm: '10px !important',xs: '10px !important'},zIndex:{lg:'2',md:'2',xs:'0',sm:'0'},marginBottom:{lg:'30px',md: '50px',sm:'80px',xs:'80px'}}} style={{ background: "#F0F0F11A", marginLeft: '0', marginRight: '0' }}>
+        <Box className="qr-code-wrapper" sx={{width:{lg: '30%',md: '45%',sm: '50%',xs: '84.2%'},marginLeft:{lg: 0,md:0,sm: '10px !important',xs: '10px !important'},zIndex:{lg:'2',md:'2',xs:'0',sm:'0'},marginBottom:{lg:'65px',md: '65px',sm:'80px',xs:'80px'}}} style={{ background: "#F0F0F11A", marginLeft: '0', marginRight: '0' }}>
           <QrCode />
         </Box>
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
+            gap: '0 10px',
             justifyContent: "space-between",
             padding: "1rem 10px",
-            // backgroundColor: "#0b0c2a",
+            backgroundColor: "#262825 !important",
             borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-            position: "fixed",
+            position: "absolute",
             bottom: 0,
             right: 0,
             width: "100%",
-            opacity: 1,
+            opacity: 0.95,
+            borderRadius: '0 !important',
           }}
-          className="send-message-input editor"
+          className="send-message-input editor with_video"
         >
-          <Editor
+          <Avatar
+              sx={{
+                width: 30,
+                height: 30,
+                backgroundColor: getColorFromName(username),
+                color: "white",
+                fontSize: "1rem",
+                textTransform: "uppercase",
+              }}
+              />
+          <Box sx={{background:'#F0F0F11A', padding: '10px', width: '93%',borderRadius: '8px'}}>
+            <Editor
             editorState={editorState}
             onChange={setEditorState}
             plugins={plugins}
@@ -710,14 +751,16 @@ function OnlyChat() {
           />
           <EmojiSuggestions />
           <EmojiSelect closeOnEmojiSelect />
+          </Box>
           <button
             onClick={sendMessage}
             style={{
               width: "50px",
-              height: "50px",
-              background:
-                "linear-gradient(93.56deg, rgb(101, 53, 233) 4.6%, rgb(78, 51, 233) 96.96%)",
-              border: "1px solid rgb(101, 53, 233)",
+              height: "40px",
+              // background:
+              //   "linear-gradient(93.56deg, rgb(101, 53, 233) 4.6%, rgb(78, 51, 233) 96.96%)",
+              backgroundColor: '#E0032C',
+              border: "1px solid #E0032C",
               outline: 0,
               borderRadius: "8px",
               color: "white",
@@ -725,7 +768,9 @@ function OnlyChat() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+
             }}
+            
           >
             <SendIcon />
           </button>
@@ -745,8 +790,8 @@ function OnlyChat() {
               color: "white",
               fontSize: 12,
               position: "absolute",
-              right: 105,
-              top: 32,
+              right: 113,
+              top: 27,
             }}
           >
             GIF
