@@ -98,9 +98,8 @@ body {
 }
 .main-chat {
   width: 27%;
-  padding: 0 5px;
   margin-left: auto;
-  height: calc(100vh - 205px);
+  height: calc(100vh - 175px);
   overflow-y: hidden;
   position: relative;
   z-index: 999999999999;
@@ -342,9 +341,8 @@ body {
   z-index: 2;
   background-color: #333333;
   padding: 20px;
-  width: 87%;
+  width: calc(100% - 60px);
   margin: 0 auto;
-  margin-bottom: 61px;
   border-radius: 10px;
   border: 1px solid #cdcdcd;
   margin-left: 10px;
@@ -358,4 +356,11 @@ body {
 }
 .qr-code-main h2 {
   margin: 0 0 10px 0;
+}
+
+.stream-impressive-page .main-chat {
+  top: 0;
+  border-radius: 0;
+  height: calc(100vh - 10px);
+  padding-bottom: 10px !important;
 }

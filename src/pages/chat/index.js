@@ -1,47 +1,26 @@
-import axios from 'axios';
-import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { ContentState, convertToRaw, EditorState } from "draft-js";
-import { Avatar, Box, Button, TextField, Typography } from "@mui/material";
-import SendIcon from "@mui/icons-material/Send";
-import Editor from "@draft-js-plugins/editor";
-import createEmojiPlugin, { defaultTheme } from "@draft-js-plugins/emoji";
+import { Box } from "@mui/material";
 import { ChatBubble } from "@mui/icons-material";
-import { GiphyModal } from "../../Components/GiphyModal";
-// import RadioPlayer from "../Immersive/Component/RadioPlayer";
 import RadioPlayer from "./RadioPlayer";
-import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 import QrCode from "../../Components/QrCode";
 import UserIcon from "../../assets/user-icon.png";
 import VerifiedIcon from "@mui/icons-material/Verified";
-import HideImageOutlinedIcon from '@mui/icons-material/HideImageOutlined';
 
 const socket = io("https://api.staging-new.boltplus.tv", {
   path: "/public-socket/",
   transports: ["websocket"], // optionally add 'polling' if needed
 });
 
-defaultTheme.emojiSuggestions += " emojiSuggestions";
-defaultTheme.emojiSuggestionsEntry += " emojiSuggestionsEntry";
-defaultTheme.emojiSuggestionsEntryFocused += " emojiSuggestionsEntryFocused";
-defaultTheme.emojiSuggestionsEntryText += " emojiSuggestionsEntryText";
-defaultTheme.emojiSelect += " emojiSelect";
-defaultTheme.emojiSelectButton += " emojiSelectButton";
-defaultTheme.emojiSelectButtonPressed += " emojiSelectButtonPressed";
-defaultTheme.emojiSelectPopover += " emojiSelectPopover";
-
 function Chat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
 
-  const [chatAds, setChatAds] = useState([]);
-  const [chatAdIndex, setChatAdIndex] = useState(0);
-
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
-  // Aimal code Start
   const [connectedUsersCount, setConnectedUsersCount] = useState(null);
 
   useEffect(() => {
@@ -94,71 +73,6 @@ function Chat() {
       socket.disconnect();
     };
   }, []);
-  // console.log("input", input);
-  const sendMessage = () => {
-    if (input?.message) {
-      const payload = {
-        message: input?.message,
-        draftContent: "",
-        type: "text",
-      };
-      socket.emit("sendMessage", payload);
-      setInput("");
-      setEditorState(EditorState.createEmpty());
-    }
-  };
-
-  const sendGiphy = (data) => {
-    if (data?.giphy) {
-      const payload = {
-        message: "",
-        giphy: data?.giphy,
-        draftContent: "",
-        type: "giphy",
-      };
-      socket.emit("sendMessage", payload);
-      setInput("");
-      setShowGiphyModal(false);
-      setEditorState(EditorState.createEmpty());
-    }
-  };
-
-  // Fetch ads
-  useEffect(() => {
-    const fetchAds = async () => {
-      try {
-        const response = await fetch(
-          "https://api.staging-new.boltplus.tv/advertisements/get?limit=10&page=1&skip=0&forFrontend=true",
-          {
-            method: "GET",
-            headers: {
-              Accept: "application/json, text/plain, */*",
-              "Accept-Language": "en-US,en;q=0.9",
-              Connection: "keep-alive",
-              Origin: "https://staging-new.boltplus.tv",
-              Referer: "https://staging-new.boltplus.tv/",
-              "User-Agent": "Mozilla/5.0",
-              boltsrc: "boltplus-webapp/microsoft_windows/0.1.0",
-              device: "d520c7a8-421b-4563-b955-f5abc56b97ec",
-              "product-token": "330dbc49a5872166f13049629596fc088b26d885",
-              session: "1744790058433",
-              "Cache-Control": "no-cache",
-            },
-          }
-        );
-
-        if (!response.ok)
-          throw new Error(`HTTP error! status: ${response.status}`);
-
-        const data = await response.json();
-        setChatAds(data?.data?.filter((ad) => ad.placement === "chat"));
-      } catch (e) {
-        console.error("Error fetching ads:", e);
-      }
-    };
-
-    fetchAds();
-  }, []);
 
   // Fetch messages
   useEffect(() => {
@@ -191,15 +105,6 @@ function Chat() {
     fetchMessages();
   }, []);
 
-  // Rotate ads every 5 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setChatAdIndex((prevIndex) => (prevIndex + 1) % chatAds.length);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [chatAds]);
-
   // Utility: Get first letter of name
   const getInitial = (name) => {
     if (!name) return "";
@@ -213,52 +118,6 @@ function Chat() {
       .split("")
       .reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return colors[hash % colors.length];
-  };
-
-  // Render ads every 8th message
-  const renderChatAd = (index) => {
-    if (chatAds.length === 0) return null;
-    if ((index + 1) % 8 === 0) {
-      return (
-        <Box mt={1} style={{ width: "97%", borderRadius: 8, padding: "0px" }}>
-          {chatAds[chatAdIndex] && (
-            <img
-              src={chatAds[chatAdIndex].assetUrl}
-              alt="Chat Ad"
-              style={{ width: "100%", borderRadius: 8 }}
-            />
-          )}
-        </Box>
-      );
-    }
-    return null;
-  };
-  const TestVideo =
-    "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8";
-
-  const [username, setUsername] = useState(
-    localStorage.getItem("userName") || ""
-  );
-
-  const [isSettingUsername, setIsSettingUsername] = useState(
-    !localStorage.getItem("userName")
-  );
-
-  const handleSaveUsername = () => {
-    const trimmedUsername = username.trim();
-    if (trimmedUsername) {
-      localStorage.setItem("userName", trimmedUsername);
-      setUsername(trimmedUsername); // Update state with trimmed value
-      setIsSettingUsername(false); // Emit the join event with the new username immediately after saving
-      // The useEffect listening to 'username' and 'socket.connected' will also trigger this
-      // but emitting here ensures it happens right after saving.
-
-      if (socket.connected) {
-        emitJoin(trimmedUsername);
-      }
-    } else {
-      console.warn("Username cannot be empty."); // Optionally provide feedback to the user
-    }
   };
 
   const emitJoin = (currentUsername) => {
@@ -294,24 +153,11 @@ function Chat() {
         }
       }
     };
-
-    // Debounce to handle rapid message updates
-    if (chatAds?.length > 0 && messages?.length > 0) {
+    if (messages?.length > 0) {
       const timeout = setTimeout(scrollToBottom, 1000);
       return () => clearTimeout(timeout);
     }
-  }, [messages, chatAds]);
-
-  const { EmojiSuggestions, EmojiSelect, plugins } = useMemo(() => {
-    const emojiPlugin = createEmojiPlugin({
-      useNativeArt: true,
-      theme: defaultTheme,
-    });
-    const { EmojiSuggestions, EmojiSelect } = emojiPlugin;
-
-    const plugins = [emojiPlugin];
-    return { plugins, EmojiSuggestions, EmojiSelect };
-  }, []);
+  }, [messages]);
 
   useEffect(() => {
     const newState = EditorState.push(
@@ -321,14 +167,6 @@ function Chat() {
     );
     setEditorState(EditorState.moveFocusToEnd(newState));
   }, []);
-
-  const handleKeyCommand = (command) => {
-    if (command === "split-block" && !!sendMessage) {
-      sendMessage();
-      return "handled";
-    }
-    return "not-handled";
-  };
 
   const updateChatState = (payload) => {
     setInput((prev) => ({ ...prev, ...payload }));
@@ -352,104 +190,8 @@ function Chat() {
     onChangeText(editorData?.blocks?.map((item) => item.text)?.join("\n"));
   }, [editorState]);
 
-  const [showGiphyModal, setShowGiphyModal] = useState(false);
-
-    const [isUploading, setIsUploading] = useState(false);
-  const [profileImage, setProfileImage] = useState(
-      localStorage.getItem("profileImage") || null
-    );
-
-    const uploadProfileImage = async (file, dispatchCallback = () => {}) => {
-      const UPLOAD_API_BASE_URL = "https://api.staging-new.boltplus.tv";
-      const UPLOAD_ENDPOINT = "/upload/public-profile";
-    
-      try {
-        const fileName = `${Date.now()}-${file.name.replace(/[^\w.]/g, "")}`;
-        const { data: { fields, url } } = await axios.post(`${UPLOAD_API_BASE_URL}${UPLOAD_ENDPOINT}`, {
-          type: file.type,
-          name: fileName,
-          folder:"avatar"
-        });
-    
-        const formData = new FormData();
-        formData.append("key", fields.key);
-        formData.append("Content-Type", file.type);
-        formData.append("acl", "public-read");
-    
-        Object.entries(fields).forEach(([key, value]) => {
-          if (key !== "key") {
-            formData.append(key, value);
-          }
-        });
-        formData.append("file", file);
-    
-        await axios.post(url, formData, {
-          onUploadProgress: (event) => {
-            const progress = Math.floor((event.loaded / event.total) * 100);
-            console.log(`Upload progress: ${progress}%`);
-            // If you had a Redux action for progress, you'd call it here:
-            // dispatchCallback({ type: 'UPLOAD_PROGRESS', payload: { uploadId: 'profileImage', progress } });
-          },
-        });
-    
-        const publicImageUrl = `${url}/${fields.key}`;
-        console.log("Image uploaded successfully:", publicImageUrl);
-        return publicImageUrl;
-    
-      } catch (error) {
-        console.error("Error uploading profile image:", error);
-        return null;
-      }
-    };
-    const handleSaveProfile = useCallback(() => { // Renamed from handleSaveUsername
-        const trimmedUsername = username.trim();
-        let usernameToEmit = "guest";
-        let imageToEmit = profileImage; // Use the URL directly
-    
-        if (trimmedUsername) {
-          localStorage.setItem("userName", trimmedUsername);
-          setUsername(trimmedUsername);
-          usernameToEmit = trimmedUsername;
-        } else {
-          localStorage.removeItem("userName");
-          setUsername(""); // Ensure state is cleared
-        }
-    
-        if (profileImage) {
-          localStorage.setItem("profileImage", profileImage); // Store the URL
-        } else {
-          localStorage.removeItem("profileImage");
-        }
-    
-        setIsSettingUsername(false); // Close the settings modal
-    
-        // Emit the combined data via socket if connected
-        if (socket.connected) {
-          emitJoin(usernameToEmit, imageToEmit); // Emit the URL
-        } else {
-          console.warn("Socket not connected. Profile will be saved locally but not emitted.");
-        }
-      }, [username, profileImage]); // Added dependencies
-    const handleImageUpload = async (event) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setIsUploading(true); // Set uploading state
-      try {
-        const imageUrl = await uploadProfileImage(file); // Call the utility function
-        if (imageUrl) {
-          setProfileImage(imageUrl); // Update state with the public URL
-        }
-      } catch (error) {
-        console.error("Failed to upload image:", error);
-        // Handle error, e.g., show a toast message
-      } finally {
-        setIsUploading(false); // Reset uploading state
-      }
-    }
-  };
   return (
     <Box className="chat-ui">
-      {/* <div className="gradient-bg" style={{ height: "100%" }}></div> */}
       <RadioPlayer />
       <Box
         className="main-chat"
@@ -459,13 +201,13 @@ function Chat() {
           flex: 1,
           pt: {
             md: 2,
-            sm: 0
+            sm: 0,
           },
-          pb: 2,
+          pb: 1.2,
           pl: 0,
           right: {
-            lg: 20,
-            md: 20,
+            lg: 60,
+            md: 60,
             sm: 0,
             xs: 0,
           },
@@ -475,12 +217,11 @@ function Chat() {
           background: {
             sm: "#2c3035",
             xs: "#2c3035",
-          }
+          },
         }}
       >
         <div
           style={{
-            // background: "linear-gradient(to bottom, rgba(38, 40, 37, 1) 7%, rgba(38, 40, 37, 0) 95%)",
             backgroundColor: "#2c3136",
             width: "auto",
             marginTop: "-10px",
@@ -488,8 +229,7 @@ function Chat() {
             alignItems: "center",
             justifyContent: "space-between",
             gap: "20px",
-            padding: "5px",
-            // borderBottom:'1px solid #F0F0F11A',
+            padding: "5px 20px 5px 5px",
             height: "40px",
           }}
         >
@@ -500,7 +240,6 @@ function Chat() {
             className="connected-users-count"
             style={{ display: "flex", alignItems: "center", gap: "5px" }}
           >
-            {/* <SupervisorAccountIcon size="large"/> */}
             <img
               src={UserIcon}
               alt="Bolt Logo"
@@ -511,19 +250,27 @@ function Chat() {
             </span>
           </div>
         </div>
-        <Box sx={{ display: "flex", alignItems: "baseline", gap: 1, background: '#181818', padding: '5px 0 5px 19px', borderRadius: "4px" }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            background: "#181818",
+            padding: "8px 13px 8px 13px",
+            borderTop: "1px solid #818181",
+            borderBottom: "1px solid #818181",
+          }}
+        >
           <Box
             sx={{
               color: "#fff",
               fontWeight: 600,
-              fontSize: "13.5px",
+              fontSize: "14px",
               textTransform: "capitalize",
               textWrap: "nowrap",
               display: "flex",
               alignItems: "center",
               gap: "0 5px",
-
-
             }}
           >
             <Box
@@ -543,7 +290,6 @@ function Chat() {
             >
               T
             </Box>
-            {/* {name} */}
             TVC News{" "}
             <VerifiedIcon
               sx={{
@@ -556,16 +302,15 @@ function Chat() {
           </Box>
           <Box
             sx={{
-              fontSize: "13.5px",
+              fontSize: "14px",
               pl: "2px",
               pr: "5px",
-              lineHeight: "20px",
+              lineHeight: "21px",
               fontWeight: "400",
               textTransform: "capitalize",
             }}
           >
-            {/* item?.message */}🔴 LIVE: TVC News – Breaking Updates &
-            Discussion
+            🔴 LIVE: TVC News – Breaking Updates & Discussion
           </Box>
         </Box>
         <Box
@@ -594,7 +339,6 @@ function Chat() {
               "#F0F0F1",
               "#EB5757",
             ];
-            // Pick a random color for each message render
             const randomColor =
               nameColors[Math.floor(Math.random() * nameColors.length)];
             return (
@@ -612,9 +356,6 @@ function Chat() {
                   marginBottom: "5px",
                 }}
               >
-                {/* For channel Heading */}
-
-                {/* for channle heading end */}
                 <Box
                   style={{
                     width: "99%",
@@ -626,7 +367,6 @@ function Chat() {
                     padding: "5px 10px 5px 10px",
                   }}
                 >
-                  {/* Top row: Avatar + Username */}
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     {avatarUrl ? (
                       <Box
@@ -671,7 +411,6 @@ function Chat() {
                     </Box>
                   </Box>
 
-                  {/* Message or Giphy */}
                   {item?.type === "text" ? (
                     <Box
                       sx={{
@@ -705,252 +444,16 @@ function Chat() {
                     </Box>
                   )}
                 </Box>
-
-                {/* Optional Ad */}
-                {/* {renderChatAd(index)} */}
               </Box>
             );
           })}
 
           <div ref={messagesEndRef} />
         </Box>
-        {/* <Box className="qr-code-wrapper">
+        <Box className="qr-code-wrapper">
           <QrCode />
-        </Box> */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: '0 10px',
-            justifyContent: "space-between",
-            padding: "1rem 10px",
-            // backgroundColor: "red",
-            borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-            position: "absolute",
-            bottom: 0,
-            right: 0,
-            width: "100%",
-            opacity: 0.95,
-          }}
-          className="send-message-input editor with_video"
-        >
-          <Avatar
-              sx={{
-                width: 30,
-                height: 30,
-                backgroundColor: '#fff',
-                color: "#000",
-                fontSize: "1rem",
-                textTransform: "uppercase",
-              }}
-              />
-          <Box sx={{background:'#4c4d4b', padding: '10px', width: '80%',borderRadius: '8px'}}>
-            <Editor
-            editorState={editorState}
-            onChange={setEditorState}
-            plugins={plugins}
-            handleKeyCommand={handleKeyCommand}
-            placeholder="Type something..."
-          />
-          <EmojiSuggestions />
-          <EmojiSelect closeOnEmojiSelect />
-          </Box>
-          <button
-            onClick={sendMessage}
-            style={{
-              width: "50px",
-              height: "40px",
-              // background:
-              //   "linear-gradient(93.56deg, rgb(101, 53, 233) 4.6%, rgb(78, 51, 233) 96.96%)",
-              backgroundColor: '#E0032C',
-              border: "1px solid #E0032C",
-              outline: 0,
-              borderRadius: "8px",
-              color: "white",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <SendIcon />
-          </button>
-
-          <Button
-            className="chat-gif-icon"
-            size="small"
-            onClick={() => setShowGiphyModal(true)}
-            sx={{
-              borderStyle: "solid",
-              height: 18,
-              minWidth: 40,
-              pl: 0,
-              pr: 0,
-              borderColor: "#818181",
-              borderWidth: 1,
-              color: "#818181",
-              fontSize: 12,
-              position: "absolute",
-              right: 113,
-              top: 27,
-              zIndex: 9999999999, // Ensure it's above chat content
-            }}
-          >
-            GIF
-          </Button>
         </Box>
       </Box>
-      <Box
-        sx={{
-          position: "fixed", // Example positioning
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          zIndex: 9999999999, // Ensure it's above chat content
-          backgroundColor: "rgba(0,0,0,0.8)",
-          padding: 3,
-          borderRadius: 2,
-          display: isSettingUsername ? "flex" : "none", // Show/hide based on state
-          flexDirection: "column",
-          gap: 2,
-        }}
-      >
-
-        <Typography variant="h6" sx={{ color: "white", mb: 2 }}>
-                  Set Profile
-                </Typography>
-        
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: 80,
-                      height: 80,
-                      borderRadius: "50%",
-                      overflow: "hidden",
-                      mb: 1,
-                      border: "1px solid rgba(255,255,255,0.3)",
-                    }}
-                  >
-                    {profileImage ? (
-                      <img
-                        src={profileImage}
-                        alt="Profile"
-                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                      />
-                    ) : (
-                      <Box
-                        sx={{
-                          width: "100%",
-                          height: "100%",
-                          backgroundColor: "rgba(255,255,255,0.1)",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          color: "rgba(255,255,255,0.7)",
-                          fontSize: "1.5rem",
-                        }}
-                      >
-                        {username ? username.charAt(0).toUpperCase() : <HideImageOutlinedIcon />}
-                      </Box>
-                    )}
-                  </Box>
-                </Box>
-        
-                <Button
-                  component="label"
-                  variant="outlined"
-                  sx={{ color: "white", borderColor: "rgba(255,255,255,0.3)", mb: 1 }}
-                  disabled={isUploading} 
-                >
-                  {isUploading ? "Uploading..." : "Upload Image"}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    hidden
-                    onChange={handleImageUpload}
-                  />
-                </Button>
-        
-                <TextField
-                  label="Username"
-                  variant="outlined"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  InputLabelProps={{ style: { color: "rgba(255,255,255,0.7)" } }}
-                  InputProps={{ style: { color: "white" } }}
-                  sx={{
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "rgba(255,255,255,0.3)",
-                    },
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "rgba(255,255,255,0.5)",
-                    },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "rgba(255,255,255,0.7)",
-                    },
-                    mb: 2,
-                  }}
-                />
-        
-                <Button variant="contained" onClick={handleSaveProfile} disabled={isUploading}> {/* Renamed function */}
-                  Save
-                </Button>
-              </Box>
-        
-              {/* --- Profile Edit/Set Buttons (outside modal) --- */}
-              {/* {!isSettingUsername && (username || profileImage) && ( // Show edit if either username or image exists
-                <Box
-                  sx={{ position: "fixed", top: 30, right: 34,transform: 'translate(0, 4px)', zIndex: 99999999999, display: 'flex', flexDirection: 'column', gap: 0.5, alignItems: 'flex-end' }}
-                >
-                  {profileImage && ( // Show image preview if available
-                    <Box
-                      sx={{
-                        width: 30,
-                        height: 30,
-                        borderRadius: "50%",
-                        overflow: "hidden",
-                        border: "1px solid rgba(0,0,0,0.1)",
-                        cursor: 'pointer',
-                        mb: 0.5
-                      }}
-                      onClick={() => setIsSettingUsername(true)}
-                    >
-                      <img
-                        src={profileImage}
-                        alt="Profile"
-                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                      />
-                    </Box>
-                  )}
-                  <Button variant="outlined" size="small" onClick={() => setIsSettingUsername(true)}>
-                    Edit Profile
-                  </Button>
-                </Box>
-              )} */}
-              {/* Show "Set Profile" if neither username nor image is set */}
-              {/* {!isSettingUsername && !username && !profileImage && (
-                <Box sx={{ position: "fixed", top: 10, right: 10, zIndex: 99999999999 }}>
-                  <Button variant="outlined" onClick={() => setIsSettingUsername(true)}>
-                    Set Profile
-                  </Button>
-                </Box>
-              )} */}
-
-      <GiphyModal
-        open={showGiphyModal}
-        inputPlaceholder="Type something..."
-        initialEditorState={editorState}
-        onClose={() => setShowGiphyModal(false)}
-        onSelectItem={(data) => {
-          sendGiphy(data);
-        }}
-      />
     </Box>
   );
 }
