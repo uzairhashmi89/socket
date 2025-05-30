@@ -543,7 +543,7 @@ const [anchorEl, setAnchorEl] = React.useState(null);
             alignItems: "center",
             gap: "20px",
             padding: "15px 10px",
-            justifyContent: "space-between",
+            justifyContent: "space-around",
           }}
           sx={{
             marginTop:{
@@ -561,8 +561,8 @@ const [anchorEl, setAnchorEl] = React.useState(null);
             width:{
               lg: '98.7%',
               md: '98.7%',
-              sm: '94.7%',
-              xs: '94.7%',
+              sm: '93.7%',
+              xs: '93.7%',
 
             }
           }}
