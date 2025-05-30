@@ -47,7 +47,7 @@ defaultTheme.emojiSelectButton += " emojiSelectButton";
 defaultTheme.emojiSelectButtonPressed += " emojiSelectButtonPressed";
 defaultTheme.emojiSelectPopover += " emojiSelectPopover";
 
-function OnlyChat() {
+function Header() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
@@ -280,74 +280,11 @@ function OnlyChat() {
     }
   };
 
-  const emitJoin = (currentUsername) => {
-    const userPayload = {
-      username: currentUsername,
-    };
+  
 
-    const payload = {
-      channelId: "68090b895880466655dc6a17", // Use your actual channel ID
-      channelType: "channel",
-      user: userPayload,
-    };
-    console.log("Joining channel with payload:", payload);
-    socket.emit("join", payload);
-  };
-  const scrollableContainerRef = useRef(null);
-  const firstMessageRef = useRef(null);
+  
 
-  useEffect(() => {
-    const scrollToBottom = () => {
-      if (scrollableContainerRef.current) {
-        const scrollableElement = scrollableContainerRef.current;
-        // Check if user is near the top (newest messages, scrollTop close to 0)
-        const isNearBottom = scrollableElement.scrollTop < 100; // Adjust threshold as needed
-
-        if (isNearBottom) {
-          if (firstMessageRef.current) {
-            firstMessageRef.current.scrollIntoView({ behavior: "smooth" });
-          } else {
-            // Fallback to scrollTop = 0 if ref isn't set yet
-            scrollableElement.scrollTop = 0;
-          }
-        }
-      }
-    };
-
-    // Debounce to handle rapid message updates
-    if (chatAds?.length > 0 && messages?.length > 0) {
-      const timeout = setTimeout(scrollToBottom, 1000);
-      return () => clearTimeout(timeout);
-    }
-  }, [messages, chatAds]);
-
-  const { EmojiSuggestions, EmojiSelect, plugins } = useMemo(() => {
-    const emojiPlugin = createEmojiPlugin({
-      useNativeArt: true,
-      theme: defaultTheme,
-    });
-    const { EmojiSuggestions, EmojiSelect } = emojiPlugin;
-
-    const plugins = [emojiPlugin];
-    return { plugins, EmojiSuggestions, EmojiSelect };
-  }, []);
-
-  useEffect(() => {
-    const newState = EditorState.push(
-      editorState,
-      ContentState.createFromText(""),
-      "insert-characters"
-    );
-    setEditorState(EditorState.moveFocusToEnd(newState));
-  }, []);
-
-  const handleKeyCommand = (command) => {
-    if (command === "split-block" && !!sendMessage) {
-      sendMessage();
-      return "handled";
-    }
-    return "not-handled";
-  };
+  
 
   const updateChatState = (payload) => {
     setInput((prev) => ({ ...prev, ...payload }));
@@ -371,7 +308,6 @@ function OnlyChat() {
     onChangeText(editorData?.blocks?.map((item) => item.text)?.join("\n"));
   }, [editorState]);
 
-  const [showGiphyModal, setShowGiphyModal] = useState(false);
 
   const [isUploading, setIsUploading] = useState(false);
   const [profileImage, setProfileImage] = useState(
@@ -471,392 +407,56 @@ function OnlyChat() {
     }
   };
   return (
-    <Box className="only-chat-ui" sx={{ backgroundColor: "#262825" }}>
+    <>
       <Box
-        className="main-chat"
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          flex: 1,
-          color: "white",
+        display="flex"
+        justifyContent="space-between"
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          background: "#000",
           width: "100%",
-          opacity: 1,
-          position: "",
-          background: {
-            sm: "#2c3035",
-            xs: "#2c3035",
-          },
+          display: "flex",
+          alignItems: "center",
+          padding: "4px 8px",
+          height: "50px",
+          justifyContent: "space-between",
         }}
       >
         <Box
-          display="flex"
-          justifyContent="space-between"
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            background: "#000",
-            width: "100%",
-            display: "flex",
-            alignItems: "center",
-            padding: "4px 8px",
-            height: "50px",
-            justifyContent: "space-between",
-          }}
-        >
-          {/* Replace this with your actual logo */}
-          <Box
-            component="img"
-            src={logo}
-            alt="View Media Logo"
-            sx={{ height: 32 }}
-          />
+          component="img"
+          src={logo}
+          alt="View Media Logo"
+          sx={{ height: 32 }}
+        />
 
-          <IconButton
-            id="basic-button"
-            aria-controls={open ? "basic-menu" : undefined}
-            aria-haspopup="true"
-            aria-expanded={open ? "true" : undefined}
-            onClick={handleClick}
-            color="inherit"
-            size="large"
-          >
-            <Avatar sx={{ bgcolor: "white" }}>
-              <AccountCircleIcon sx={{ color: "#333" }} />
-            </Avatar>
-          </IconButton>
-          <Menu
-            id="basic-menu"
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            MenuListProps={{
-              "aria-labelledby": "basic-button",
-            }}
-          >
-            <MenuItem onClick={() => setIsSettingUsername(true)}>
-              {username ? "Edit Profile" : "Set Profile"}
-            </MenuItem>
-          </Menu>
-        </Box>
-        <div
-          style={{
-            backgroundColor: "#2c3136",
-            width: "auto",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "20px",
-            padding: "5px 20px 5px 5px",
-            height: "40px",
+        <IconButton
+          id="basic-button"
+          aria-controls={open ? "basic-menu" : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? "true" : undefined}
+          onClick={handleClick}
+          color="inherit"
+          size="large"
+        >
+          <Avatar sx={{ bgcolor: "white" }}>
+            <AccountCircleIcon sx={{ color: "#333" }} />
+          </Avatar>
+        </IconButton>
+        <Menu
+          id="basic-menu"
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+          MenuListProps={{
+            "aria-labelledby": "basic-button",
           }}
         >
-          <button className="static-chat-button">
-            <ChatBubble /> Chat
-          </button>
-          <div
-            className="connected-users-count"
-            style={{ display: "flex", alignItems: "center", gap: "5px" }}
-          >
-            <img
-              src={UserIcon}
-              alt="Bolt Logo"
-              style={{ width: "20px", height: "20px" }}
-            />
-            <span style={{ color: "white", fontSize: "12px" }}>
-              {connectedUsersCount}
-            </span>
-          </div>
-        </div>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-            background: "#181818",
-            padding: "8px 13px 8px 13px",
-            borderTop: "1px solid #818181",
-            borderBottom: "1px solid #818181",
-          }}
-        >
-          <Box
-            sx={{
-              color: "#fff",
-              fontWeight: 600,
-              fontSize: "14px",
-              textTransform: "capitalize",
-              textWrap: "nowrap",
-              display: "flex",
-              alignItems: "center",
-              gap: "0 5px",
-            }}
-          >
-            <Box
-              sx={{
-                width: 30,
-                height: 30,
-                borderRadius: "50%",
-                backgroundColor: "red",
-                color: "white",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: "500",
-                fontSize: "1rem",
-                textTransform: "uppercase",
-              }}
-            >
-              T
-            </Box>
-            TVC News{" "}
-            <VerifiedIcon
-              sx={{
-                fontSize: "12px",
-                color: "#6FCF97",
-                marginLeft: "5px",
-                color: "#43A2F2",
-              }}
-            />
-          </Box>
-          <Box
-            sx={{
-              fontSize: "14px",
-              pl: "2px",
-              pr: "5px",
-              lineHeight: "21px",
-              fontWeight: "400",
-              textTransform: "capitalize",
-            }}
-          >
-            🔴 LIVE: TVC News – Breaking Updates & Discussion
-          </Box>
-        </Box>
-        <Box
-          ref={scrollableContainerRef}
-          sx={{
-            display: "flex",
-            flexDirection: "column-reverse",
-            overflowY: "auto",
-            mt: "auto",
-            p: "0px 10px 15px",
-            scrollBehavior: "smooth",
-            gap: "0",
-          }}
-          className="message-container"
-        >
-          {messages?.map((item, index) => {
-            const name = item?.sender || "User";
-            const avatarUrl = item?.sender?.photoUrl;
-            const initial = getInitial(name);
-            const isFirstMessage = index === 0;
-            const nameColors = [
-              "#6FCF97",
-              "#219653",
-              "#F2C94C",
-              "#F2994A",
-              "#F0F0F1",
-              "#EB5757",
-            ];
-            const randomColor =
-              nameColors[Math.floor(Math.random() * nameColors.length)];
-            return (
-              <Box
-                className="message"
-                key={index}
-                ref={isFirstMessage ? firstMessageRef : null}
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "10px 0",
-                  mb: 1,
-                }}
-                style={{
-                  marginBottom: "5px",
-                }}
-              >
-                <Box
-                  style={{
-                    width: "99%",
-                    display: "flex",
-                    flexDirection: item?.type === "text" ? "row" : "column", // ← key line
-                    alignItems:
-                      item?.type === "text" ? "baseline" : "flex-start", // for better vertical alignment
-                    gap: "5px", // optional spacing
-                    padding: "5px 10px 5px 10px",
-                  }}
-                >
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    {avatarUrl ? (
-                      <Box
-                        component="img"
-                        src={avatarUrl}
-                        alt={name}
-                        sx={{
-                          width: 30,
-                          height: 30,
-                          borderRadius: "50%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    ) : (
-                      <Box
-                        sx={{
-                          width: 30,
-                          height: 30,
-                          borderRadius: "50%",
-                          backgroundColor: getColorFromName(randomColor),
-                          color: "white",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontWeight: "500",
-                          fontSize: "1rem",
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        {initial}
-                      </Box>
-                    )}
-                    <Box
-                      sx={{
-                        color: randomColor,
-                        fontWeight: 600,
-                        fontSize: "13.5px",
-                        textTransform: "capitalize",
-                      }}
-                    >
-                      {name}
-                    </Box>
-                  </Box>
-
-                  {item?.type === "text" ? (
-                    <Box
-                      sx={{
-                        fontSize: "13.5px",
-                        pl: "2px",
-                        pr: "1.5px",
-                        lineHeight: "20px",
-                        fontWeight: "400",
-                        textTransform: "capitalize",
-                      }}
-                    >
-                      {item?.message}
-                    </Box>
-                  ) : (
-                    <Box
-                      style={{
-                        width: "100%",
-                        display: "flex",
-                      }}
-                    >
-                      <img
-                        src={
-                          "https://media.giphy.com/media/" +
-                          (item.giphy && item.giphy.id) +
-                          "/giphy.gif"
-                        }
-                        width={250}
-                        style={{ borderRadius: "8px" }}
-                      />
-                    </Box>
-                  )}
-                </Box>
-              </Box>
-            );
-          })}
-
-          <div ref={messagesEndRef} />
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0 10px",
-            justifyContent: "space-between",
-            padding: "1rem 10px",
-            backgroundColor: "#262825 !important",
-            borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-            position: "absolute",
-            bottom: 0,
-            right: 0,
-            width: "100%",
-            opacity: 0.95,
-            borderRadius: "0 !important",
-          }}
-          className="send-message-input editor with_video"
-        >
-          <Avatar
-            sx={{
-              width: 30,
-              height: 30,
-              backgroundColor: "#fff",
-              color: "#000",
-              fontSize: "1rem",
-              textTransform: "uppercase",
-            }}
-          />
-          <Box
-            sx={{
-              background: "#F0F0F11A",
-              padding: "10px",
-              width: "93%",
-              borderRadius: "8px",
-            }}
-          >
-            <Editor
-              editorState={editorState}
-              onChange={setEditorState}
-              plugins={plugins}
-              handleKeyCommand={handleKeyCommand}
-              placeholder="Type something..."
-            />
-            <EmojiSuggestions />
-            <EmojiSelect closeOnEmojiSelect />
-          </Box>
-          <button
-            onClick={sendMessage}
-            style={{
-              width: "50px",
-              height: "40px",
-              // background:
-              //   "linear-gradient(93.56deg, rgb(101, 53, 233) 4.6%, rgb(78, 51, 233) 96.96%)",
-              backgroundColor: "#E0032C",
-              border: "1px solid #E0032C",
-              outline: 0,
-              borderRadius: "8px",
-              color: "white",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <SendIcon />
-          </button>
-
-          <Button
-            className="chat-gif-icon"
-            size="small"
-            onClick={() => setShowGiphyModal(true)}
-            sx={{
-              borderStyle: "solid",
-              height: 18,
-              minWidth: 40,
-              pl: 0,
-              pr: 0,
-              borderColor: "#818181",
-              borderWidth: 1,
-              color: "#818181",
-              fontSize: 12,
-              position: "absolute",
-              right: 113,
-              top: 27,
-              zIndex: 9999999999, // Ensure it's above chat content
-            }}
-          >
-            GIF
-          </Button>
-        </Box>
+          <MenuItem onClick={() => setIsSettingUsername(true)}>
+            {username ? "Edit Profile" : "Set Profile"}
+          </MenuItem>
+        </Menu>
       </Box>
 
       <Box
@@ -970,20 +570,8 @@ function OnlyChat() {
           Save
         </Button>
       </Box>
-
-      {/* --- Profile Edit/Set Buttons (outside modal) --- */}
-
-      <GiphyModal
-        open={showGiphyModal}
-        inputPlaceholder="Type something..."
-        initialEditorState={editorState}
-        onClose={() => setShowGiphyModal(false)}
-        onSelectItem={(data) => {
-          sendGiphy(data);
-        }}
-      />
-    </Box>
+    </>
   );
 }
 
-export default OnlyChat;
+export default Header;

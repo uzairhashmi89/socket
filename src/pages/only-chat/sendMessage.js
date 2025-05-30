@@ -47,7 +47,7 @@ defaultTheme.emojiSelectButton += " emojiSelectButton";
 defaultTheme.emojiSelectButtonPressed += " emojiSelectButtonPressed";
 defaultTheme.emojiSelectPopover += " emojiSelectPopover";
 
-function OnlyChat() {
+function Header() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
@@ -471,21 +471,28 @@ function OnlyChat() {
     }
   };
   return (
-    <Box className="only-chat-ui" sx={{ backgroundColor: "#262825" }}>
+    <Box className="chat-ui" sx={{ backgroundColor: "#262825" }}>
+      {/* <div className="gradient-bg"></div> */}
       <Box
         className="main-chat"
         sx={{
           display: "flex",
           flexDirection: "column",
           flex: 1,
+          p: 2,
+          backgroundColor: "#262825 !important",
           color: "white",
-          width: "100%",
           opacity: 1,
           position: "",
-          background: {
-            sm: "#2c3035",
-            xs: "#2c3035",
+          width: "auto",
+          height: {
+            lg: "92.5dvh !important",
+            md: "95.5dvh !important",
+            sm: "100% !important",
+            xs: "100% !important",
           },
+          borderRadius: "0 !important",
+          zIndex: "9 !important",
         }}
       >
         <Box
@@ -539,25 +546,61 @@ function OnlyChat() {
             </MenuItem>
           </Menu>
         </Box>
-        <div
+        <Box
           style={{
-            backgroundColor: "#2c3136",
-            width: "auto",
+            position: "fixed",
+            top: 55,
+            left: 0,
+            background: "#333",
+            width: "98.7%",
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
             gap: "20px",
-            padding: "5px 20px 5px 5px",
-            height: "40px",
+            padding: "15px 10px",
+            justifyContent: "space-around",
+          }}
+          sx={{
+            marginTop: {
+              lg: "0",
+              md: "0",
+              sm: "0px",
+              xs: "0px",
+            },
+            height: {
+              lg: "36px",
+              md: "36px",
+              sm: "50px",
+              xs: "50px",
+            },
+            width: {
+              lg: "98.7%",
+              md: "98.7%",
+              sm: "93.7%",
+              xs: "93.7%",
+            },
           }}
         >
-          <button className="static-chat-button">
+          <button
+            className="static-chat-button"
+            style={{
+              background: "#fff",
+              color: "#000",
+              padding: "5px 10px",
+              borderRadius: "4px",
+              display: "flex",
+              alignItems: "center",
+              gap: "5px",
+              cursor: "pointer",
+            }}
+            onClick={() => setIsSettingUsername(true)}
+          >
             <ChatBubble /> Chat
           </button>
           <div
             className="connected-users-count"
             style={{ display: "flex", alignItems: "center", gap: "5px" }}
           >
+            {/* <SupervisorAccountIcon size="large"/> */}
             <img
               src={UserIcon}
               alt="Bolt Logo"
@@ -567,23 +610,31 @@ function OnlyChat() {
               {connectedUsersCount}
             </span>
           </div>
-        </div>
+        </Box>
         <Box
           sx={{
+            marginLeft: "-16px",
+            marginTop: { lg: "87px", md: "92px", sm: "102px", xs: "130px" },
             display: "flex",
-            alignItems: "center",
+            alignItems: "baseline",
             gap: 1,
-            background: "#181818",
-            padding: "8px 13px 8px 13px",
-            borderTop: "1px solid #818181",
-            borderBottom: "1px solid #818181",
+            background: {
+              lg: "#818181",
+              md: "#818181",
+              sm: "#818181",
+              xs: "#818181",
+            },
+            padding: "10px 10px 10px 20px",
+            borderRadius: "4px",
+            width: "fit-content",
+            position: { lg: "static", md: "static", sm: "fixed", xs: "fixed" },
           }}
         >
           <Box
             sx={{
               color: "#fff",
               fontWeight: 600,
-              fontSize: "14px",
+              fontSize: "13.5px",
               textTransform: "capitalize",
               textWrap: "nowrap",
               display: "flex",
@@ -608,6 +659,7 @@ function OnlyChat() {
             >
               T
             </Box>
+            {/* {name} */}
             TVC News{" "}
             <VerifiedIcon
               sx={{
@@ -620,17 +672,19 @@ function OnlyChat() {
           </Box>
           <Box
             sx={{
-              fontSize: "14px",
+              fontSize: "13.5px",
               pl: "2px",
               pr: "5px",
-              lineHeight: "21px",
+              lineHeight: "20px",
               fontWeight: "400",
               textTransform: "capitalize",
             }}
           >
-            🔴 LIVE: TVC News – Breaking Updates & Discussion
+            {/* item?.message */}🔴 LIVE: TVC News – Breaking Updates &
+            Discussion
           </Box>
         </Box>
+        {/* tvs news end */}
         <Box
           ref={scrollableContainerRef}
           sx={{
@@ -638,9 +692,8 @@ function OnlyChat() {
             flexDirection: "column-reverse",
             overflowY: "auto",
             mt: "auto",
-            p: "0px 10px 15px",
+            p: "5px 10px 10px",
             scrollBehavior: "smooth",
-            gap: "0",
           }}
           className="message-container"
         >
@@ -657,34 +710,38 @@ function OnlyChat() {
               "#F0F0F1",
               "#EB5757",
             ];
+            // Pick a random color for each message render
             const randomColor =
               nameColors[Math.floor(Math.random() * nameColors.length)];
+
             return (
               <Box
-                className="message"
+                className="message chat-input"
                 key={index}
                 ref={isFirstMessage ? firstMessageRef : null}
                 sx={{
                   display: "flex",
                   flexDirection: "column",
                   gap: "10px 0",
-                  mb: 1,
                 }}
                 style={{
                   marginBottom: "5px",
                 }}
               >
+                {/* For channel Heading */}
+
+                {/* for channle heading end */}
                 <Box
                   style={{
                     width: "99%",
                     display: "flex",
                     flexDirection: item?.type === "text" ? "row" : "column", // ← key line
-                    alignItems:
-                      item?.type === "text" ? "baseline" : "flex-start", // for better vertical alignment
+                    alignItems: item?.type === "text" ? "center" : "flex-start", // for better vertical alignment
                     gap: "5px", // optional spacing
-                    padding: "5px 10px 5px 10px",
+                    padding: "5px 0px 5px 10px",
                   }}
                 >
+                  {/* Top row: Avatar + Username */}
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     {avatarUrl ? (
                       <Box
@@ -720,7 +777,7 @@ function OnlyChat() {
                     <Box
                       sx={{
                         color: randomColor,
-                        fontWeight: 600,
+                        fontWeight: 500,
                         fontSize: "13.5px",
                         textTransform: "capitalize",
                       }}
@@ -729,14 +786,12 @@ function OnlyChat() {
                     </Box>
                   </Box>
 
+                  {/* Message or Giphy */}
                   {item?.type === "text" ? (
                     <Box
                       sx={{
                         fontSize: "13.5px",
                         pl: "2px",
-                        pr: "1.5px",
-                        lineHeight: "20px",
-                        fontWeight: "400",
                         textTransform: "capitalize",
                       }}
                     >
@@ -747,7 +802,9 @@ function OnlyChat() {
                       style={{
                         width: "100%",
                         display: "flex",
+                        justifyContent: "flex-start",
                       }}
+                      sx={{ pt: "5px" }}
                     >
                       <img
                         src={
@@ -761,12 +818,17 @@ function OnlyChat() {
                     </Box>
                   )}
                 </Box>
+                {/* Optional Ad */}
+                {/* {renderChatAd(index)} */}
               </Box>
             );
           })}
 
           <div ref={messagesEndRef} />
         </Box>
+        {/* <Box className="qr-code-wrapper" sx={{width:{lg: '30%',md: '45%',sm: '50%',xs: '84.2%'},marginLeft:{lg: 0,md:0,sm: '10px !important',xs: '10px !important'},zIndex:{lg:'2',md:'2',xs:'0',sm:'0'},marginBottom:{lg:'65px',md: '65px',sm:'80px',xs:'80px'}}} style={{ background: "#F0F0F11A", marginLeft: '0', marginRight: '0' }}>
+          <QrCode />
+        </Box> */}
         <Box
           sx={{
             display: "flex",
@@ -858,7 +920,6 @@ function OnlyChat() {
           </Button>
         </Box>
       </Box>
-
       <Box
         sx={{
           position: "fixed", // Example positioning
@@ -986,4 +1047,4 @@ function OnlyChat() {
   );
 }
 
-export default OnlyChat;
+export default Header;
