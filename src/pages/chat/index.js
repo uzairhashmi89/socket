@@ -904,7 +904,7 @@ function Chat() {
               {/* --- Profile Edit/Set Buttons (outside modal) --- */}
               {!isSettingUsername && (username || profileImage) && ( // Show edit if either username or image exists
                 <Box
-                  sx={{ position: "fixed", top: 10, right: 10, zIndex: 99999999999, display: 'flex', flexDirection: 'column', gap: 0.5, alignItems: 'flex-end' }}
+                  sx={{ position: "fixed", top: 30, right: 34,transform: 'translate(0, 4px)', zIndex: 99999999999, display: 'flex', flexDirection: 'column', gap: 0.5, alignItems: 'flex-end' }}
                 >
                   {profileImage && ( // Show image preview if available
                     <Box
