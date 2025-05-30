@@ -804,7 +804,7 @@ function Chat() {
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          zIndex: 10, // Ensure it's above chat content
+          zIndex: 9999999999, // Ensure it's above chat content
           backgroundColor: "rgba(0,0,0,0.8)",
           padding: 3,
           borderRadius: 2,

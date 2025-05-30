@@ -350,6 +350,99 @@ function OnlyChat() {
 
   const [showGiphyModal, setShowGiphyModal] = useState(false);
 
+  const [isUploading, setIsUploading] = useState(false);
+  const [profileImage, setProfileImage] = useState(
+      localStorage.getItem("profileImage") || null
+    );
+
+    const uploadProfileImage = async (file, dispatchCallback = () => {}) => {
+      const UPLOAD_API_BASE_URL = "https://api.staging-new.boltplus.tv";
+      const UPLOAD_ENDPOINT = "/upload/public-profile";
+    
+      try {
+        const fileName = `${Date.now()}-${file.name.replace(/[^\w.]/g, "")}`;
+        const { data: { fields, url } } = await axios.post(`${UPLOAD_API_BASE_URL}${UPLOAD_ENDPOINT}`, {
+          type: file.type,
+          name: fileName,
+          folder:"avatar"
+        });
+    
+        const formData = new FormData();
+        formData.append("key", fields.key);
+        formData.append("Content-Type", file.type);
+        formData.append("acl", "public-read");
+    
+        Object.entries(fields).forEach(([key, value]) => {
+          if (key !== "key") {
+            formData.append(key, value);
+          }
+        });
+        formData.append("file", file);
+    
+        await axios.post(url, formData, {
+          onUploadProgress: (event) => {
+            const progress = Math.floor((event.loaded / event.total) * 100);
+            console.log(`Upload progress: ${progress}%`);
+            // If you had a Redux action for progress, you'd call it here:
+            // dispatchCallback({ type: 'UPLOAD_PROGRESS', payload: { uploadId: 'profileImage', progress } });
+          },
+        });
+    
+        const publicImageUrl = `${url}/${fields.key}`;
+        console.log("Image uploaded successfully:", publicImageUrl);
+        return publicImageUrl;
+    
+      } catch (error) {
+        console.error("Error uploading profile image:", error);
+        return null;
+      }
+    };
+    const handleSaveProfile = useCallback(() => { // Renamed from handleSaveUsername
+        const trimmedUsername = username.trim();
+        let usernameToEmit = "guest";
+        let imageToEmit = profileImage; // Use the URL directly
+    
+        if (trimmedUsername) {
+          localStorage.setItem("userName", trimmedUsername);
+          setUsername(trimmedUsername);
+          usernameToEmit = trimmedUsername;
+        } else {
+          localStorage.removeItem("userName");
+          setUsername(""); // Ensure state is cleared
+        }
+    
+        if (profileImage) {
+          localStorage.setItem("profileImage", profileImage); // Store the URL
+        } else {
+          localStorage.removeItem("profileImage");
+        }
+    
+        setIsSettingUsername(false); // Close the settings modal
+    
+        // Emit the combined data via socket if connected
+        if (socket.connected) {
+          emitJoin(usernameToEmit, imageToEmit); // Emit the URL
+        } else {
+          console.warn("Socket not connected. Profile will be saved locally but not emitted.");
+        }
+      }, [username, profileImage]); // Added dependencies
+    const handleImageUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setIsUploading(true); // Set uploading state
+      try {
+        const imageUrl = await uploadProfileImage(file); // Call the utility function
+        if (imageUrl) {
+          setProfileImage(imageUrl); // Update state with the public URL
+        }
+      } catch (error) {
+        console.error("Failed to upload image:", error);
+        // Handle error, e.g., show a toast message
+      } finally {
+        setIsUploading(false); // Reset uploading state
+      }
+    }
+  };
   return (
     <Box className="chat-ui" sx={{ backgroundColor: "#333333" }}>
       <div className="gradient-bg"></div>
@@ -366,8 +459,8 @@ function OnlyChat() {
           position: "",
           width: "auto",
           height: {
-            lg: "88dvh !important",
-            md: "88dvh !important",
+            lg: "92dvh !important",
+            md: "92dvh !important",
             sm: "100% !important",
             xs: "100% !important",
           },
@@ -388,14 +481,14 @@ function OnlyChat() {
           }}
           sx={{
             marginTop:{
-              lg:'5px',
-              md:'5px',
+              lg:'0',
+              md:'0',
               sm:'0px',
               xs:'0px',
             },
             height:{
-              lg: "30px",
-              md: "30px",
+              lg: "36px",
+              md: "36px",
               sm: "50px",
               xs: "50px",
             }
@@ -412,7 +505,7 @@ function OnlyChat() {
             </span>
           </div>
         </Box>
-        <Box sx={{ marginTop: {lg: '40px',md: '40px',sm:'58px',xs: '58px'}, display: "flex", alignItems: "baseline", gap: 1, background: {lg:'rgba(240, 240, 241, 0.1)',md:'rgba(240, 240, 241, 0.1)',sm:'#333',xs:'#333'}, padding: '10px 10px 10px 20px', borderRadius: "4px", width: 'fit-content', position:{lg:'static',md: 'static',sm: 'fixed',xs:'fixed'}, }}>
+        <Box sx={{ marginTop: {lg:'12px', md: '12px', sm: '38px', xs: '38px'}, display: "flex", alignItems: "baseline", gap: 1, background: {lg:'rgba(240, 240, 241, 0.1)',md:'rgba(240, 240, 241, 0.1)',sm:'#333',xs:'#333'}, padding: '10px 10px 10px 20px', borderRadius: "4px", width: 'fit-content', position:{lg:'static',md: 'static',sm: 'fixed',xs:'fixed'}, }}>
           <Box
             sx={{
               color: "#fff",
@@ -589,7 +682,7 @@ function OnlyChat() {
 
           <div ref={messagesEndRef} />
         </Box>
-        <Box className="qr-code-wrapper" sx={{width:{lg: '30%',md: '30%',sm: '50%',xs: '84.2%'},marginLeft:{lg: 0,md:0,sm: '10px !important',xs: '10px !important'},zIndex:{lg:'2',md:'2',xs:'0',sm:'0'},marginBottom:{lg:'30px',md: '50px',sm:'80px',xs:'80px'}}} style={{ background: "#F0F0F11A", marginLeft: '0', marginRight: '0' }}>
+        <Box className="qr-code-wrapper" sx={{width:{lg: '50%',md: '50%',sm: '50%',xs: '84.2%'},marginLeft:{lg: 0,md:0,sm: '10px !important',xs: '10px !important'},zIndex:{lg:'2',md:'2',xs:'0',sm:'0'},marginBottom:{lg:'30px',md: '50px',sm:'80px',xs:'80px'}}} style={{ background: "#F0F0F11A", marginLeft: '0', marginRight: '0' }}>
           <QrCode />
         </Box>
         <Box
@@ -666,7 +759,7 @@ function OnlyChat() {
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          zIndex: 10, // Ensure it's above chat content
+          zIndex: 9999999999, // Ensure it's above chat content
           backgroundColor: "rgba(0,0,0,0.8)",
           padding: 3,
           borderRadius: 2,
@@ -676,49 +769,131 @@ function OnlyChat() {
         }}
       >
 
-        <Typography variant="h6" sx={{ color: "white" }}>
-          Set Username
-        </Typography>
-
-        <TextField
-          label="Username"
-          variant="outlined"
-          value={username} // Use the username state
-          onChange={(e) => setUsername(e.target.value)}
-          InputLabelProps={{ style: { color: "rgba(255,255,255,0.7)" } }} // Style label
-          InputProps={{ style: { color: "white" } }} // Style input text
-          sx={{
-            "& .MuiOutlinedInput-notchedOutline": {
-              borderColor: "rgba(255,255,255,0.3)",
-            },
-            "&:hover .MuiOutlinedInput-notchedOutline": {
-              borderColor: "rgba(255,255,255,0.5)",
-            },
-            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-              borderColor: "rgba(255,255,255,0.7)",
-            },
-          }}
-        />
-
-        <Button variant="contained" onClick={handleSaveUsername}>
-          Save
-        </Button>
-      </Box>
-
-      {!isSettingUsername && username && (
-        <Box sx={{ position: "fixed", top: 10, right: 10, zIndex: 5 }}>
-          <Button variant="outlined" onClick={() => setIsSettingUsername(true)}>
-            Edit Username
-          </Button>
-        </Box>
-      )}
-      {!isSettingUsername && !username && (
-        <Box sx={{ position: "fixed", top: 10, right: 10, zIndex: 5 }}>
-          <Button variant="outlined" onClick={() => setIsSettingUsername(true)}>
-            Set Username
-          </Button>
-        </Box>
-      )}
+        <Typography variant="h6" sx={{ color: "white", mb: 2 }}>
+                  Set Profile
+                </Typography>
+        
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 80,
+                      height: 80,
+                      borderRadius: "50%",
+                      overflow: "hidden",
+                      mb: 1,
+                      border: "1px solid rgba(255,255,255,0.3)",
+                    }}
+                  >
+                    {profileImage ? (
+                      <img
+                        src={profileImage}
+                        alt="Profile"
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      />
+                    ) : (
+                      <Box
+                        sx={{
+                          width: "100%",
+                          height: "100%",
+                          backgroundColor: "rgba(255,255,255,0.1)",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          color: "rgba(255,255,255,0.7)",
+                          fontSize: "1.5rem",
+                        }}
+                      >
+                        {username ? username.charAt(0).toUpperCase() : <HideImageOutlinedIcon />}
+                      </Box>
+                    )}
+                  </Box>
+                </Box>
+        
+                <Button
+                  component="label"
+                  variant="outlined"
+                  sx={{ color: "white", borderColor: "rgba(255,255,255,0.3)", mb: 1 }}
+                  disabled={isUploading} 
+                >
+                  {isUploading ? "Uploading..." : "Upload Image"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    onChange={handleImageUpload}
+                  />
+                </Button>
+        
+                <TextField
+                  label="Username"
+                  variant="outlined"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  InputLabelProps={{ style: { color: "rgba(255,255,255,0.7)" } }}
+                  InputProps={{ style: { color: "white" } }}
+                  sx={{
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "rgba(255,255,255,0.3)",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "rgba(255,255,255,0.5)",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "rgba(255,255,255,0.7)",
+                    },
+                    mb: 2,
+                  }}
+                />
+        
+                <Button variant="contained" onClick={handleSaveProfile} disabled={isUploading}> {/* Renamed function */}
+                  Save
+                </Button>
+              </Box>
+        
+              {/* --- Profile Edit/Set Buttons (outside modal) --- */}
+              {!isSettingUsername && (username || profileImage) && ( // Show edit if either username or image exists
+                <Box
+                  sx={{ position: "fixed", top: 10, right: 10, zIndex: 99999999999, display: 'flex', flexDirection: 'column', gap: 0.5, alignItems: 'flex-end' }}
+                >
+                  {profileImage && ( // Show image preview if available
+                    <Box
+                      sx={{
+                        width: 30,
+                        height: 30,
+                        borderRadius: "50%",
+                        overflow: "hidden",
+                        border: "1px solid rgba(0,0,0,0.1)",
+                        cursor: 'pointer',
+                        mb: 0.5
+                      }}
+                      onClick={() => setIsSettingUsername(true)}
+                    >
+                      <img
+                        src={profileImage}
+                        alt="Profile"
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      />
+                    </Box>
+                  )}
+                  <Button variant="outlined" size="small" onClick={() => setIsSettingUsername(true)}>
+                    Edit Profile
+                  </Button>
+                </Box>
+              )}
+              {/* Show "Set Profile" if neither username nor image is set */}
+              {!isSettingUsername && !username && !profileImage && (
+                <Box sx={{ position: "fixed", top: 10, right: 10, zIndex: 99999999999 }}>
+                  <Button variant="outlined" onClick={() => setIsSettingUsername(true)}>
+                    Set Profile
+                  </Button>
+                </Box>
+              )}
 
       <GiphyModal
         open={showGiphyModal}
