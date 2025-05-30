@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from "react";
+import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { io } from "socket.io-client";
 import {
   ContentState,
@@ -6,7 +6,7 @@ import {
   DraftHandleValue,
   EditorState,
 } from "draft-js";
-import { Box, Button, TextField, Typography, Avatar } from "@mui/material";
+import { Box, Button, TextField, Typography, Avatar ,IconButton,MenuItem,Menu} from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import Editor, { PluginEditorProps } from "@draft-js-plugins/editor";
 import createEmojiPlugin, { defaultTheme } from "@draft-js-plugins/emoji";
@@ -15,6 +15,8 @@ import { GiphyModal } from "../../Components/GiphyModal";
 import QrCode from "../../Components/QrCode";
 import UserIcon from "../../assets/user-icon.png"
 import VerifiedIcon from '@mui/icons-material/Verified';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import logo from '../../assets/logo.png'
 
 const socket = io("https://api.staging-new.boltplus.tv", {
   path: "/public-socket/",
@@ -30,7 +32,7 @@ defaultTheme.emojiSelectButton += " emojiSelectButton";
 defaultTheme.emojiSelectButtonPressed += " emojiSelectButtonPressed";
 defaultTheme.emojiSelectPopover += " emojiSelectPopover";
 
-function LiveChatImmersive() {
+function OnlyChat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
@@ -41,6 +43,16 @@ function LiveChatImmersive() {
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
+  // Drop start
+const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  // Drop end
   // Aimal code start
   const [connectedUsersCount, setConnectedUsersCount] = useState(null);
   useEffect(() => {
@@ -350,41 +362,188 @@ function LiveChatImmersive() {
 
   const [showGiphyModal, setShowGiphyModal] = useState(false);
 
+  const [isUploading, setIsUploading] = useState(false);
+  const [profileImage, setProfileImage] = useState(
+      localStorage.getItem("profileImage") || null
+    );
+
+    const uploadProfileImage = async (file, dispatchCallback = () => {}) => {
+      const UPLOAD_API_BASE_URL = "https://api.staging-new.boltplus.tv";
+      const UPLOAD_ENDPOINT = "/upload/public-profile";
+    
+      try {
+        const fileName = `${Date.now()}-${file.name.replace(/[^\w.]/g, "")}`;
+        const { data: { fields, url } } = await axios.post(`${UPLOAD_API_BASE_URL}${UPLOAD_ENDPOINT}`, {
+          type: file.type,
+          name: fileName,
+          folder:"avatar"
+        });
+    
+        const formData = new FormData();
+        formData.append("key", fields.key);
+        formData.append("Content-Type", file.type);
+        formData.append("acl", "public-read");
+    
+        Object.entries(fields).forEach(([key, value]) => {
+          if (key !== "key") {
+            formData.append(key, value);
+          }
+        });
+        formData.append("file", file);
+    
+        await axios.post(url, formData, {
+          onUploadProgress: (event) => {
+            const progress = Math.floor((event.loaded / event.total) * 100);
+            console.log(`Upload progress: ${progress}%`);
+            // If you had a Redux action for progress, you'd call it here:
+            // dispatchCallback({ type: 'UPLOAD_PROGRESS', payload: { uploadId: 'profileImage', progress } });
+          },
+        });
+    
+        const publicImageUrl = `${url}/${fields.key}`;
+        console.log("Image uploaded successfully:", publicImageUrl);
+        return publicImageUrl;
+    
+      } catch (error) {
+        console.error("Error uploading profile image:", error);
+        return null;
+      }
+    };
+    const handleSaveProfile = useCallback(() => { // Renamed from handleSaveUsername
+        const trimmedUsername = username.trim();
+        let usernameToEmit = "guest";
+        let imageToEmit = profileImage; // Use the URL directly
+    
+        if (trimmedUsername) {
+          localStorage.setItem("userName", trimmedUsername);
+          setUsername(trimmedUsername);
+          usernameToEmit = trimmedUsername;
+        } else {
+          localStorage.removeItem("userName");
+          setUsername(""); // Ensure state is cleared
+        }
+    
+        if (profileImage) {
+          localStorage.setItem("profileImage", profileImage); // Store the URL
+        } else {
+          localStorage.removeItem("profileImage");
+        }
+    
+        setIsSettingUsername(false); // Close the settings modal
+    
+        // Emit the combined data via socket if connected
+        if (socket.connected) {
+          emitJoin(usernameToEmit, imageToEmit); // Emit the URL
+        } else {
+          console.warn("Socket not connected. Profile will be saved locally but not emitted.");
+        }
+      }, [username, profileImage]); // Added dependencies
+    const handleImageUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setIsUploading(true); // Set uploading state
+      try {
+        const imageUrl = await uploadProfileImage(file); // Call the utility function
+        if (imageUrl) {
+          setProfileImage(imageUrl); // Update state with the public URL
+        }
+      } catch (error) {
+        console.error("Failed to upload image:", error);
+        // Handle error, e.g., show a toast message
+      } finally {
+        setIsUploading(false); // Reset uploading state
+      }
+    }
+  };
   return (
-    <Box className="chat-ui" sx={{ backgroundColor: "#333333" }}>
-      <div className="gradient-bg"></div>
-       <Box
+    <Box className="chat-ui" sx={{ backgroundColor: "#262825" }}>
+      {/* <div className="gradient-bg"></div> */}
+      <Box
         className="main-chat"
         sx={{
           display: "flex",
           flexDirection: "column",
           flex: 1,
           p: 2,
-          backgroundColor: "#333333",
+          backgroundColor: "#262825 !important",
           color: "white",
           opacity: 1,
           position: "",
           width: "auto",
           height: {
-            lg: "92dvh !important",
-            md: "92dvh !important",
+            lg: "92.5dvh !important",
+            md: "95.5dvh !important",
             sm: "100% !important",
             xs: "100% !important",
           },
+          borderRadius: '0 !important',
+          zIndex: '9 !important',
         }}
       >
         <Box
-          style={{
+      display="flex"
+      justifyContent="space-between"
+      style={{
             position: "fixed",
             top: 0,
             left: 0,
-            background: "#333",
+            background: "#000",
             width: "100%",
             display: "flex",
-            alignItems: "baseline",
+            alignItems: "center",
+            padding: "4px 8px",
+            height: "50px",
+            justifyContent: "space-between",
+          }}
+    >
+      {/* Replace this with your actual logo */}
+      <Box component="img" src={logo} alt="View Media Logo" sx={{ height: 32 }} />
+
+      <IconButton
+        id="basic-button"
+        aria-controls={open ? 'basic-menu' : undefined}
+        aria-haspopup="true"
+        aria-expanded={open ? 'true' : undefined}
+        onClick={handleClick}
+        color="inherit"
+        size="large"
+      >
+        <Avatar sx={{ bgcolor: 'white' }}>
+          <AccountCircleIcon sx={{ color: '#333' }} />
+        </Avatar>
+      </IconButton>
+      <Menu
+        id="basic-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        MenuListProps={{
+          'aria-labelledby': 'basic-button',
+        }}
+      >
+        <MenuItem onClick={() => setIsSettingUsername(true)}>
+        { (username || profileImage) && ( // Show edit if either username or image exists
+                 'Edit Profile'
+              )}
+              {/* Show "Set Profile" if neither username nor image is set */}
+              {username && !profileImage && (
+                ' Set Profile'
+              )}
+        </MenuItem>
+      </Menu>
+    </Box>
+        <Box
+          style={{
+            position: "fixed",
+            top: 55,
+            left: 0,
+            background: "#333",
+            width: "98.7%",
+            display: "flex",
+            alignItems: "center",
             gap: "20px",
-            padding: "5px",
-            justifyContent: "space-around",
+            padding: "15px 10px",
+            justifyContent: "space-between",
           }}
           sx={{
             marginTop:{
@@ -398,10 +557,17 @@ function LiveChatImmersive() {
               md: "36px",
               sm: "50px",
               xs: "50px",
+            },
+            width:{
+              lg: '98.7%',
+              md: '98.7%',
+              sm: '94.7%',
+              xs: '94.7%',
+
             }
           }}
         >
-          <button className="static-chat-button">
+          <button className="static-chat-button" style={{background: '#fff', color: '#000', padding: '5px 10px', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer'}} onClick={() => setIsSettingUsername(true)}>
             <ChatBubble /> Chat
           </button>
           <div className="connected-users-count" style={{ display: "flex", alignItems: "center", gap: "5px" }}>
@@ -412,7 +578,7 @@ function LiveChatImmersive() {
             </span>
           </div>
         </Box>
-        <Box sx={{ marginTop: {lg:'12px', md: '12px', sm: '38px', xs: '38px'}, display: "flex", alignItems: "baseline", gap: 1, background: '#000', padding: '10px 10px 10px 20px', borderRadius: "4px", width: 'fit-content', position:{lg:'static',md: 'static',sm: 'fixed',xs:'fixed'}, }}>
+        <Box sx={{marginLeft: '-16px', marginTop: {lg:'87px', md: '92px', sm: '102px', xs: '130px'}, display: "flex", alignItems: "baseline", gap: 1, background: {lg:'#818181',md:'#818181',sm:'#818181',xs:'#818181'}, padding: '10px 10px 10px 20px', borderRadius: "4px", width: 'fit-content', position:{lg:'static',md: 'static',sm: 'fixed',xs:'fixed'}, }}>
           <Box
             sx={{
               color: "#fff",
@@ -589,26 +755,39 @@ function LiveChatImmersive() {
 
           <div ref={messagesEndRef} />
         </Box>
-        <Box className="qr-code-wrapper" sx={{width:{lg: '50%',md: '50%',sm: '50%',xs: '84.2%'},marginLeft:{lg: 0,md:0,sm: '10px !important',xs: '10px !important'},zIndex:{lg:'2',md:'2',xs:'0',sm:'0'},marginBottom:{lg:'20px',md: '20px',sm:'10px',xs:'10px'}}} style={{ background: "#F0F0F11A", marginLeft: '0', marginRight: '0' }}>
+        <Box className="qr-code-wrapper" sx={{width:{lg: '30%',md: '45%',sm: '50%',xs: '84.2%'},marginLeft:{lg: 0,md:0,sm: '10px !important',xs: '10px !important'},zIndex:{lg:'2',md:'2',xs:'0',sm:'0'},marginBottom:{lg:'0px',md: '0px',sm:'0px',xs:'0px'}}} style={{ background: "#F0F0F11A", marginLeft: '0', marginRight: '0' }}>
           <QrCode />
         </Box>
         {/* <Box
           sx={{
             display: "flex",
             alignItems: "center",
+            gap: '0 10px',
             justifyContent: "space-between",
             padding: "1rem 10px",
-            // backgroundColor: "#0b0c2a",
+            backgroundColor: "#262825 !important",
             borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-            position: "fixed",
+            position: "absolute",
             bottom: 0,
             right: 0,
             width: "100%",
-            opacity: 1,
+            opacity: 0.95,
+            borderRadius: '0 !important',
           }}
-          className="send-message-input editor"
+          className="send-message-input editor with_video"
         >
-          <Editor
+          <Avatar
+              sx={{
+                width: 30,
+                height: 30,
+                backgroundColor: '#fff',
+                color: "#000",
+                fontSize: "1rem",
+                textTransform: "uppercase",
+              }}
+              />
+          <Box sx={{background:'#F0F0F11A', padding: '10px', width: '93%',borderRadius: '8px'}}>
+            <Editor
             editorState={editorState}
             onChange={setEditorState}
             plugins={plugins}
@@ -617,14 +796,16 @@ function LiveChatImmersive() {
           />
           <EmojiSuggestions />
           <EmojiSelect closeOnEmojiSelect />
+          </Box>
           <button
             onClick={sendMessage}
             style={{
               width: "50px",
-              height: "50px",
-              background:
-                "linear-gradient(93.56deg, rgb(101, 53, 233) 4.6%, rgb(78, 51, 233) 96.96%)",
-              border: "1px solid rgb(101, 53, 233)",
+              height: "40px",
+              // background:
+              //   "linear-gradient(93.56deg, rgb(101, 53, 233) 4.6%, rgb(78, 51, 233) 96.96%)",
+              backgroundColor: '#E0032C',
+              border: "1px solid #E0032C",
               outline: 0,
               borderRadius: "8px",
               color: "white",
@@ -632,7 +813,9 @@ function LiveChatImmersive() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+
             }}
+            
           >
             <SendIcon />
           </button>
@@ -647,27 +830,27 @@ function LiveChatImmersive() {
               minWidth: 40,
               pl: 0,
               pr: 0,
-              borderColor: "white",
+              borderColor: "#818181",
               borderWidth: 1,
-              color: "white",
+              color: "#818181",
               fontSize: 12,
               position: "absolute",
-              right: 105,
-              top: 32,
+              right: 113,
+              top: 27,
+              zIndex: 9999999999, // Ensure it's above chat content
             }}
           >
             GIF
           </Button>
         </Box> */}
       </Box>
-      {/* <Box
+      <Box
         sx={{
           position: "fixed", // Example positioning
-          display: 'none',
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          zIndex: 10, // Ensure it's above chat content
+          zIndex: 9999999999, // Ensure it's above chat content
           backgroundColor: "rgba(0,0,0,0.8)",
           padding: 3,
           borderRadius: 2,
@@ -677,49 +860,95 @@ function LiveChatImmersive() {
         }}
       >
 
-        <Typography variant="h6" sx={{ color: "white" }}>
-          Set Username
-        </Typography>
-
-        <TextField
-          label="Username"
-          variant="outlined"
-          value={username} // Use the username state
-          onChange={(e) => setUsername(e.target.value)}
-          InputLabelProps={{ style: { color: "rgba(255,255,255,0.7)" } }} // Style label
-          InputProps={{ style: { color: "white" } }} // Style input text
-          sx={{
-            "& .MuiOutlinedInput-notchedOutline": {
-              borderColor: "rgba(255,255,255,0.3)",
-            },
-            "&:hover .MuiOutlinedInput-notchedOutline": {
-              borderColor: "rgba(255,255,255,0.5)",
-            },
-            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-              borderColor: "rgba(255,255,255,0.7)",
-            },
-          }}
-        />
-
-        <Button variant="contained" onClick={handleSaveUsername}>
-          Save
-        </Button>
-      </Box> */}
-
-      {/* {!isSettingUsername && username && (
-        <Box sx={{ position: "fixed", top: 10, right: 10, zIndex: 5 }}>
-          <Button variant="outlined" onClick={() => setIsSettingUsername(true)}>
-            Edit Username
-          </Button>
-        </Box>
-      )}
-      {!isSettingUsername && !username && (
-        <Box sx={{ position: "fixed", top: 10, right: 10, zIndex: 5 }}>
-          <Button variant="outlined" onClick={() => setIsSettingUsername(true)}>
-            Set Username
-          </Button>
-        </Box>
-      )}
+        <Typography variant="h6" sx={{ color: "white", mb: 2 }}>
+                  Set Profile
+                </Typography>
+        
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 80,
+                      height: 80,
+                      borderRadius: "50%",
+                      overflow: "hidden",
+                      mb: 1,
+                      border: "1px solid rgba(255,255,255,0.3)",
+                    }}
+                  >
+                    {profileImage ? (
+                      <img
+                        src={profileImage}
+                        alt="Profile"
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      />
+                    ) : (
+                      <Box
+                        sx={{
+                          width: "100%",
+                          height: "100%",
+                          backgroundColor: "rgba(255,255,255,0.1)",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          color: "rgba(255,255,255,0.7)",
+                          fontSize: "1.5rem",
+                        }}
+                      >
+                        {username ? username.charAt(0).toUpperCase() : <HideImageOutlinedIcon />}
+                      </Box>
+                    )}
+                  </Box>
+                </Box>
+        
+                <Button
+                  component="label"
+                  variant="outlined"
+                  sx={{ color: "white", borderColor: "rgba(255,255,255,0.3)", mb: 1 }}
+                  disabled={isUploading} 
+                >
+                  {isUploading ? "Uploading..." : "Upload Image"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    onChange={handleImageUpload}
+                  />
+                </Button>
+        
+                <TextField
+                  label="Username"
+                  variant="outlined"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  InputLabelProps={{ style: { color: "rgba(255,255,255,0.7)" } }}
+                  InputProps={{ style: { color: "white" } }}
+                  sx={{
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "rgba(255,255,255,0.3)",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "rgba(255,255,255,0.5)",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "rgba(255,255,255,0.7)",
+                    },
+                    mb: 2,
+                  }}
+                />
+        
+                <Button variant="contained" onClick={handleSaveProfile} disabled={isUploading}> {/* Renamed function */}
+                  Save
+                </Button>
+              </Box>
+        
+              {/* --- Profile Edit/Set Buttons (outside modal) --- */}
+              
 
       <GiphyModal
         open={showGiphyModal}
@@ -729,9 +958,9 @@ function LiveChatImmersive() {
         onSelectItem={(data) => {
           sendGiphy(data);
         }}
-      /> */}
+      />
     </Box>
   );
 }
 
-export default LiveChatImmersive;
+export default OnlyChat;

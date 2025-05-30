@@ -387,11 +387,16 @@ function Immersive() {
           right: "0",
           bottom: "0",
           height: {
-            lg: '100dvh',
-            md: '100dvh',
+            lg: '92dvh',
+            md: '92dvh',
             sm: 'auto',
             xs: 'auto'
           },
+          overflowx:'hidden',
+          marginRight: {
+                lg: "20px",
+                md: "20px"
+              }
           // borderLeft: "1px solid gray",
         }}
       >
@@ -430,9 +435,14 @@ function Immersive() {
               backgroundColor: "transparent",
               color: "white",
               opacity: 1,
-              height: 'height: calc(100vh - 109px);',
+              height: 'calc(100vh - 90px);',
               width: "95%",
+              pl:0,
+              pt:0,
+              mt:0,
+              overflowx:'hidden'
             }}
+            style={{paddingLeft:'0 !important',}}
           >
             <div
               style={{
@@ -446,7 +456,7 @@ function Immersive() {
                 alignItems: "baseline",
                 gap: "0px",
                 padding: "5px",
-                justifyContent: "space-around",
+                justifyContent: "space-between",
               }}
             >
               <button className="static-chat-button">
@@ -460,7 +470,7 @@ function Immersive() {
                 </span>
               </div>
             </div>
-            <Box sx={{ display: "flex", alignItems: "baseline", gap: 1, background: 'rgba(240, 240, 241, 0.1)', padding: '5px 0 5px 10px', borderRadius: "4px" }}>
+            <Box sx={{ display: "flex", alignItems: "baseline", gap: 1, background: '#181818', padding: '5px 0 5px 10px', borderRadius: "4px", }}>
               <Box
                 sx={{
                   color: "#fff",
@@ -633,7 +643,7 @@ function Immersive() {
 
               <div ref={messagesEndRef} />
             </Box>
-            <Box className="qr-code-wrapper" style={{ background: "#333333", width: "89%", margin: '0' }} sx={{marginBottom:{xs: "0px", md: "0px"}}}>
+            <Box className="qr-code-wrapper" style={{ background: "#333333", width: "86%", margin: '0' }} sx={{marginBottom:{xs: "0px", md: "0px"},marginLeft:'10px !important'}}>
               <QrCode />
             </Box>
           </Box>

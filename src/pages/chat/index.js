@@ -473,8 +473,8 @@ function Chat() {
           opacity: 1,
           position: "",
           background: {
-            sm: "rgba(38, 40, 37, 0.8)",
-            xs: "rgba(38, 40, 37, 0.8)",
+            sm: "#2c3035",
+            xs: "#2c3035",
           }
         }}
       >
@@ -486,6 +486,7 @@ function Chat() {
             marginTop: "-10px",
             display: "flex",
             alignItems: "center",
+            justifyContent: "space-between",
             gap: "20px",
             padding: "5px",
             // borderBottom:'1px solid #F0F0F11A',
@@ -510,7 +511,7 @@ function Chat() {
             </span>
           </div>
         </div>
-        <Box sx={{ display: "flex", alignItems: "baseline", gap: 1, background: 'rgba(240, 240, 241, 0.1)', padding: '5px 0 5px 19px', borderRadius: "4px" }}>
+        <Box sx={{ display: "flex", alignItems: "baseline", gap: 1, background: '#181818', padding: '5px 0 5px 19px', borderRadius: "4px" }}>
           <Box
             sx={{
               color: "#fff",
@@ -713,9 +714,9 @@ function Chat() {
 
           <div ref={messagesEndRef} />
         </Box>
-        <Box className="qr-code-wrapper">
+        {/* <Box className="qr-code-wrapper">
           <QrCode />
-        </Box>
+        </Box> */}
         <Box
           sx={{
             display: "flex",
@@ -737,13 +738,13 @@ function Chat() {
               sx={{
                 width: 30,
                 height: 30,
-                backgroundColor: getColorFromName(username),
-                color: "white",
+                backgroundColor: '#fff',
+                color: "#000",
                 fontSize: "1rem",
                 textTransform: "uppercase",
               }}
               />
-          <Box sx={{background:'#5f5e5e', padding: '10px', width: '80%',borderRadius: '8px'}}>
+          <Box sx={{background:'#4c4d4b', padding: '10px', width: '80%',borderRadius: '8px'}}>
             <Editor
             editorState={editorState}
             onChange={setEditorState}
@@ -785,13 +786,14 @@ function Chat() {
               minWidth: 40,
               pl: 0,
               pr: 0,
-              borderColor: "white",
+              borderColor: "#818181",
               borderWidth: 1,
-              color: "white",
+              color: "#818181",
               fontSize: 12,
               position: "absolute",
               right: 113,
               top: 27,
+              zIndex: 9999999999, // Ensure it's above chat content
             }}
           >
             GIF
@@ -902,7 +904,7 @@ function Chat() {
               </Box>
         
               {/* --- Profile Edit/Set Buttons (outside modal) --- */}
-              {!isSettingUsername && (username || profileImage) && ( // Show edit if either username or image exists
+              {/* {!isSettingUsername && (username || profileImage) && ( // Show edit if either username or image exists
                 <Box
                   sx={{ position: "fixed", top: 30, right: 34,transform: 'translate(0, 4px)', zIndex: 99999999999, display: 'flex', flexDirection: 'column', gap: 0.5, alignItems: 'flex-end' }}
                 >
@@ -930,15 +932,15 @@ function Chat() {
                     Edit Profile
                   </Button>
                 </Box>
-              )}
+              )} */}
               {/* Show "Set Profile" if neither username nor image is set */}
-              {!isSettingUsername && !username && !profileImage && (
+              {/* {!isSettingUsername && !username && !profileImage && (
                 <Box sx={{ position: "fixed", top: 10, right: 10, zIndex: 99999999999 }}>
                   <Button variant="outlined" onClick={() => setIsSettingUsername(true)}>
                     Set Profile
                   </Button>
                 </Box>
-              )}
+              )} */}
 
       <GiphyModal
         open={showGiphyModal}

@@ -6,7 +6,7 @@ import {
   DraftHandleValue,
   EditorState,
 } from "draft-js";
-import { Box, Button, TextField, Typography, Avatar ,IconButton} from "@mui/material";
+import { Box, Button, TextField, Typography, Avatar ,IconButton,MenuItem,Menu} from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import Editor, { PluginEditorProps } from "@draft-js-plugins/editor";
 import createEmojiPlugin, { defaultTheme } from "@draft-js-plugins/emoji";
@@ -43,6 +43,16 @@ function OnlyChat() {
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
+  // Drop start
+const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  // Drop end
   // Aimal code start
   const [connectedUsersCount, setConnectedUsersCount] = useState(null);
   useEffect(() => {
@@ -466,7 +476,8 @@ function OnlyChat() {
             sm: "100% !important",
             xs: "100% !important",
           },
-          borderRadius: '0 !important'
+          borderRadius: '0 !important',
+          zIndex: '9 !important',
         }}
       >
         <Box
@@ -488,11 +499,38 @@ function OnlyChat() {
       {/* Replace this with your actual logo */}
       <Box component="img" src={logo} alt="View Media Logo" sx={{ height: 32 }} />
 
-      <IconButton>
+      <IconButton
+        id="basic-button"
+        aria-controls={open ? 'basic-menu' : undefined}
+        aria-haspopup="true"
+        aria-expanded={open ? 'true' : undefined}
+        onClick={handleClick}
+        color="inherit"
+        size="large"
+      >
         <Avatar sx={{ bgcolor: 'white' }}>
           <AccountCircleIcon sx={{ color: '#333' }} />
         </Avatar>
       </IconButton>
+      <Menu
+        id="basic-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        MenuListProps={{
+          'aria-labelledby': 'basic-button',
+        }}
+      >
+        <MenuItem onClick={() => setIsSettingUsername(true)}>
+        { (username || profileImage) && ( // Show edit if either username or image exists
+                 'Edit Profile'
+              )}
+              {/* Show "Set Profile" if neither username nor image is set */}
+              {username && !profileImage && (
+                ' Set Profile'
+              )}
+        </MenuItem>
+      </Menu>
     </Box>
         <Box
           style={{
@@ -500,12 +538,12 @@ function OnlyChat() {
             top: 55,
             left: 0,
             background: "#333",
-            width: "100%",
+            width: "98.7%",
             display: "flex",
             alignItems: "center",
             gap: "20px",
-            padding: "5px",
-            justifyContent: "space-around",
+            padding: "15px 10px",
+            justifyContent: "space-between",
           }}
           sx={{
             marginTop:{
@@ -519,10 +557,17 @@ function OnlyChat() {
               md: "36px",
               sm: "50px",
               xs: "50px",
+            },
+            width:{
+              lg: '98.7%',
+              md: '98.7%',
+              sm: '94.7%',
+              xs: '94.7%',
+
             }
           }}
         >
-          <button className="static-chat-button">
+          <button className="static-chat-button" style={{background: '#fff', color: '#000', padding: '5px 10px', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer'}} onClick={() => setIsSettingUsername(true)}>
             <ChatBubble /> Chat
           </button>
           <div className="connected-users-count" style={{ display: "flex", alignItems: "center", gap: "5px" }}>
@@ -533,7 +578,7 @@ function OnlyChat() {
             </span>
           </div>
         </Box>
-        <Box sx={{marginLeft: '-16px', marginTop: {lg:'66px', md: '88px', sm: '98px', xs: '110px'}, display: "flex", alignItems: "baseline", gap: 1, background: {lg:'#818181',md:'#818181',sm:'#818181',xs:'#818181'}, padding: '10px 10px 10px 20px', borderRadius: "4px", width: 'fit-content', position:{lg:'static',md: 'static',sm: 'fixed',xs:'fixed'}, }}>
+        <Box sx={{marginLeft: '-16px', marginTop: {lg:'87px', md: '92px', sm: '102px', xs: '130px'}, display: "flex", alignItems: "baseline", gap: 1, background: {lg:'#818181',md:'#818181',sm:'#818181',xs:'#818181'}, padding: '10px 10px 10px 20px', borderRadius: "4px", width: 'fit-content', position:{lg:'static',md: 'static',sm: 'fixed',xs:'fixed'}, }}>
           <Box
             sx={{
               color: "#fff",
@@ -710,9 +755,9 @@ function OnlyChat() {
 
           <div ref={messagesEndRef} />
         </Box>
-        <Box className="qr-code-wrapper" sx={{width:{lg: '30%',md: '45%',sm: '50%',xs: '84.2%'},marginLeft:{lg: 0,md:0,sm: '10px !important',xs: '10px !important'},zIndex:{lg:'2',md:'2',xs:'0',sm:'0'},marginBottom:{lg:'65px',md: '65px',sm:'80px',xs:'80px'}}} style={{ background: "#F0F0F11A", marginLeft: '0', marginRight: '0' }}>
+        {/* <Box className="qr-code-wrapper" sx={{width:{lg: '30%',md: '45%',sm: '50%',xs: '84.2%'},marginLeft:{lg: 0,md:0,sm: '10px !important',xs: '10px !important'},zIndex:{lg:'2',md:'2',xs:'0',sm:'0'},marginBottom:{lg:'65px',md: '65px',sm:'80px',xs:'80px'}}} style={{ background: "#F0F0F11A", marginLeft: '0', marginRight: '0' }}>
           <QrCode />
-        </Box>
+        </Box> */}
         <Box
           sx={{
             display: "flex",
@@ -735,8 +780,8 @@ function OnlyChat() {
               sx={{
                 width: 30,
                 height: 30,
-                backgroundColor: getColorFromName(username),
-                color: "white",
+                backgroundColor: '#fff',
+                color: "#000",
                 fontSize: "1rem",
                 textTransform: "uppercase",
               }}
@@ -785,13 +830,14 @@ function OnlyChat() {
               minWidth: 40,
               pl: 0,
               pr: 0,
-              borderColor: "white",
+              borderColor: "#818181",
               borderWidth: 1,
-              color: "white",
+              color: "#818181",
               fontSize: 12,
               position: "absolute",
               right: 113,
               top: 27,
+              zIndex: 9999999999, // Ensure it's above chat content
             }}
           >
             GIF
@@ -902,43 +948,7 @@ function OnlyChat() {
               </Box>
         
               {/* --- Profile Edit/Set Buttons (outside modal) --- */}
-              {!isSettingUsername && (username || profileImage) && ( // Show edit if either username or image exists
-                <Box
-                  sx={{ position: "fixed", top: 10, right: 10, zIndex: 99999999999, display: 'flex', flexDirection: 'column', gap: 0.5, alignItems: 'flex-end' }}
-                >
-                  {profileImage && ( // Show image preview if available
-                    <Box
-                      sx={{
-                        width: 30,
-                        height: 30,
-                        borderRadius: "50%",
-                        overflow: "hidden",
-                        border: "1px solid rgba(0,0,0,0.1)",
-                        cursor: 'pointer',
-                        mb: 0.5
-                      }}
-                      onClick={() => setIsSettingUsername(true)}
-                    >
-                      <img
-                        src={profileImage}
-                        alt="Profile"
-                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                      />
-                    </Box>
-                  )}
-                  <Button variant="outlined" size="small" onClick={() => setIsSettingUsername(true)}>
-                    Edit Profile
-                  </Button>
-                </Box>
-              )}
-              {/* Show "Set Profile" if neither username nor image is set */}
-              {!isSettingUsername && !username && !profileImage && (
-                <Box sx={{ position: "fixed", top: 10, right: 10, zIndex: 99999999999 }}>
-                  <Button variant="outlined" onClick={() => setIsSettingUsername(true)}>
-                    Set Profile
-                  </Button>
-                </Box>
-              )}
+              
 
       <GiphyModal
         open={showGiphyModal}
