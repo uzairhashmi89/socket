@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { io } from "socket.io-client";
-import { ContentState, EditorState } from "draft-js";
+import { ContentState, EditorState, convertToRaw } from "draft-js";
 import Editor from "@draft-js-plugins/editor";
 import createEmojiPlugin, { defaultTheme } from "@draft-js-plugins/emoji";
 import { Box, Button, TextField, Typography, Avatar, IconButton, MenuItem, Menu } from "@mui/material";
