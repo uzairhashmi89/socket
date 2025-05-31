@@ -1,13 +1,34 @@
-import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
+import axios from "axios";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useMemo,
+  useCallback,
+} from "react";
 import { io } from "socket.io-client";
 import { ContentState, EditorState, convertToRaw } from "draft-js";
 import Editor from "@draft-js-plugins/editor";
 import createEmojiPlugin, { defaultTheme } from "@draft-js-plugins/emoji";
-import { Box, Button, TextField, Typography, Avatar, IconButton, MenuItem, Menu } from "@mui/material";
-import { Send as SendIcon, ChatBubble, Verified as VerifiedIcon, AccountCircle as AccountCircleIcon } from "@mui/icons-material";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Avatar,
+  IconButton,
+  MenuItem,
+  Menu,
+} from "@mui/material";
+import {
+  Send as SendIcon,
+  ChatBubble,
+  Verified as VerifiedIcon,
+  AccountCircle as AccountCircleIcon,
+} from "@mui/icons-material";
 import HideImageOutlinedIcon from "@mui/icons-material/HideImageOutlined";
+import Snackbar, { SnackbarOrigin } from "@mui/material/Snackbar";
 import { GiphyModal } from "../../Components/GiphyModal";
-import QrCode from "../../Components/QrCode";
 import UserIcon from "../../assets/mdi_account-online.svg";
 import logo from "../../assets/logo.png";
 
@@ -29,7 +50,7 @@ function OnlyChat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
-
+  const [openSnackbar, setOpenSnackbar] = useState(false);
   const [chatAds, setChatAds] = useState([]);
   const [chatAdIndex, setChatAdIndex] = useState(0);
 
@@ -50,8 +71,6 @@ function OnlyChat() {
   const [connectedUsersCount, setConnectedUsersCount] = useState(null);
   useEffect(() => {
     socket.on("viewer", (data) => {
-      console.log("Viewer event received:", data);
-
       // If data is an array like [{ viewers: 3 }]
       if (Array.isArray(data) && data[0]?.viewers !== undefined) {
         setConnectedUsersCount(data[0].viewers);
@@ -79,8 +98,8 @@ function OnlyChat() {
       console.log("[Client] Connected:", socket.id);
       if (localStorage.getItem("userName")) {
         emitJoin(localStorage.getItem("userName"));
-      }else{
-        emitJoin('Guest');
+      } else {
+        emitJoin("Guest");
       }
     });
 
@@ -100,7 +119,7 @@ function OnlyChat() {
       socket.disconnect();
     };
   }, []);
-  console.log("input", input);
+
   const sendMessage = () => {
     if (input?.message) {
       const payload = {
@@ -270,7 +289,7 @@ function OnlyChat() {
       channelType: "channel",
       user: userPayload,
     };
-    console.log("Joining channel with payload:", payload);
+
     socket.emit("join", payload);
   };
   const scrollableContainerRef = useRef(null);
@@ -362,6 +381,15 @@ function OnlyChat() {
     const UPLOAD_API_BASE_URL = "https://api.staging-new.boltplus.tv";
     const UPLOAD_ENDPOINT = "/upload/public-profile";
 
+    const maxSizeMB = 2;
+    const maxSizeBytes = maxSizeMB * 1024 * 1024;
+
+    if (file.size > maxSizeBytes) {
+      setOpenSnackbar(true);
+      return;
+    }
+
+    console.log("Uploading file:", file);
     try {
       const fileName = `${Date.now()}-${file.name.replace(/[^\w.]/g, "")}`;
       const {
@@ -450,6 +478,13 @@ function OnlyChat() {
       }
     }
   };
+
+  const handleSnackClose = () => {
+    setOpenSnackbar(false);
+  };
+
+  console.log('username', username)
+
   return (
     <Box className="only-chat-ui" sx={{ backgroundColor: "#262825" }}>
       <Box
@@ -839,69 +874,69 @@ function OnlyChat() {
         </Box>
       </Box>
 
+      {/* --- Profile Setting Modal --- */}
       <Box
         sx={{
-          position: "fixed", // Example positioning
+          position: "fixed",
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          zIndex: 9999999999, // Ensure it's above chat content
-          backgroundColor: "rgba(0,0,0,0.8)",
+          zIndex: 99999999999, // Higher zIndex for modal
+          backgroundColor: "rgba(0,0,0,0.9)", // Darker overlay
           padding: 3,
           borderRadius: 2,
-          display: isSettingUsername ? "flex" : "none", // Show/hide based on state
+          display: isSettingUsername ? "flex" : "none",
           flexDirection: "column",
           gap: 2,
+          alignItems: "center",
+          width: { xs: "90%", sm: "400px" }, // Responsive width
+          maxWidth: "400px",
         }}
       >
         <Typography variant="h6" sx={{ color: "white", mb: 2 }}>
           Set Profile
         </Typography>
 
+        {/* Profile Image Display in Modal */}
         <Box
           sx={{
-            display: "flex",
-            flexDirection: "column",
+            width: 80,
+            height: 80,
+            borderRadius: "50%",
+            overflow: "hidden",
+            mb: 1,
+            border: "1px solid rgba(255,255,255,0.3)",
+            display: "flex", // For centering fallback content
+            justifyContent: "center",
             alignItems: "center",
           }}
         >
-          <Box
-            sx={{
-              width: 80,
-              height: 80,
-              borderRadius: "50%",
-              overflow: "hidden",
-              mb: 1,
-              border: "1px solid rgba(255,255,255,0.3)",
-            }}
-          >
-            {profileImage ? (
-              <img
-                src={profileImage}
-                alt="Profile"
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
-            ) : (
-              <Box
-                sx={{
-                  width: "100%",
-                  height: "100%",
-                  backgroundColor: "rgba(255,255,255,0.1)",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  color: "rgba(255,255,255,0.7)",
-                  fontSize: "1.5rem",
-                }}
-              >
-                {username ? (
-                  username.charAt(0).toUpperCase()
-                ) : (
-                  <HideImageOutlinedIcon />
-                )}
-              </Box>
-            )}
-          </Box>
+          {profileImage ? (
+            <img
+              src={profileImage}
+              alt="Profile"
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          ) : (
+            <Box
+              sx={{
+                width: "100%",
+                height: "100%",
+                backgroundColor: "rgba(255,255,255,0.1)",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                color: "rgba(255,255,255,0.7)",
+                fontSize: "1.5rem",
+              }}
+            >
+              {username ? (
+                username.charAt(0).toUpperCase()
+              ) : (
+                <HideImageOutlinedIcon />
+              )}
+            </Box>
+          )}
         </Box>
 
         <Button
@@ -937,6 +972,7 @@ function OnlyChat() {
               borderColor: "rgba(255,255,255,0.7)",
             },
             mb: 2,
+            width: "100%", // Full width in modal
           }}
         />
 
@@ -944,9 +980,8 @@ function OnlyChat() {
           variant="contained"
           onClick={handleSaveProfile}
           disabled={isUploading}
+          sx={{ width: "100%" }} // Full width in modal
         >
-          {" "}
-          {/* Renamed function */}
           Save
         </Button>
       </Box>
@@ -961,6 +996,14 @@ function OnlyChat() {
         onSelectItem={(data) => {
           sendGiphy(data);
         }}
+      />
+
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={openSnackbar}
+        message="Profile image is greater than 2MB, please upload a smaller image."
+        autoHideDuration={4000}
+        onClose={handleSnackClose}
       />
     </Box>
   );
