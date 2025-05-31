@@ -5,6 +5,7 @@ import { Box } from "@mui/material";
 import { ChatBubble } from "@mui/icons-material";
 import QrCode from "../../Components/QrCode";
 import UserIcon from "../../assets/mdi_account-online.svg";
+import TvcIcon from "../../assets/tvc-news.svg";
 import VerifiedIcon from "@mui/icons-material/Verified";
 
 const socket = io("https://api.staging-new.boltplus.tv", {
@@ -267,8 +268,8 @@ function StreamImpressive() {
           >
             <Box
               sx={{
-                width: 60,
-                height: 60,
+                width: 30,
+                height: 30,
                 borderRadius: "50%",
                 backgroundColor: "red",
                 color: "white",
@@ -276,11 +277,15 @@ function StreamImpressive() {
                 alignItems: "center",
                 justifyContent: "center",
                 fontWeight: "500",
-                fontSize: "2rem",
+                fontSize: "1rem",
                 textTransform: "uppercase",
               }}
             >
-              T
+              <img
+              src={TvcIcon}
+              alt="Bolt Logo"
+              style={{ width: "100%", height: "100%" }}
+            />
             </Box>
             TVC News{" "}
             <VerifiedIcon
