@@ -114,7 +114,12 @@ function StreamImpressive() {
 
   // Utility: Get color from name
   const getColorFromName = (name) => {
-    const colors = ["#F44336", "#2196F3", "#FF9800", "#4CAF50", "#9C27B0"];
+    const colors = ["#6FCF97",
+              "#219653",
+              "#F2C94C",
+              "#F2994A",
+              "#F0F0F1",
+              "#EB5757"];
     const hash = name
       .split("")
       .reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -252,7 +257,7 @@ function StreamImpressive() {
             sx={{
               color: "#fff",
               fontWeight: 600,
-              fontSize: "14px",
+              fontSize: "20px",
               textTransform: "capitalize",
               textWrap: "nowrap",
               display: "flex",
@@ -262,8 +267,8 @@ function StreamImpressive() {
           >
             <Box
               sx={{
-                width: 30,
-                height: 30,
+                width: 60,
+                height: 60,
                 borderRadius: "50%",
                 backgroundColor: "red",
                 color: "white",
@@ -271,7 +276,7 @@ function StreamImpressive() {
                 alignItems: "center",
                 justifyContent: "center",
                 fontWeight: "500",
-                fontSize: "1rem",
+                fontSize: "2rem",
                 textTransform: "uppercase",
               }}
             >
@@ -280,7 +285,7 @@ function StreamImpressive() {
             TVC News{" "}
             <VerifiedIcon
               sx={{
-                fontSize: "12px",
+                fontSize: "18px",
                 color: "#6FCF97",
                 marginLeft: "5px",
                 color: "#43A2F2",
@@ -289,11 +294,11 @@ function StreamImpressive() {
           </Box>
           <Box
             sx={{
-              fontSize: "14px",
+              fontSize: "19px",
               pl: "2px",
               pr: "5px",
-              lineHeight: "21px",
-              fontWeight: "400",
+              lineHeight: "30px",
+              fontWeight: "600",
               textTransform: "capitalize",
             }}
           >
@@ -319,12 +324,7 @@ function StreamImpressive() {
             const initial = getInitial(name);
             const isFirstMessage = index === 0;
             const nameColors = [
-              "#6FCF97",
-              "#219653",
-              "#F2C94C",
-              "#F2994A",
-              "#F0F0F1",
-              "#EB5757",
+              "#F2C94C", "#F2994A", "#FF9800"
             ];
             const randomColor =
               nameColors[Math.floor(Math.random() * nameColors.length)];
@@ -347,7 +347,7 @@ function StreamImpressive() {
                   style={{
                     width: "99%",
                     display: "flex",
-                    flexDirection: item?.type === "text" ? "row" : "column", // ← key line
+                    flexDirection: item?.type === "text" ? "row" : "row", // ← key line
                     alignItems:
                       item?.type === "text" ? "baseline" : "flex-start", // for better vertical alignment
                     gap: "5px", // optional spacing
@@ -378,8 +378,8 @@ function StreamImpressive() {
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          fontWeight: "800",
-                          fontSize: "20",
+                          fontWeight: "1000",
+                          fontSize: "20px",
                           textTransform: "uppercase",
                         }}
                       >
@@ -389,9 +389,10 @@ function StreamImpressive() {
                     <Box
                       sx={{
                         color: randomColor,
-                        fontWeight: 800,
+                        fontWeight: 1000,
                         fontSize: "20px",
                         textTransform: "capitalize",
+                        letterSpacing: "1px"
                       }}
                     >
                       {name}
@@ -407,6 +408,7 @@ function StreamImpressive() {
                         lineHeight: "20px",
                         fontWeight: "800",
                         textTransform: "capitalize",
+                        letterSpacing: "1px"
                       }}
                     >
                       {item?.message}
