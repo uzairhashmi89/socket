@@ -1,37 +1,14 @@
-import React, {
-  useEffect,
-  useRef,
-  useState,
-  useMemo,
-  useCallback,
-} from "react";
+import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { io } from "socket.io-client";
-import {
-  ContentState,
-  convertToRaw,
-  DraftHandleValue,
-  EditorState,
-} from "draft-js";
-import {
-  Box,
-  Button,
-  TextField,
-  Typography,
-  Avatar,
-  IconButton,
-  MenuItem,
-  Menu,
-} from "@mui/material";
-import SendIcon from "@mui/icons-material/Send";
-import Editor, { PluginEditorProps } from "@draft-js-plugins/editor";
+import { ContentState, EditorState } from "draft-js";
+import Editor from "@draft-js-plugins/editor";
 import createEmojiPlugin, { defaultTheme } from "@draft-js-plugins/emoji";
-import { ChatBubble } from "@mui/icons-material";
-import HideImageOutlinedIcon from '@mui/icons-material/HideImageOutlined';
+import { Box, Button, TextField, Typography, Avatar, IconButton, MenuItem, Menu } from "@mui/material";
+import { Send as SendIcon, ChatBubble, Verified as VerifiedIcon, AccountCircle as AccountCircleIcon } from "@mui/icons-material";
+import HideImageOutlinedIcon from "@mui/icons-material/HideImageOutlined";
 import { GiphyModal } from "../../Components/GiphyModal";
 import QrCode from "../../Components/QrCode";
 import UserIcon from "../../assets/user-icon.png";
-import VerifiedIcon from "@mui/icons-material/Verified";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import logo from "../../assets/logo.png";
 
 const socket = io("https://api.staging-new.boltplus.tv", {
