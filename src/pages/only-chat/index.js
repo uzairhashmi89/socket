@@ -10,7 +10,7 @@ import HideImageOutlinedIcon from "@mui/icons-material/HideImageOutlined";
 import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar';
 import { GiphyModal } from "../../Components/GiphyModal";
 import QrCode from "../../Components/QrCode";
-import UserIcon from "../../assets/user-icon.png";
+import UserIcon from "../../assets/mdi_account-online.svg";
 import logo from "../../assets/logo.png";
 
 const socket = io("https://api.staging-new.boltplus.tv", {
@@ -570,7 +570,7 @@ function OnlyChat() {
             display: "flex",
             alignItems: "center",
             gap: 1,
-            background: "#181818",
+            background: "#818181",
             padding: "8px 13px 8px 13px",
             borderTop: "1px solid #818181",
             borderBottom: "1px solid #818181",
