@@ -26,6 +26,7 @@ import SendIcon from "@mui/icons-material/Send";
 import Editor, { PluginEditorProps } from "@draft-js-plugins/editor";
 import createEmojiPlugin, { defaultTheme } from "@draft-js-plugins/emoji";
 import { ChatBubble } from "@mui/icons-material";
+import HideImageOutlinedIcon from '@mui/icons-material/HideImageOutlined';
 import { GiphyModal } from "../../Components/GiphyModal";
 import QrCode from "../../Components/QrCode";
 import UserIcon from "../../assets/user-icon.png";
