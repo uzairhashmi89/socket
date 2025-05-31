@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { io } from "socket.io-client";
 import { ContentState, EditorState, convertToRaw } from "draft-js";
@@ -6,6 +7,7 @@ import createEmojiPlugin, { defaultTheme } from "@draft-js-plugins/emoji";
 import { Box, Button, TextField, Typography, Avatar, IconButton, MenuItem, Menu } from "@mui/material";
 import { Send as SendIcon, ChatBubble, Verified as VerifiedIcon, AccountCircle as AccountCircleIcon } from "@mui/icons-material";
 import HideImageOutlinedIcon from "@mui/icons-material/HideImageOutlined";
+import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar';
 import { GiphyModal } from "../../Components/GiphyModal";
 import QrCode from "../../Components/QrCode";
 import UserIcon from "../../assets/user-icon.png";
@@ -29,7 +31,7 @@ function OnlyChat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
-
+  const [openSnackbar, setOpenSnackbar] = useState(false);
   const [chatAds, setChatAds] = useState([]);
   const [chatAdIndex, setChatAdIndex] = useState(0);
 
@@ -50,7 +52,6 @@ function OnlyChat() {
   const [connectedUsersCount, setConnectedUsersCount] = useState(null);
   useEffect(() => {
     socket.on("viewer", (data) => {
-      console.log("Viewer event received:", data);
 
       // If data is an array like [{ viewers: 3 }]
       if (Array.isArray(data) && data[0]?.viewers !== undefined) {
@@ -100,7 +101,7 @@ function OnlyChat() {
       socket.disconnect();
     };
   }, []);
-  console.log("input", input);
+  
   const sendMessage = () => {
     if (input?.message) {
       const payload = {
@@ -270,7 +271,7 @@ function OnlyChat() {
       channelType: "channel",
       user: userPayload,
     };
-    console.log("Joining channel with payload:", payload);
+    
     socket.emit("join", payload);
   };
   const scrollableContainerRef = useRef(null);
@@ -311,6 +312,8 @@ function OnlyChat() {
     const plugins = [emojiPlugin];
     return { plugins, EmojiSuggestions, EmojiSelect };
   }, []);
+
+  
 
   useEffect(() => {
     const newState = EditorState.push(
@@ -362,6 +365,15 @@ function OnlyChat() {
     const UPLOAD_API_BASE_URL = "https://api.staging-new.boltplus.tv";
     const UPLOAD_ENDPOINT = "/upload/public-profile";
 
+    const maxSizeMB = 2;
+    const maxSizeBytes = maxSizeMB * 1024 * 1024;
+
+    if (file.size > maxSizeBytes) {
+      setOpenSnackbar(true);
+      return;
+    }
+
+    console.log("Uploading file:", file);
     try {
       const fileName = `${Date.now()}-${file.name.replace(/[^\w.]/g, "")}`;
       const {
@@ -450,6 +462,11 @@ function OnlyChat() {
       }
     }
   };
+
+  const handleSnackClose = () => {
+    setOpenSnackbar(false);
+  };
+
   return (
     <Box className="only-chat-ui" sx={{ backgroundColor: "#262825" }}>
       <Box
@@ -961,6 +978,15 @@ function OnlyChat() {
         onSelectItem={(data) => {
           sendGiphy(data);
         }}
+      />
+
+      <Snackbar
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        open={openSnackbar}
+        message="Profile image is greater than 2MB, please upload a smaller image."
+        autoHideDuration={4000}
+        onClose={handleSnackClose}
+
       />
     </Box>
   );
