@@ -235,25 +235,6 @@ function OnlyChat() {
     return colors[hash % colors.length];
   };
 
-  // Render ads every 8th message
-  const renderChatAd = (index) => {
-    if (chatAds.length === 0) return null;
-    if ((index + 1) % 8 === 0) {
-      return (
-        <Box mt={1} style={{ width: "97%", borderRadius: 8, padding: "0px" }}>
-          {chatAds[chatAdIndex] && (
-            <img
-              src={chatAds[chatAdIndex].assetUrl}
-              alt="Chat Ad"
-              style={{ width: "100%", borderRadius: 8 }}
-            />
-          )}
-        </Box>
-      );
-    }
-    return null;
-  };
-
   const [username, setUsername] = useState(
     localStorage.getItem("userName") || ""
   );
@@ -532,7 +513,10 @@ function OnlyChat() {
               "aria-labelledby": "basic-button",
             }}
           >
-            <MenuItem onClick={() => setIsSettingUsername(true)}>
+            <MenuItem onClick={() => {
+              setAnchorEl(null);
+              setIsSettingUsername(true);
+            }}>
               {username ? "Edit Profile" : "Set Profile"}
             </MenuItem>
           </Menu>
@@ -647,16 +631,7 @@ function OnlyChat() {
             const avatarUrl = item?.sender?.photoUrl;
             const initial = getInitial(name);
             const isFirstMessage = index === 0;
-            const nameColors = [
-              "#6FCF97",
-              "#219653",
-              "#F2C94C",
-              "#F2994A",
-              "#F0F0F1",
-              "#EB5757",
-            ];
-            const randomColor =
-              nameColors[Math.floor(Math.random() * nameColors.length)];
+            const userColor = getColorFromName(name);
             return (
               <Box
                 className="message"
@@ -702,7 +677,7 @@ function OnlyChat() {
                           width: 30,
                           height: 30,
                           borderRadius: "50%",
-                          backgroundColor: getColorFromName(randomColor),
+                          backgroundColor: userColor,
                           color: "white",
                           display: "flex",
                           alignItems: "center",
@@ -717,7 +692,7 @@ function OnlyChat() {
                     )}
                     <Box
                       sx={{
-                        color: randomColor,
+                        color: userColor,
                         fontWeight: 600,
                         fontSize: "13.5px",
                         textTransform: "capitalize",
