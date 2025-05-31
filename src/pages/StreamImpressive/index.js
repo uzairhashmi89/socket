@@ -54,8 +54,8 @@ function StreamImpressive() {
       console.log("[Client] Connected:", socket.id);
       if (localStorage.getItem("userName")) {
         emitJoin(localStorage.getItem("userName"));
-      }else{
-        emitJoin('Guest');
+      } else {
+        emitJoin("Guest");
       }
     });
 
@@ -115,12 +115,14 @@ function StreamImpressive() {
 
   // Utility: Get color from name
   const getColorFromName = (name) => {
-    const colors = ["#6FCF97",
-              "#219653",
-              "#F2C94C",
-              "#F2994A",
-              "#F0F0F1",
-              "#EB5757"];
+    const colors = [
+      "#6FCF97",
+      "#219653",
+      "#F2C94C",
+      "#F2994A",
+      "#F0F0F1",
+      "#EB5757",
+    ];
     const hash = name
       .split("")
       .reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -227,7 +229,7 @@ function StreamImpressive() {
           }}
         >
           <button className="static-chat-button-stream">
-            <ChatBubble style={{fontSize:"35px"}} /> Chat
+            <ChatBubble style={{ fontSize: "35px" }} /> Chat
           </button>
           <div
             className="connected-users-count"
@@ -282,10 +284,10 @@ function StreamImpressive() {
               }}
             >
               <img
-              src={TvcIcon}
-              alt="Bolt Logo"
-              style={{ width: "100%", height: "100%" }}
-            />
+                src={TvcIcon}
+                alt="Bolt Logo"
+                style={{ width: "100%", height: "100%" }}
+              />
             </Box>
             TVC News{" "}
             <VerifiedIcon
@@ -325,14 +327,10 @@ function StreamImpressive() {
         >
           {messages?.map((item, index) => {
             const name = item?.sender || "User";
-            const avatarUrl = item?.sender?.photoUrl;
+            const avatarUrl = item?.profileImage || null;
             const initial = getInitial(name);
             const isFirstMessage = index === 0;
-            const nameColors = [
-              "#F2C94C", "#F2994A", "#FF9800"
-            ];
-            const randomColor =
-              nameColors[Math.floor(Math.random() * nameColors.length)];
+            const userColor = getColorFromName(name);
             return (
               <Box
                 className="message"
@@ -353,8 +351,7 @@ function StreamImpressive() {
                     width: "99%",
                     display: "flex",
                     flexDirection: item?.type === "text" ? "row" : "row", // ← key line
-                    alignItems:
-                      item?.type === "text" ? "baseline" : "flex-start", // for better vertical alignment
+                    alignItems: item?.type === "text" ? "center" : "flex-start", // for better vertical alignment
                     gap: "5px", // optional spacing
                     padding: "5px 10px 5px 10px",
                   }}
@@ -378,7 +375,7 @@ function StreamImpressive() {
                           width: 30,
                           height: 30,
                           borderRadius: "50%",
-                          backgroundColor: getColorFromName(randomColor),
+                          backgroundColor: userColor,
                           color: "white",
                           display: "flex",
                           alignItems: "center",
@@ -393,11 +390,11 @@ function StreamImpressive() {
                     )}
                     <Box
                       sx={{
-                        color: randomColor,
+                        color: userColor,
                         fontWeight: 1000,
                         fontSize: "20px",
                         textTransform: "capitalize",
-                        letterSpacing: "1px"
+                        letterSpacing: "1px",
                       }}
                     >
                       {name}
@@ -413,7 +410,7 @@ function StreamImpressive() {
                         lineHeight: "20px",
                         fontWeight: "800",
                         textTransform: "capitalize",
-                        letterSpacing: "1px"
+                        letterSpacing: "1px",
                       }}
                     >
                       {item?.message}
@@ -443,9 +440,7 @@ function StreamImpressive() {
 
           <div ref={messagesEndRef} />
         </Box>
-        <Box className="qr-code-wrapper_stream">
-          &nbsp;
-        </Box>
+        <Box className="qr-code-wrapper_stream">&nbsp;</Box>
       </Box>
     </Box>
   );

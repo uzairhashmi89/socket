@@ -54,8 +54,8 @@ function Chat() {
       console.log("[Client] Connected:", socket.id);
       if (localStorage.getItem("userName")) {
         emitJoin(localStorage.getItem("userName"));
-      }else{
-        emitJoin('Guest');
+      } else {
+        emitJoin("Guest");
       }
     });
 
@@ -330,19 +330,10 @@ function Chat() {
         >
           {messages?.map((item, index) => {
             const name = item?.sender || "User";
-            const avatarUrl = item?.sender?.photoUrl;
+            const avatarUrl = item?.profileImage || null;
             const initial = getInitial(name);
             const isFirstMessage = index === 0;
-            const nameColors = [
-              "#6FCF97",
-              "#219653",
-              "#F2C94C",
-              "#F2994A",
-              "#F0F0F1",
-              "#EB5757",
-            ];
-            const randomColor =
-              nameColors[Math.floor(Math.random() * nameColors.length)];
+            const userColor = getColorFromName(name);
             return (
               <Box
                 className="message"
@@ -363,8 +354,7 @@ function Chat() {
                     width: "99%",
                     display: "flex",
                     flexDirection: item?.type === "text" ? "row" : "column", // ← key line
-                    alignItems:
-                      item?.type === "text" ? "baseline" : "flex-start", // for better vertical alignment
+                    alignItems: item?.type === "text" ? "center" : "flex-start", // for better vertical alignment
                     gap: "5px", // optional spacing
                     padding: "5px 10px 5px 10px",
                   }}
@@ -380,6 +370,7 @@ function Chat() {
                           height: 30,
                           borderRadius: "50%",
                           objectFit: "cover",
+                          display: "block",
                         }}
                       />
                     ) : (
@@ -388,7 +379,7 @@ function Chat() {
                           width: 30,
                           height: 30,
                           borderRadius: "50%",
-                          backgroundColor: getColorFromName(randomColor),
+                          backgroundColor: userColor,
                           color: "white",
                           display: "flex",
                           alignItems: "center",
@@ -403,7 +394,7 @@ function Chat() {
                     )}
                     <Box
                       sx={{
-                        color: randomColor,
+                        color: userColor,
                         fontWeight: 600,
                         fontSize: "13.5px",
                         textTransform: "capitalize",

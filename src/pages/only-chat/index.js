@@ -149,7 +149,6 @@ function OnlyChat() {
     }
   };
 
-
   // Fetch messages
   useEffect(() => {
     const fetchMessages = async () => {
@@ -299,10 +298,7 @@ function OnlyChat() {
 
   const [isUploading, setIsUploading] = useState(false);
 
-  const uploadProfileImage = async (
-    file,
-    dispatchCallback = () => {},
-  ) => {
+  const uploadProfileImage = async (file, dispatchCallback = () => {}) => {
     // Added setOpenSnackbarFunc as a parameter
     const UPLOAD_API_BASE_URL = "https://api.staging-new.boltplus.tv";
     const UPLOAD_ENDPOINT = "/upload/public-profile"; // Removed trailing slash
@@ -348,7 +344,7 @@ function OnlyChat() {
         { headers: apiHeaders } // Pass the headers here
       );
 
-     const formData = new FormData();
+      const formData = new FormData();
       formData.append("key", fields.key);
       formData.append("Content-Type", file.type);
       formData.append("acl", "public-read");
@@ -655,8 +651,7 @@ function OnlyChat() {
                     width: "99%",
                     display: "flex",
                     flexDirection: item?.type === "text" ? "row" : "column", // ← key line
-                    alignItems:
-                      item?.type === "text" ? "center" : "flex-start", // for better vertical alignment
+                    alignItems: item?.type === "text" ? "center" : "flex-start", // for better vertical alignment
                     gap: "5px", // optional spacing
                     padding: "5px 10px 5px 10px",
                   }}
@@ -672,7 +667,7 @@ function OnlyChat() {
                           height: 30,
                           borderRadius: "50%",
                           objectFit: "cover",
-                          display: 'block',
+                          display: "block",
                         }}
                       />
                     ) : (
@@ -781,7 +776,7 @@ function OnlyChat() {
             }}
           >
             <Editor
-          editorState={editorState}
+              editorState={editorState}
               onChange={setEditorState}
               plugins={plugins}
               handleKeyCommand={handleKeyCommand}
