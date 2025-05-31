@@ -262,23 +262,6 @@ function OnlyChat() {
     !localStorage.getItem("userName")
   );
 
-  const handleSaveUsername = () => {
-    const trimmedUsername = username.trim();
-    if (trimmedUsername) {
-      localStorage.setItem("userName", trimmedUsername);
-      setUsername(trimmedUsername); // Update state with trimmed value
-      setIsSettingUsername(false); // Emit the join event with the new username immediately after saving
-      // The useEffect listening to 'username' and 'socket.connected' will also trigger this
-      // but emitting here ensures it happens right after saving.
-
-      if (socket.connected) {
-        emitJoin(trimmedUsername);
-      }
-    } else {
-      console.warn("Username cannot be empty."); // Optionally provide feedback to the user
-    }
-  };
-
   const emitJoin = (currentUsername) => {
     const userPayload = {
       username: currentUsername,
@@ -454,7 +437,7 @@ function OnlyChat() {
 
     // Emit the combined data via socket if connected
     if (socket.connected) {
-      emitJoin(usernameToEmit, imageToEmit); // Emit the URL
+      emitJoin(usernameToEmit); // Emit the URL
     } else {
       console.warn(
         "Socket not connected. Profile will be saved locally but not emitted."
@@ -866,7 +849,7 @@ function OnlyChat() {
               position: "absolute",
               right: 113,
               top: 27,
-              zIndex: 9999999999, // Ensure it's above chat content
+              zIndex: 99, // Ensure it's above chat content
             }}
           >
             GIF
@@ -882,7 +865,7 @@ function OnlyChat() {
           left: "50%",
           transform: "translate(-50%, -50%)",
           zIndex: 99999999999, // Higher zIndex for modal
-          backgroundColor: "rgba(0,0,0,0.9)", // Darker overlay
+          backgroundColor: "rgba(0,0,0,1)", // Darker overlay
           padding: 3,
           borderRadius: 2,
           display: isSettingUsername ? "flex" : "none",
