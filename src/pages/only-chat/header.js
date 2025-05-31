@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, {
   useEffect,
   useRef,
@@ -6,12 +7,9 @@ import React, {
   useCallback,
 } from "react";
 import { io } from "socket.io-client";
-import {
-  ContentState,
-  convertToRaw,
-  DraftHandleValue,
-  EditorState,
-} from "draft-js";
+import { ContentState, EditorState, convertToRaw } from "draft-js";
+import Editor from "@draft-js-plugins/editor";
+import createEmojiPlugin, { defaultTheme } from "@draft-js-plugins/emoji";
 import {
   Box,
   Button,
@@ -22,15 +20,16 @@ import {
   MenuItem,
   Menu,
 } from "@mui/material";
-import SendIcon from "@mui/icons-material/Send";
-import Editor, { PluginEditorProps } from "@draft-js-plugins/editor";
-import createEmojiPlugin, { defaultTheme } from "@draft-js-plugins/emoji";
-import { ChatBubble } from "@mui/icons-material";
+import {
+  Send as SendIcon,
+  ChatBubble,
+  Verified as VerifiedIcon,
+  AccountCircle as AccountCircleIcon,
+} from "@mui/icons-material";
+import HideImageOutlinedIcon from "@mui/icons-material/HideImageOutlined";
+import Snackbar, { SnackbarOrigin } from "@mui/material/Snackbar";
 import { GiphyModal } from "../../Components/GiphyModal";
-import QrCode from "../../Components/QrCode";
-import UserIcon from "../../assets/user-icon.png";
-import VerifiedIcon from "@mui/icons-material/Verified";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import UserIcon from "../../assets/mdi_account-online.svg";
 import logo from "../../assets/logo.png";
 
 const socket = io("https://api.staging-new.boltplus.tv", {
@@ -51,9 +50,7 @@ function Header() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
-
-  const [chatAds, setChatAds] = useState([]);
-  const [chatAdIndex, setChatAdIndex] = useState(0);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
@@ -72,8 +69,6 @@ function Header() {
   const [connectedUsersCount, setConnectedUsersCount] = useState(null);
   useEffect(() => {
     socket.on("viewer", (data) => {
-      console.log("Viewer event received:", data);
-
       // If data is an array like [{ viewers: 3 }]
       if (Array.isArray(data) && data[0]?.viewers !== undefined) {
         setConnectedUsersCount(data[0].viewers);
@@ -100,7 +95,12 @@ function Header() {
     socket.on("connect", () => {
       console.log("[Client] Connected:", socket.id);
       if (localStorage.getItem("userName")) {
-        emitJoin(localStorage.getItem("userName"));
+        emitJoin(
+          localStorage.getItem("userName"),
+          localStorage.getItem("profileImage")
+        );
+      } else {
+        emitJoin("Guest");
       }
     });
 
@@ -120,7 +120,7 @@ function Header() {
       socket.disconnect();
     };
   }, []);
-  console.log("input", input);
+
   const sendMessage = () => {
     if (input?.message) {
       const payload = {
@@ -149,43 +149,6 @@ function Header() {
     }
   };
 
-  // Fetch ads
-  useEffect(() => {
-    const fetchAds = async () => {
-      try {
-        const response = await fetch(
-          "https://api.staging-new.boltplus.tv/advertisements/get?limit=10&page=1&skip=0&forFrontend=true",
-          {
-            method: "GET",
-            headers: {
-              Accept: "application/json, text/plain, */*",
-              "Accept-Language": "en-US,en;q=0.9",
-              Connection: "keep-alive",
-              Origin: "https://staging-new.boltplus.tv",
-              Referer: "https://staging-new.boltplus.tv/",
-              "User-Agent": "Mozilla/5.0",
-              boltsrc: "boltplus-webapp/microsoft_windows/0.1.0",
-              device: "d520c7a8-421b-4563-b955-f5abc56b97ec",
-              "product-token": "330dbc49a5872166f13049629596fc088b26d885",
-              session: "1744790058433",
-              "Cache-Control": "no-cache",
-            },
-          }
-        );
-
-        if (!response.ok)
-          throw new Error(`HTTP error! status: ${response.status}`);
-
-        const data = await response.json();
-        setChatAds(data?.data?.filter((ad) => ad.placement === "chat"));
-      } catch (e) {
-        console.error("Error fetching ads:", e);
-      }
-    };
-
-    fetchAds();
-  }, []);
-
   // Fetch messages
   useEffect(() => {
     const fetchMessages = async () => {
@@ -212,15 +175,6 @@ function Header() {
     fetchMessages();
   }, []);
 
-  // Rotate ads every 5 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setChatAdIndex((prevIndex) => (prevIndex + 1) % chatAds.length);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [chatAds]);
-
   // Utility: Get first letter of name
   const getInitial = (name) => {
     if (!name) return "";
@@ -236,25 +190,6 @@ function Header() {
     return colors[hash % colors.length];
   };
 
-  // Render ads every 8th message
-  const renderChatAd = (index) => {
-    if (chatAds.length === 0) return null;
-    if ((index + 1) % 8 === 0) {
-      return (
-        <Box mt={1} style={{ width: "97%", borderRadius: 8, padding: "0px" }}>
-          {chatAds[chatAdIndex] && (
-            <img
-              src={chatAds[chatAdIndex].assetUrl}
-              alt="Chat Ad"
-              style={{ width: "100%", borderRadius: 8 }}
-            />
-          )}
-        </Box>
-      );
-    }
-    return null;
-  };
-
   const [username, setUsername] = useState(
     localStorage.getItem("userName") || ""
   );
@@ -263,28 +198,79 @@ function Header() {
     !localStorage.getItem("userName")
   );
 
-  const handleSaveUsername = () => {
-    const trimmedUsername = username.trim();
-    if (trimmedUsername) {
-      localStorage.setItem("userName", trimmedUsername);
-      setUsername(trimmedUsername); // Update state with trimmed value
-      setIsSettingUsername(false); // Emit the join event with the new username immediately after saving
-      // The useEffect listening to 'username' and 'socket.connected' will also trigger this
-      // but emitting here ensures it happens right after saving.
+  const [profilePhoto, setProfilePhoto] = useState(
+    localStorage.getItem("profileImage") || null
+  );
 
-      if (socket.connected) {
-        emitJoin(trimmedUsername);
-      }
-    } else {
-      console.warn("Username cannot be empty."); // Optionally provide feedback to the user
-    }
+  const emitJoin = (currentUsername, profileImage) => {
+    const userPayload = {
+      username: currentUsername,
+      profileImage: profileImage,
+    };
+
+    const payload = {
+      channelId: "68090b895880466655dc6a17", // Use your actual channel ID
+      channelType: "channel",
+      user: userPayload,
+    };
+
+    socket.emit("join", payload);
   };
+  const scrollableContainerRef = useRef(null);
+  const firstMessageRef = useRef(null);
 
-  
+  useEffect(() => {
+    const scrollToBottom = () => {
+      if (scrollableContainerRef.current) {
+        const scrollableElement = scrollableContainerRef.current;
+        // Check if user is near the top (newest messages, scrollTop close to 0)
+        const isNearBottom = scrollableElement.scrollTop < 100; // Adjust threshold as needed
 
-  
+        if (isNearBottom) {
+          if (firstMessageRef.current) {
+            firstMessageRef.current.scrollIntoView({ behavior: "smooth" });
+          } else {
+            // Fallback to scrollTop = 0 if ref isn't set yet
+            scrollableElement.scrollTop = 0;
+          }
+        }
+      }
+    };
 
-  
+    // Debounce to handle rapid message updates
+    if (messages?.length > 0) {
+      const timeout = setTimeout(scrollToBottom, 1000);
+      return () => clearTimeout(timeout);
+    }
+  }, [messages]);
+
+  const { EmojiSuggestions, EmojiSelect, plugins } = useMemo(() => {
+    const emojiPlugin = createEmojiPlugin({
+      useNativeArt: true,
+      theme: defaultTheme,
+    });
+    const { EmojiSuggestions, EmojiSelect } = emojiPlugin;
+
+    const plugins = [emojiPlugin];
+    return { plugins, EmojiSuggestions, EmojiSelect };
+  }, []);
+
+  useEffect(() => {
+    const newState = EditorState.push(
+      editorState,
+      ContentState.createFromText(""),
+      "insert-characters"
+    );
+    setEditorState(EditorState.moveFocusToEnd(newState));
+  }, []);
+
+  const handleKeyCommand = (command) => {
+    if (command === "split-block" && !!sendMessage) {
+      sendMessage();
+      return "handled";
+    }
+    return "not-handled";
+  };
 
   const updateChatState = (payload) => {
     setInput((prev) => ({ ...prev, ...payload }));
@@ -308,25 +294,48 @@ function Header() {
     onChangeText(editorData?.blocks?.map((item) => item.text)?.join("\n"));
   }, [editorState]);
 
+  const [showGiphyModal, setShowGiphyModal] = useState(false);
 
   const [isUploading, setIsUploading] = useState(false);
-  const [profileImage, setProfileImage] = useState(
-    localStorage.getItem("profileImage") || null
-  );
 
-  const uploadProfileImage = async (file, dispatchCallback = () => {}) => {
+  const uploadProfileImage = async (file) => {
     const UPLOAD_API_BASE_URL = "https://api.staging-new.boltplus.tv";
     const UPLOAD_ENDPOINT = "/upload/public-profile";
 
+    const maxSizeMB = 2;
+    const maxSizeBytes = maxSizeMB * 1024 * 1024;
+
+    if (file.size > maxSizeBytes) {
+      setOpenSnackbar(true);
+      return;
+    }
     try {
       const fileName = `${Date.now()}-${file.name.replace(/[^\w.]/g, "")}`;
+
+      const apiHeaders = {
+        Accept: "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Content-Type": "application/json",
+        Origin: "https://staging-new.boltplus.tv",
+        Referer: "https://staging-new.boltplus.tv/",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+        boltsrc: "boltplus-webapp/microsoft_windows/0.1.0",
+        session: "1748527326242",
+      };
+
       const {
-        data: { fields, url },
-      } = await axios.post(`${UPLOAD_API_BASE_URL}${UPLOAD_ENDPOINT}`, {
-        type: file.type,
-        name: fileName,
-        folder: "avatar",
-      });
+        data: { fields, url }, // 'fields' and 'url' are from the API response for S3 upload
+      } = await axios.post(
+        `${UPLOAD_API_BASE_URL}${UPLOAD_ENDPOINT}`,
+        {
+          // Request body
+          type: file.type,
+          name: fileName,
+          folder: "avatar",
+        },
+        { headers: apiHeaders } // Pass the headers here
+      );
 
       const formData = new FormData();
       formData.append("key", fields.key);
@@ -344,24 +353,31 @@ function Header() {
         onUploadProgress: (event) => {
           const progress = Math.floor((event.loaded / event.total) * 100);
           console.log(`Upload progress: ${progress}%`);
-          // If you had a Redux action for progress, you'd call it here:
-          // dispatchCallback({ type: 'UPLOAD_PROGRESS', payload: { uploadId: 'profileImage', progress } });
+          dispatchCallback({
+            type: "UPLOAD_PROGRESS",
+            payload: { uploadId: "profileImage", progress },
+          });
         },
       });
 
-      const publicImageUrl = `${url}/${fields.key}`;
+      const publicImageUrl = `${url}/${fields.key}`; // This might need adjustment based on how S3 URL is constructed
       console.log("Image uploaded successfully:", publicImageUrl);
+      if (publicImageUrl) {
+        localStorage.setItem("profileImage", publicImageUrl); // Store the URL in localStorage
+        setProfilePhoto(publicImageUrl); // Update state with the public URL
+      }
       return publicImageUrl;
     } catch (error) {
-      console.error("Error uploading profile image:", error);
+      console.error(
+        "Error uploading profile image:",
+        error.response ? error.response.data : error.message
+      );
       return null;
     }
   };
   const handleSaveProfile = useCallback(() => {
-    // Renamed from handleSaveUsername
     const trimmedUsername = username.trim();
     let usernameToEmit = "guest";
-    let imageToEmit = profileImage; // Use the URL directly
 
     if (trimmedUsername) {
       localStorage.setItem("userName", trimmedUsername);
@@ -369,43 +385,46 @@ function Header() {
       usernameToEmit = trimmedUsername;
     } else {
       localStorage.removeItem("userName");
-      setUsername(""); // Ensure state is cleared
+      setUsername("");
     }
 
-    if (profileImage) {
-      localStorage.setItem("profileImage", profileImage); // Store the URL
+    if (profilePhoto) {
+      localStorage.setItem("profileImage", profilePhoto);
     } else {
       localStorage.removeItem("profileImage");
     }
 
-    setIsSettingUsername(false); // Close the settings modal
-
-    // Emit the combined data via socket if connected
+    setIsSettingUsername(false);
     if (socket.connected) {
-      emitJoin(usernameToEmit, imageToEmit); // Emit the URL
+      emitJoin(usernameToEmit, profilePhoto);
     } else {
       console.warn(
         "Socket not connected. Profile will be saved locally but not emitted."
       );
     }
-  }, [username, profileImage]); // Added dependencies
+  }, [username, profilePhoto]);
+
   const handleImageUpload = async (event) => {
     const file = event.target.files?.[0];
     if (file) {
-      setIsUploading(true); // Set uploading state
+      setIsUploading(true);
       try {
-        const imageUrl = await uploadProfileImage(file); // Call the utility function
+        const imageUrl = await uploadProfileImage(file);
         if (imageUrl) {
-          setProfileImage(imageUrl); // Update state with the public URL
+          setProfilePhoto(imageUrl);
         }
       } catch (error) {
         console.error("Failed to upload image:", error);
-        // Handle error, e.g., show a toast message
       } finally {
-        setIsUploading(false); // Reset uploading state
+        setIsUploading(false);
       }
     }
   };
+
+  const handleSnackClose = () => {
+    setOpenSnackbar(false);
+  };
+
   return (
     <>
       <Box
@@ -440,9 +459,17 @@ function Header() {
           color="inherit"
           size="large"
         >
-          <Avatar sx={{ bgcolor: "white" }}>
-            <AccountCircleIcon sx={{ color: "#333" }} />
-          </Avatar>
+          {profilePhoto ? (
+            <Avatar
+              src={profilePhoto}
+              alt="Profile Image"
+              sx={{ width: 30, height: 30 }}
+            />
+          ) : (
+            <Avatar sx={{ bgcolor: "white" }}>
+              <AccountCircleIcon sx={{ color: "#333" }} />
+            </Avatar>
+          )}
         </IconButton>
         <Menu
           id="basic-menu"
@@ -453,25 +480,34 @@ function Header() {
             "aria-labelledby": "basic-button",
           }}
         >
-          <MenuItem onClick={() => setIsSettingUsername(true)}>
+          <MenuItem
+            onClick={() => {
+              setAnchorEl(null);
+              setIsSettingUsername(true);
+            }}
+          >
             {username ? "Edit Profile" : "Set Profile"}
           </MenuItem>
         </Menu>
       </Box>
 
+      {/* --- Profile Setting Modal --- */}
       <Box
         sx={{
-          position: "fixed", // Example positioning
+          position: "fixed",
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          zIndex: 9999999999, // Ensure it's above chat content
-          backgroundColor: "rgba(0,0,0,0.8)",
+          zIndex: 99999999999, // Higher zIndex for modal
+          backgroundColor: "rgba(0,0,0,1)", // Darker overlay
           padding: 3,
           borderRadius: 2,
-          display: isSettingUsername ? "flex" : "none", // Show/hide based on state
+          display: isSettingUsername ? "flex" : "none",
           flexDirection: "column",
           gap: 2,
+          alignItems: "center",
+          width: { xs: "90%", sm: "400px" }, // Responsive width
+          maxWidth: "400px",
         }}
       >
         <Typography variant="h6" sx={{ color: "white", mb: 2 }}>
@@ -480,48 +516,43 @@ function Header() {
 
         <Box
           sx={{
+            width: 80,
+            height: 80,
+            borderRadius: "50%",
+            overflow: "hidden",
+            mb: 1,
+            border: "1px solid rgba(255,255,255,0.3)",
             display: "flex",
-            flexDirection: "column",
+            justifyContent: "center",
             alignItems: "center",
           }}
         >
-          <Box
-            sx={{
-              width: 80,
-              height: 80,
-              borderRadius: "50%",
-              overflow: "hidden",
-              mb: 1,
-              border: "1px solid rgba(255,255,255,0.3)",
-            }}
-          >
-            {profileImage ? (
-              <img
-                src={profileImage}
-                alt="Profile"
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
-            ) : (
-              <Box
-                sx={{
-                  width: "100%",
-                  height: "100%",
-                  backgroundColor: "rgba(255,255,255,0.1)",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  color: "rgba(255,255,255,0.7)",
-                  fontSize: "1.5rem",
-                }}
-              >
-                {username ? (
-                  username.charAt(0).toUpperCase()
-                ) : (
-                  <HideImageOutlinedIcon />
-                )}
-              </Box>
-            )}
-          </Box>
+          {profilePhoto ? (
+            <img
+              src={profilePhoto}
+              alt="Profile"
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          ) : (
+            <Box
+              sx={{
+                width: "100%",
+                height: "100%",
+                backgroundColor: "rgba(255,255,255,0.1)",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                color: "rgba(255,255,255,0.7)",
+                fontSize: "1.5rem",
+              }}
+            >
+              {username ? (
+                username.charAt(0).toUpperCase()
+              ) : (
+                <HideImageOutlinedIcon />
+              )}
+            </Box>
+          )}
         </Box>
 
         <Button
@@ -557,6 +588,7 @@ function Header() {
               borderColor: "rgba(255,255,255,0.7)",
             },
             mb: 2,
+            width: "100%",
           }}
         />
 
@@ -564,12 +596,19 @@ function Header() {
           variant="contained"
           onClick={handleSaveProfile}
           disabled={isUploading}
+          sx={{ width: "100%" }}
         >
-          {" "}
-          {/* Renamed function */}
           Save
         </Button>
       </Box>
+
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={openSnackbar}
+        message="Profile image is greater than 2MB, please upload a smaller image."
+        autoHideDuration={4000}
+        onClose={handleSnackClose}
+      />
     </>
   );
 }

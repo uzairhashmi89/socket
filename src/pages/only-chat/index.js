@@ -51,8 +51,6 @@ function OnlyChat() {
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [chatAds, setChatAds] = useState([]);
-  const [chatAdIndex, setChatAdIndex] = useState(0);
 
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
@@ -97,7 +95,10 @@ function OnlyChat() {
     socket.on("connect", () => {
       console.log("[Client] Connected:", socket.id);
       if (localStorage.getItem("userName")) {
-        emitJoin(localStorage.getItem("userName"));
+        emitJoin(
+          localStorage.getItem("userName"),
+          localStorage.getItem("profileImage")
+        );
       } else {
         emitJoin("Guest");
       }
@@ -148,42 +149,6 @@ function OnlyChat() {
     }
   };
 
-  // Fetch ads
-  useEffect(() => {
-    const fetchAds = async () => {
-      try {
-        const response = await fetch(
-          "https://api.staging-new.boltplus.tv/advertisements/get?limit=10&page=1&skip=0&forFrontend=true",
-          {
-            method: "GET",
-            headers: {
-              Accept: "application/json, text/plain, */*",
-              "Accept-Language": "en-US,en;q=0.9",
-              Connection: "keep-alive",
-              Origin: "https://staging-new.boltplus.tv",
-              Referer: "https://staging-new.boltplus.tv/",
-              "User-Agent": "Mozilla/5.0",
-              boltsrc: "boltplus-webapp/microsoft_windows/0.1.0",
-              device: "d520c7a8-421b-4563-b955-f5abc56b97ec",
-              "product-token": "330dbc49a5872166f13049629596fc088b26d885",
-              session: "1744790058433",
-              "Cache-Control": "no-cache",
-            },
-          }
-        );
-
-        if (!response.ok)
-          throw new Error(`HTTP error! status: ${response.status}`);
-
-        const data = await response.json();
-        setChatAds(data?.data?.filter((ad) => ad.placement === "chat"));
-      } catch (e) {
-        console.error("Error fetching ads:", e);
-      }
-    };
-
-    fetchAds();
-  }, []);
 
   // Fetch messages
   useEffect(() => {
@@ -211,15 +176,6 @@ function OnlyChat() {
     fetchMessages();
   }, []);
 
-  // Rotate ads every 5 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setChatAdIndex((prevIndex) => (prevIndex + 1) % chatAds.length);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [chatAds]);
-
   // Utility: Get first letter of name
   const getInitial = (name) => {
     if (!name) return "";
@@ -243,9 +199,14 @@ function OnlyChat() {
     !localStorage.getItem("userName")
   );
 
-  const emitJoin = (currentUsername) => {
+  const [profilePhoto, setProfilePhoto] = useState(
+    localStorage.getItem("profileImage") || null
+  );
+
+  const emitJoin = (currentUsername, profileImage) => {
     const userPayload = {
       username: currentUsername,
+      profileImage: profileImage,
     };
 
     const payload = {
@@ -278,11 +239,11 @@ function OnlyChat() {
     };
 
     // Debounce to handle rapid message updates
-    if (chatAds?.length > 0 && messages?.length > 0) {
+    if (messages?.length > 0) {
       const timeout = setTimeout(scrollToBottom, 1000);
       return () => clearTimeout(timeout);
     }
-  }, [messages, chatAds]);
+  }, [messages]);
 
   const { EmojiSuggestions, EmojiSelect, plugins } = useMemo(() => {
     const emojiPlugin = createEmojiPlugin({
@@ -337,34 +298,57 @@ function OnlyChat() {
   const [showGiphyModal, setShowGiphyModal] = useState(false);
 
   const [isUploading, setIsUploading] = useState(false);
-  const [profileImage, setProfileImage] = useState(
-    localStorage.getItem("profileImage") || null
-  );
 
-  const uploadProfileImage = async (file, dispatchCallback = () => {}) => {
+  const uploadProfileImage = async (
+    file,
+    dispatchCallback = () => {},
+  ) => {
+    // Added setOpenSnackbarFunc as a parameter
     const UPLOAD_API_BASE_URL = "https://api.staging-new.boltplus.tv";
-    const UPLOAD_ENDPOINT = "/upload/public-profile";
+    const UPLOAD_ENDPOINT = "/upload/public-profile"; // Removed trailing slash
 
     const maxSizeMB = 2;
     const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
     if (file.size > maxSizeBytes) {
-      setOpenSnackbar(true);
+      setOpenSnackbar(true); // Show snackbar if file is too large
       return;
     }
 
     console.log("Uploading file:", file);
     try {
       const fileName = `${Date.now()}-${file.name.replace(/[^\w.]/g, "")}`;
-      const {
-        data: { fields, url },
-      } = await axios.post(`${UPLOAD_API_BASE_URL}${UPLOAD_ENDPOINT}`, {
-        type: file.type,
-        name: fileName,
-        folder: "avatar",
-      });
 
-      const formData = new FormData();
+      // Headers for the first request, based on the cURL command
+      const apiHeaders = {
+        Accept: "application/json, text/plain, */*", // Adjusted from cURL's '/' to '*/*'
+        "Accept-Language": "en-US,en;q=0.9",
+        "Content-Type": "application/json", // This is for the body of this specific request
+        Origin: "https://staging-new.boltplus.tv",
+        Referer: "https://staging-new.boltplus.tv/",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+        boltsrc: "boltplus-webapp/microsoft_windows/0.1.0",
+        device: "d520c7a8-421b-4563-b955-f5abc56b97ec",
+        "product-token": "330dbc49a5872166f13049629596fc088b26d885",
+        // The 'session' header value is from your cURL. Replace with dynamic value if needed.
+        session: "1748527326242",
+        // Browser-controlled headers like Sec-Fetch-*, Connection, sec-ch-ua-* are usually not manually set in client-side JS.
+      };
+
+      const {
+        data: { fields, url }, // 'fields' and 'url' are from the API response for S3 upload
+      } = await axios.post(
+        `${UPLOAD_API_BASE_URL}${UPLOAD_ENDPOINT}`,
+        {
+          type: file.type,
+          name: fileName,
+          folder: "avatar",
+        },
+        { headers: apiHeaders } // Pass the headers here
+      );
+
+     const formData = new FormData();
       formData.append("key", fields.key);
       formData.append("Content-Type", file.type);
       formData.append("acl", "public-read");
@@ -380,16 +364,27 @@ function OnlyChat() {
         onUploadProgress: (event) => {
           const progress = Math.floor((event.loaded / event.total) * 100);
           console.log(`Upload progress: ${progress}%`);
-          // If you had a Redux action for progress, you'd call it here:
-          // dispatchCallback({ type: 'UPLOAD_PROGRESS', payload: { uploadId: 'profileImage', progress } });
+          dispatchCallback({
+            type: "UPLOAD_PROGRESS",
+            payload: { uploadId: "profileImage", progress },
+          });
         },
+        // Headers for the S3 upload are typically minimal as FormData sets Content-Type (multipart/form-data)
+        // and other necessary details are in the form fields.
       });
 
-      const publicImageUrl = `${url}/${fields.key}`;
+      const publicImageUrl = `${url}/${fields.key}`; // This might need adjustment based on how S3 URL is constructed
       console.log("Image uploaded successfully:", publicImageUrl);
+      if (publicImageUrl) {
+        localStorage.setItem("profileImage", publicImageUrl); // Store the URL in localStorage
+        setProfilePhoto(publicImageUrl); // Update state with the public URL
+      }
       return publicImageUrl;
     } catch (error) {
-      console.error("Error uploading profile image:", error);
+      console.error(
+        "Error uploading profile image:",
+        error.response ? error.response.data : error.message
+      );
       return null;
     }
   };
@@ -397,7 +392,6 @@ function OnlyChat() {
     // Renamed from handleSaveUsername
     const trimmedUsername = username.trim();
     let usernameToEmit = "guest";
-    let imageToEmit = profileImage; // Use the URL directly
 
     if (trimmedUsername) {
       localStorage.setItem("userName", trimmedUsername);
@@ -408,8 +402,8 @@ function OnlyChat() {
       setUsername(""); // Ensure state is cleared
     }
 
-    if (profileImage) {
-      localStorage.setItem("profileImage", profileImage); // Store the URL
+    if (profilePhoto) {
+      localStorage.setItem("profileImage", profilePhoto); // Store the URL
     } else {
       localStorage.removeItem("profileImage");
     }
@@ -418,13 +412,14 @@ function OnlyChat() {
 
     // Emit the combined data via socket if connected
     if (socket.connected) {
-      emitJoin(usernameToEmit); // Emit the URL
+      emitJoin(usernameToEmit, profilePhoto); // Emit the URL
     } else {
       console.warn(
         "Socket not connected. Profile will be saved locally but not emitted."
       );
     }
-  }, [username, profileImage]); // Added dependencies
+  }, [username, profilePhoto]); // Added dependencies
+
   const handleImageUpload = async (event) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -432,7 +427,7 @@ function OnlyChat() {
       try {
         const imageUrl = await uploadProfileImage(file); // Call the utility function
         if (imageUrl) {
-          setProfileImage(imageUrl); // Update state with the public URL
+          setProfilePhoto(imageUrl); // Update state with the public URL
         }
       } catch (error) {
         console.error("Failed to upload image:", error);
@@ -446,8 +441,6 @@ function OnlyChat() {
   const handleSnackClose = () => {
     setOpenSnackbar(false);
   };
-
-  console.log('username', username)
 
   return (
     <Box className="only-chat-ui" sx={{ backgroundColor: "#262825" }}>
@@ -500,9 +493,17 @@ function OnlyChat() {
             color="inherit"
             size="large"
           >
-            <Avatar sx={{ bgcolor: "white" }}>
-              <AccountCircleIcon sx={{ color: "#333" }} />
-            </Avatar>
+            {profilePhoto ? (
+              <Avatar
+                src={profilePhoto}
+                alt="Profile Image"
+                sx={{ width: 30, height: 30 }}
+              />
+            ) : (
+              <Avatar sx={{ bgcolor: "white" }}>
+                <AccountCircleIcon sx={{ color: "#333" }} />
+              </Avatar>
+            )}
           </IconButton>
           <Menu
             id="basic-menu"
@@ -513,10 +514,12 @@ function OnlyChat() {
               "aria-labelledby": "basic-button",
             }}
           >
-            <MenuItem onClick={() => {
-              setAnchorEl(null);
-              setIsSettingUsername(true);
-            }}>
+            <MenuItem
+              onClick={() => {
+                setAnchorEl(null);
+                setIsSettingUsername(true);
+              }}
+            >
               {username ? "Edit Profile" : "Set Profile"}
             </MenuItem>
           </Menu>
@@ -628,7 +631,7 @@ function OnlyChat() {
         >
           {messages?.map((item, index) => {
             const name = item?.sender || "User";
-            const avatarUrl = item?.sender?.photoUrl;
+            const avatarUrl = item?.profileImage || null;
             const initial = getInitial(name);
             const isFirstMessage = index === 0;
             const userColor = getColorFromName(name);
@@ -653,7 +656,7 @@ function OnlyChat() {
                     display: "flex",
                     flexDirection: item?.type === "text" ? "row" : "column", // ← key line
                     alignItems:
-                      item?.type === "text" ? "baseline" : "flex-start", // for better vertical alignment
+                      item?.type === "text" ? "center" : "flex-start", // for better vertical alignment
                     gap: "5px", // optional spacing
                     padding: "5px 10px 5px 10px",
                   }}
@@ -669,6 +672,7 @@ function OnlyChat() {
                           height: 30,
                           borderRadius: "50%",
                           objectFit: "cover",
+                          display: 'block',
                         }}
                       />
                     ) : (
@@ -777,7 +781,7 @@ function OnlyChat() {
             }}
           >
             <Editor
-              editorState={editorState}
+          editorState={editorState}
               onChange={setEditorState}
               plugins={plugins}
               handleKeyCommand={handleKeyCommand}
@@ -869,9 +873,9 @@ function OnlyChat() {
             alignItems: "center",
           }}
         >
-          {profileImage ? (
+          {profilePhoto ? (
             <img
-              src={profileImage}
+              src={profilePhoto}
               alt="Profile"
               style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
