@@ -5,8 +5,10 @@ import { Box } from "@mui/material";
 import { ChatBubble } from "@mui/icons-material";
 import RadioPlayer from "./RadioPlayer";
 import QrCode from "../../Components/QrCode";
-import UserIcon from "../../assets/user-icon.png";
+import UserIcon from "../../assets/mdi_account-online.svg";
 import VerifiedIcon from "@mui/icons-material/Verified";
+import TvcIcon from "../../assets/tvc-news.svg";
+
 
 const socket = io("https://api.staging-new.boltplus.tv", {
   path: "/public-socket/",
@@ -290,7 +292,11 @@ function Chat() {
                 textTransform: "uppercase",
               }}
             >
-              T
+              <img
+                src={TvcIcon}
+                alt="Bolt Logo"
+                style={{ width: "100%", height: "100%" }}
+              />
             </Box>
             TVC News{" "}
             <VerifiedIcon
