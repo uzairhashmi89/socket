@@ -15,7 +15,7 @@ const socket = io("https://api.staging-new.boltplus.tv", {
   transports: ["websocket"], // optionally add 'polling' if needed
 });
 
-function Immersive() {
+function Immersive2() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
@@ -460,4 +460,4 @@ const TestVideo =
   );
 }
 
-export default Immersive;
+export default Immersive2;
