@@ -19,8 +19,8 @@ function App() {
           path="/stream-impressive"
           element={<StreamImpressive />}
         />
-        <Route strict path="/immersive" element={<Immersive />} />
-        <Route strict path="/immersive2" element={<Immersive2 />} />
+        {/* <Route strict path="/immersive" element={<Immersive />} /> */}
+        <Route strict path="/immersive" element={<Immersive2 />} />
       </Routes>
     </BrowserRouter>
   );
