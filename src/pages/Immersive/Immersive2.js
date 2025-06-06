@@ -194,8 +194,9 @@ function Immersive2() {
     onChangeText(editorData?.blocks?.map((item) => item.text)?.join("\n"));
   }, [editorState]);
 
-const TestVideo =
-    "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8";
+  const TestVideo = "https://api-ott.lightsoutsportstv.com/loggingmediaurlpassthrough/a.m3u8?version=12&id=8090&partner=boltplus";
+  //     "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8";
+  // "https://api-ott.motorvision.tv/loggingmediaurlpassthrough/a.m3u8?version=12&id=2459&partner=boltplus";
 
   return (
     <Box className="chat-ui">

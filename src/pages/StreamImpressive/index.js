@@ -114,20 +114,22 @@ function StreamImpressive() {
   };
 
   // Utility: Get color from name
-  const getColorFromName = (name) => {
+  function getColorFromName(name) {
     const colors = [
       "#6FCF97",
       "#219653",
       "#F2C94C",
       "#F2994A",
-      "#F0F0F1",
+      "#00FF00",
       "#EB5757",
     ];
-    const hash = name
-      .split("")
-      .reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return colors[hash % colors.length];
-  };
+  
+    let hash = 5381;
+    for (let i = 0; i < name.length; i++) {
+      hash = (hash * 33) ^ name.charCodeAt(i);
+    }
+    return colors[Math.abs(hash) % colors.length];
+  }
 
   const emitJoin = (currentUsername) => {
     const userPayload = {
