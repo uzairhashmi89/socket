@@ -1,4 +1,3 @@
-import axios from "axios";
 import React, {
   useEffect,
   useRef,
@@ -31,10 +30,19 @@ import Snackbar, { SnackbarOrigin } from "@mui/material/Snackbar";
 import { GiphyModal } from "../../Components/GiphyModal";
 import UserIcon from "../../assets/mdi_account-online.svg";
 import logo from "../../assets/logo.png";
+import {
+  BASE_URLS,
+  ENVIRONMENT_MODE,
+  scrollToBottom,
+} from "../../config/constants";
+import axios from "../../config/axiosInterceptor";
 
-const socket = io("https://api.staging-new.boltplus.tv", {
+const baseUrl = BASE_URLS[ENVIRONMENT_MODE].REACT_APP_API_BASE_URL;
+const channelId = BASE_URLS[ENVIRONMENT_MODE].CHANNEL_ID;
+
+const socket = io(baseUrl, {
   path: "/public-socket/",
-  transports: ["websocket"], // optionally add 'polling' if needed
+  transports: ["websocket"],
 });
 
 defaultTheme.emojiSuggestions += " emojiSuggestions";
@@ -55,7 +63,7 @@ function OnlyChat() {
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
-  // Drop start
+  
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -64,17 +72,14 @@ function OnlyChat() {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  // Drop end
-  // Aimal code start
+  
   const [connectedUsersCount, setConnectedUsersCount] = useState(null);
   useEffect(() => {
     socket.on("viewer", (data) => {
-      // If data is an array like [{ viewers: 3 }]
       if (Array.isArray(data) && data[0]?.viewers !== undefined) {
         setConnectedUsersCount(data[0].viewers);
       }
 
-      // If data is just { viewers: 3 }
       else if (data?.viewers !== undefined) {
         setConnectedUsersCount(data.viewers);
       }
@@ -84,16 +89,15 @@ function OnlyChat() {
       socket.off("viewer");
     };
   }, []);
+
   useEffect(() => {
     socket.on("disconnect", () => {
       console.log("Disconnected");
     });
   }, []);
-  // Aimal code end
 
   useEffect(() => {
     socket.on("connect", () => {
-      console.log("[Client] Connected:", socket.id);
       if (localStorage.getItem("userName")) {
         emitJoin(
           localStorage.getItem("userName"),
@@ -105,7 +109,6 @@ function OnlyChat() {
     });
 
     socket.on("message", (message) => {
-      console.log("message", message);
       setMessages((prev) => [message, ...prev]);
     });
 
@@ -149,24 +152,17 @@ function OnlyChat() {
     }
   };
 
-  // Fetch messages
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const response = await fetch(
-          "https://api.staging-new.boltplus.tv/messages/open/channel/68090b895880466655dc6a17",
-          {
-            method: "GET",
-          }
+        const response = await axios.get(
+          `${baseUrl}/messages/open/channel/${channelId}`
         );
 
-        if (!response.ok) {
-          console.error("Fetch error:", response.status);
-          return;
+        if (response.data) {
+          const data = await response.data;
+          setMessages(data);
         }
-
-        const data = await response.json();
-        setMessages(data);
       } catch (error) {
         console.error("Error during fetch:", error);
       }
@@ -175,13 +171,11 @@ function OnlyChat() {
     fetchMessages();
   }, []);
 
-  // Utility: Get first letter of name
   const getInitial = (name) => {
     if (!name) return "";
     return name.trim()[0].toUpperCase();
   };
 
-  // Utility: Get color from name
   const getColorFromName = (name) => {
     const colors = ["#F44336", "#2196F3", "#FF9800", "#4CAF50", "#9C27B0"];
     const hash = name
@@ -209,7 +203,7 @@ function OnlyChat() {
     };
 
     const payload = {
-      channelId: "68090b895880466655dc6a17", // Use your actual channel ID
+      channelId: channelId,
       channelType: "channel",
       user: userPayload,
     };
@@ -220,26 +214,11 @@ function OnlyChat() {
   const firstMessageRef = useRef(null);
 
   useEffect(() => {
-    const scrollToBottom = () => {
-      if (scrollableContainerRef.current) {
-        const scrollableElement = scrollableContainerRef.current;
-        // Check if user is near the top (newest messages, scrollTop close to 0)
-        const isNearBottom = scrollableElement.scrollTop < 100; // Adjust threshold as needed
-
-        if (isNearBottom) {
-          if (firstMessageRef.current) {
-            firstMessageRef.current.scrollIntoView({ behavior: "smooth" });
-          } else {
-            // Fallback to scrollTop = 0 if ref isn't set yet
-            scrollableElement.scrollTop = 0;
-          }
-        }
-      }
-    };
-
-    // Debounce to handle rapid message updates
     if (messages?.length > 0) {
-      const timeout = setTimeout(scrollToBottom, 1000);
+      const timeout = setTimeout(
+        scrollToBottom(scrollableContainerRef, firstMessageRef),
+        1000
+      );
       return () => clearTimeout(timeout);
     }
   }, [messages]);
@@ -299,50 +278,24 @@ function OnlyChat() {
   const [isUploading, setIsUploading] = useState(false);
 
   const uploadProfileImage = async (file, dispatchCallback = () => {}) => {
-    // Added setOpenSnackbarFunc as a parameter
-    const UPLOAD_API_BASE_URL = "https://api.staging-new.boltplus.tv";
-    const UPLOAD_ENDPOINT = "/upload/public-profile"; // Removed trailing slash
-
     const maxSizeMB = 2;
     const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
     if (file.size > maxSizeBytes) {
-      setOpenSnackbar(true); // Show snackbar if file is too large
+      setOpenSnackbar(true);
       return;
     }
 
-    console.log("Uploading file:", file);
     try {
       const fileName = `${Date.now()}-${file.name.replace(/[^\w.]/g, "")}`;
 
-      // Headers for the first request, based on the cURL command
-      const apiHeaders = {
-        Accept: "application/json, text/plain, */*", // Adjusted from cURL's '/' to '*/*'
-        "Accept-Language": "en-US,en;q=0.9",
-        "Content-Type": "application/json", // This is for the body of this specific request
-        Origin: "https://staging-new.boltplus.tv",
-        Referer: "https://staging-new.boltplus.tv/",
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
-        boltsrc: "boltplus-webapp/microsoft_windows/0.1.0",
-        device: "d520c7a8-421b-4563-b955-f5abc56b97ec",
-        "product-token": "330dbc49a5872166f13049629596fc088b26d885",
-        // The 'session' header value is from your cURL. Replace with dynamic value if needed.
-        session: "1748527326242",
-        // Browser-controlled headers like Sec-Fetch-*, Connection, sec-ch-ua-* are usually not manually set in client-side JS.
-      };
-
       const {
-        data: { fields, url }, // 'fields' and 'url' are from the API response for S3 upload
-      } = await axios.post(
-        `${UPLOAD_API_BASE_URL}${UPLOAD_ENDPOINT}`,
-        {
-          type: file.type,
-          name: fileName,
-          folder: "avatar",
-        },
-        { headers: apiHeaders } // Pass the headers here
-      );
+        data: { fields, url },
+      } = await axios.post(`${baseUrl}/upload/public-profile`, {
+        type: file.type,
+        name: fileName,
+        folder: "avatar",
+      });
 
       const formData = new FormData();
       formData.append("key", fields.key);
@@ -359,21 +312,19 @@ function OnlyChat() {
       await axios.post(url, formData, {
         onUploadProgress: (event) => {
           const progress = Math.floor((event.loaded / event.total) * 100);
-          console.log(`Upload progress: ${progress}%`);
+
           dispatchCallback({
             type: "UPLOAD_PROGRESS",
             payload: { uploadId: "profileImage", progress },
           });
         },
-        // Headers for the S3 upload are typically minimal as FormData sets Content-Type (multipart/form-data)
-        // and other necessary details are in the form fields.
       });
 
-      const publicImageUrl = `${url}/${fields.key}`; // This might need adjustment based on how S3 URL is constructed
-      console.log("Image uploaded successfully:", publicImageUrl);
+      const publicImageUrl = `${url}/${fields.key}`;
+      
       if (publicImageUrl) {
-        localStorage.setItem("profileImage", publicImageUrl); // Store the URL in localStorage
-        setProfilePhoto(publicImageUrl); // Update state with the public URL
+        localStorage.setItem("profileImage", publicImageUrl);
+        setProfilePhoto(publicImageUrl);
       }
       return publicImageUrl;
     } catch (error) {
@@ -384,8 +335,8 @@ function OnlyChat() {
       return null;
     }
   };
+
   const handleSaveProfile = useCallback(() => {
-    // Renamed from handleSaveUsername
     const trimmedUsername = username.trim();
     let usernameToEmit = "guest";
 
@@ -395,41 +346,39 @@ function OnlyChat() {
       usernameToEmit = trimmedUsername;
     } else {
       localStorage.removeItem("userName");
-      setUsername(""); // Ensure state is cleared
+      setUsername("");
     }
 
     if (profilePhoto) {
-      localStorage.setItem("profileImage", profilePhoto); // Store the URL
+      localStorage.setItem("profileImage", profilePhoto);
     } else {
       localStorage.removeItem("profileImage");
     }
 
-    setIsSettingUsername(false); // Close the settings modal
+    setIsSettingUsername(false);
 
-    // Emit the combined data via socket if connected
     if (socket.connected) {
-      emitJoin(usernameToEmit, profilePhoto); // Emit the URL
+      emitJoin(usernameToEmit, profilePhoto);
     } else {
       console.warn(
         "Socket not connected. Profile will be saved locally but not emitted."
       );
     }
-  }, [username, profilePhoto]); // Added dependencies
+  }, [username, profilePhoto]);
 
   const handleImageUpload = async (event) => {
     const file = event.target.files?.[0];
     if (file) {
-      setIsUploading(true); // Set uploading state
+      setIsUploading(true);
       try {
-        const imageUrl = await uploadProfileImage(file); // Call the utility function
+        const imageUrl = await uploadProfileImage(file);
         if (imageUrl) {
-          setProfilePhoto(imageUrl); // Update state with the public URL
+          setProfilePhoto(imageUrl);
         }
       } catch (error) {
         console.error("Failed to upload image:", error);
-        // Handle error, e.g., show a toast message
       } finally {
-        setIsUploading(false); // Reset uploading state
+        setIsUploading(false);
       }
     }
   };

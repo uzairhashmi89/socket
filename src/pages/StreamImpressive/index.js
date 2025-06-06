@@ -7,8 +7,17 @@ import QrCode from "../../Components/QrCode";
 import UserIcon from "../../assets/mdi_account-online.svg";
 import TvcIcon from "../../assets/tvc-news.svg";
 import VerifiedIcon from "@mui/icons-material/Verified";
+import {
+  BASE_URLS,
+  ENVIRONMENT_MODE,
+  scrollToBottom,
+} from "../../config/constants";
+import axios from "../../config/axiosInterceptor";
 
-const socket = io("https://api.staging-new.boltplus.tv", {
+const baseUrl = BASE_URLS[ENVIRONMENT_MODE].REACT_APP_API_BASE_URL;
+const channelId = BASE_URLS[ENVIRONMENT_MODE].CHANNEL_ID;
+
+const socket = io(baseUrl, {
   path: "/public-socket/",
   transports: ["websocket"], // optionally add 'polling' if needed
 });
@@ -80,25 +89,14 @@ function StreamImpressive() {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const response = await fetch(
-          "https://api.staging-new.boltplus.tv/messages/open/channel/68090b895880466655dc6a17",
-          {
-            method: "GET",
-          }
+        const response = await axios.get(
+          `${baseUrl}/messages/open/channel/${channelId}`
         );
 
-        if (!response.ok) {
-          console.error("Fetch error:", response.status);
-          return;
+        if (response.data) {
+          const data = await response.data;
+          setMessages(data);
         }
-
-        const data = await response.json();
-        // const senders = data.map(item => item.sender);
-        // console.log('senders', senders);
-        // const uniqueSenders = [...new Set(senders)];
-        // console.log('uniqueSenders', uniqueSenders);
-
-        setMessages(data);
       } catch (error) {
         console.error("Error during fetch:", error);
       }
@@ -123,7 +121,7 @@ function StreamImpressive() {
       "#00FF00",
       "#EB5757",
     ];
-  
+
     let hash = 5381;
     for (let i = 0; i < name.length; i++) {
       hash = (hash * 33) ^ name.charCodeAt(i);
@@ -137,7 +135,7 @@ function StreamImpressive() {
     };
 
     const payload = {
-      channelId: "68090b895880466655dc6a17", // Use your actual channel ID
+      channelId: channelId, // Use your actual channel ID
       channelType: "channel",
       user: userPayload,
     };
@@ -148,24 +146,11 @@ function StreamImpressive() {
   const firstMessageRef = useRef(null);
 
   useEffect(() => {
-    const scrollToBottom = () => {
-      if (scrollableContainerRef.current) {
-        const scrollableElement = scrollableContainerRef.current;
-        // Check if user is near the top (newest messages, scrollTop close to 0)
-        const isNearBottom = scrollableElement.scrollTop < 100; // Adjust threshold as needed
-
-        if (isNearBottom) {
-          if (firstMessageRef.current) {
-            firstMessageRef.current.scrollIntoView({ behavior: "smooth" });
-          } else {
-            // Fallback to scrollTop = 0 if ref isn't set yet
-            scrollableElement.scrollTop = 0;
-          }
-        }
-      }
-    };
     if (messages?.length > 0) {
-      const timeout = setTimeout(scrollToBottom, 1000);
+      const timeout = setTimeout(
+        scrollToBottom(scrollableContainerRef, firstMessageRef),
+        1000
+      );
       return () => clearTimeout(timeout);
     }
   }, [messages]);

@@ -8,9 +8,17 @@ import QrCode from "../../Components/QrCode";
 import UserIcon from "../../assets/mdi_account-online.svg";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import TvcIcon from "../../assets/tvc-news.svg";
+import {
+  BASE_URLS,
+  ENVIRONMENT_MODE,
+  scrollToBottom,
+} from "../../config/constants";
+import axios from "../../config/axiosInterceptor";
 
+const baseUrl = BASE_URLS[ENVIRONMENT_MODE].REACT_APP_API_BASE_URL;
+const channelId = BASE_URLS[ENVIRONMENT_MODE].CHANNEL_ID;
 
-const socket = io("https://api.staging-new.boltplus.tv", {
+const socket = io(baseUrl, {
   path: "/public-socket/",
   transports: ["websocket"], // optionally add 'polling' if needed
 });
@@ -27,15 +35,9 @@ function Chat() {
 
   useEffect(() => {
     socket.on("viewer", (data) => {
-      console.log("Viewer event received:", data);
-
-      // If data is an array like [{ viewers: 3 }]
       if (Array.isArray(data) && data[0]?.viewers !== undefined) {
         setConnectedUsersCount(data[0].viewers);
-      }
-
-      // If data is just { viewers: 3 }
-      else if (data?.viewers !== undefined) {
+      } else if (data?.viewers !== undefined) {
         setConnectedUsersCount(data.viewers);
       }
     });
@@ -44,16 +46,15 @@ function Chat() {
       socket.off("viewer");
     };
   }, []);
+
   useEffect(() => {
     socket.on("disconnect", () => {
       console.log("Disconnected");
     });
   }, []);
-  // Aimal code end
 
   useEffect(() => {
     socket.on("connect", () => {
-      console.log("[Client] Connected:", socket.id);
       if (localStorage.getItem("userName")) {
         emitJoin(localStorage.getItem("userName"));
       } else {
@@ -62,7 +63,6 @@ function Chat() {
     });
 
     socket.on("message", (message) => {
-      console.log("message", message.sender);
       setMessages((prev) => [message, ...prev]);
     });
 
@@ -78,29 +78,17 @@ function Chat() {
     };
   }, []);
 
-  // Fetch messages
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const response = await fetch(
-          "https://api.staging-new.boltplus.tv/messages/open/channel/68090b895880466655dc6a17",
-          {
-            method: "GET",
-          }
+        const response = await axios.get(
+          `${baseUrl}/messages/open/channel/${channelId}`
         );
 
-        if (!response.ok) {
-          console.error("Fetch error:", response.status);
-          return;
+        if (response.data) {
+          const data = await response.data;
+          setMessages(data);
         }
-
-        const data = await response.json();
-        // const senders = data.map(item => item.sender);
-        // console.log('senders', senders);
-        // const uniqueSenders = [...new Set(senders)];
-        // console.log('uniqueSenders', uniqueSenders);
-
-        setMessages(data);
       } catch (error) {
         console.error("Error during fetch:", error);
       }
@@ -109,13 +97,11 @@ function Chat() {
     fetchMessages();
   }, []);
 
-  // Utility: Get first letter of name
   const getInitial = (name) => {
     if (!name) return "";
     return name.trim()[0].toUpperCase();
   };
 
-  // Utility: Get color from name
   const getColorFromName = (name) => {
     const colors = ["#F44336", "#2196F3", "#FF9800", "#4CAF50", "#9C27B0"];
     const hash = name
@@ -130,35 +116,21 @@ function Chat() {
     };
 
     const payload = {
-      channelId: "68090b895880466655dc6a17", // Use your actual channel ID
+      channelId: channelId,
       channelType: "channel",
       user: userPayload,
     };
-    console.log("Joining channel with payload:", payload);
     socket.emit("join", payload);
   };
   const scrollableContainerRef = useRef(null);
   const firstMessageRef = useRef(null);
 
   useEffect(() => {
-    const scrollToBottom = () => {
-      if (scrollableContainerRef.current) {
-        const scrollableElement = scrollableContainerRef.current;
-        // Check if user is near the top (newest messages, scrollTop close to 0)
-        const isNearBottom = scrollableElement.scrollTop < 100; // Adjust threshold as needed
-
-        if (isNearBottom) {
-          if (firstMessageRef.current) {
-            firstMessageRef.current.scrollIntoView({ behavior: "smooth" });
-          } else {
-            // Fallback to scrollTop = 0 if ref isn't set yet
-            scrollableElement.scrollTop = 0;
-          }
-        }
-      }
-    };
     if (messages?.length > 0) {
-      const timeout = setTimeout(scrollToBottom, 1000);
+      const timeout = setTimeout(
+        scrollToBottom(scrollableContainerRef, firstMessageRef),
+        1000
+      );
       return () => clearTimeout(timeout);
     }
   }, [messages]);
