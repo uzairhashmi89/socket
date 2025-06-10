@@ -115,9 +115,12 @@ body {
   overflow-y: hidden;
   position: relative;
   z-index: 9;
-  background-color: #262825e6 !important;
+  background-color: #262825e4 !important;
   top: 20px;
   border-radius: 10px;
+}
+.main-chat-inner{
+  background-color: #2628253f !important;
 }
 
 .scanQR {

@@ -176,7 +176,6 @@ function Chat() {
           flexDirection: "column",
           flex: 1,
           pt: {
-            md: 2,
             sm: 0,
           },
           pb: 1.2,
@@ -200,7 +199,6 @@ function Chat() {
           style={{
             backgroundColor: "#2c3136",
             width: "auto",
-            marginTop: "-10px",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",

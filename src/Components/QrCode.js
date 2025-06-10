@@ -1,5 +1,5 @@
 import React from 'react'
-import QR from '../assets/qr.png'
+import QR from '../assets/bolt_qr.svg'
 import BoltLogo from '../assets/bolt.png'
 const QrCode = () => {
   return (
@@ -13,7 +13,7 @@ const QrCode = () => {
             </div>
         </div>
         <div>
-            <img src={QR} alt="QR Code" />
+            <img src={QR} alt="QR Code" style={{width:'75px', borderRadius: '5px'}} />
         </div>
     </div>
   )
