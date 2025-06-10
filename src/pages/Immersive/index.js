@@ -19,7 +19,7 @@ const socket = io(baseUrl, {
   transports: ["websocket"],
 });
 
-function Immersive() {
+function Immersive({VideoUrl='https://api-ott.lightsoutsportstv.com/loggingmediaurlpassthrough/a.m3u8?version=12&id=8090&partner=boltplus'}) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
@@ -167,7 +167,8 @@ function Immersive() {
     onChangeText(editorData?.blocks?.map((item) => item.text)?.join("\n"));
   }, [editorState]);
 
-  const TestVideo = "https://api-ott.lightsoutsportstv.com/loggingmediaurlpassthrough/a.m3u8?version=12&id=8090&partner=boltplus";
+  const TestVideo = VideoUrl; 
+  //"https://api-ott.lightsoutsportstv.com/loggingmediaurlpassthrough/a.m3u8?version=12&id=8090&partner=boltplus";
   //     "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8";
   // "https://api-ott.motorvision.tv/loggingmediaurlpassthrough/a.m3u8?version=12&id=2459&partner=boltplus";
 
@@ -175,13 +176,13 @@ function Immersive() {
     <Box className="chat-ui">
       <RadioPlayer url={TestVideo} width="100%" />
       <Box
-        className="main-chat"
+        className="main-chat main-chat-inner"
         sx={{
           display: "flex",
           flexDirection: "column",
           flex: 1,
           pt: {
-            md: 2,
+//            md: 2,
             sm: 0,
           },
           pb: 1.2,
@@ -205,7 +206,6 @@ function Immersive() {
           style={{
             backgroundColor: "#2c3136",
             width: "auto",
-            marginTop: "-10px",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
