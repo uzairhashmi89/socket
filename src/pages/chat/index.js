@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { ContentState, convertToRaw, EditorState } from "draft-js";
 import { Box } from "@mui/material";
@@ -166,6 +166,55 @@ function Chat() {
     onChangeText(editorData?.blocks?.map((item) => item.text)?.join("\n"));
   }, [editorState]);
 
+  const [chatAds, setChatAds] = useState([]);
+  const [chatAdIndex, setChatAdIndex] = useState(0);
+
+  useEffect(() => {
+    const fetchAds = async () => {
+      try {
+        const response = await axios.get(
+          `${baseUrl}/advertisements/get?limit=10&page=1&skip=0`
+        );
+
+        if (response.data) {
+          const data = await response?.data?.data;
+          setChatAds(data.filter((ad) => ad.placement === "chat"));
+        }
+      } catch (error) {
+        console.error("Error during fetch:", error);
+      }
+    };
+
+    fetchAds();
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setChatAdIndex((prevIndex) => (prevIndex + 1) % chatAds.length);
+    }, 5000); // 3 seconds
+
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, [chatAds]);
+
+  const renderChatAd = (index) => {
+    if (chatAds.length === 0) return null; // No ads available
+
+    if ((index + 1) % 8 === 0) {
+      return (
+        <div>
+          {chatAds[chatAdIndex] && (
+            <img
+              src={chatAds[chatAdIndex].assetUrl}
+              alt="Chat Ad"
+              style={{ borderRadius: 12, maxHeight: '130px', width: "100%" }}
+            />
+          )}
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <Box className="chat-ui">
       <RadioPlayer />
@@ -311,109 +360,113 @@ function Chat() {
             const isFirstMessage = index === 0;
             const userColor = getColorFromName(name);
             return (
-              <Box
-                className="message"
-                key={index}
-                ref={isFirstMessage ? firstMessageRef : null}
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "10px 0",
-                  mb: 1,
-                }}
-                style={{
-                  marginBottom: "5px",
-                }}
-              >
+              <Fragment key={index}>
                 <Box
-                  style={{
-                    width: "99%",
+                  className="message"
+                  key={index}
+                  ref={isFirstMessage ? firstMessageRef : null}
+                  sx={{
                     display: "flex",
-                    flexDirection: item?.type === "text" ? "row" : "column", // ← key line
-                    alignItems: item?.type === "text" ? "center" : "flex-start", // for better vertical alignment
-                    gap: "5px", // optional spacing
-                    padding: "5px 10px 5px 10px",
+                    flexDirection: "column",
+                    gap: "10px 0",
+                    mb: 1,
+                  }}
+                  style={{
+                    marginBottom: "5px",
                   }}
                 >
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    {avatarUrl ? (
+                  <Box
+                    style={{
+                      width: "99%",
+                      display: "flex",
+                      flexDirection: item?.type === "text" ? "row" : "column", // ← key line
+                      alignItems:
+                        item?.type === "text" ? "center" : "flex-start", // for better vertical alignment
+                      gap: "5px", // optional spacing
+                      padding: "5px 10px 5px 10px",
+                    }}
+                  >
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      {avatarUrl ? (
+                        <Box
+                          component="img"
+                          src={avatarUrl}
+                          alt={name}
+                          sx={{
+                            width: 30,
+                            height: 30,
+                            borderRadius: "50%",
+                            objectFit: "cover",
+                            display: "block",
+                          }}
+                        />
+                      ) : (
+                        <Box
+                          sx={{
+                            width: 30,
+                            height: 30,
+                            borderRadius: "50%",
+                            backgroundColor: userColor,
+                            color: "white",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontWeight: "500",
+                            fontSize: "1rem",
+                            textTransform: "uppercase",
+                          }}
+                        >
+                          {initial}
+                        </Box>
+                      )}
                       <Box
-                        component="img"
-                        src={avatarUrl}
-                        alt={name}
                         sx={{
-                          width: 30,
-                          height: 30,
-                          borderRadius: "50%",
-                          objectFit: "cover",
-                          display: "block",
-                        }}
-                      />
-                    ) : (
-                      <Box
-                        sx={{
-                          width: 30,
-                          height: 30,
-                          borderRadius: "50%",
-                          backgroundColor: userColor,
-                          color: "white",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontWeight: "500",
-                          fontSize: "1rem",
-                          textTransform: "uppercase",
+                          color: userColor,
+                          fontWeight: 600,
+                          fontSize: "13.5px",
+                          textTransform: "capitalize",
                         }}
                       >
-                        {initial}
+                        {name}
+                      </Box>
+                    </Box>
+
+                    {item?.type === "text" ? (
+                      <Box
+                        sx={{
+                          fontSize: "13.5px",
+                          pl: "2px",
+                          pr: "1.5px",
+                          lineHeight: "20px",
+                          fontWeight: "400",
+                          textTransform: "capitalize",
+                        }}
+                      >
+                        {item?.message}
+                      </Box>
+                    ) : (
+                      <Box
+                        style={{
+                          width: "100%",
+                          display: "flex",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <img
+                          src={
+                            "https://media.giphy.com/media/" +
+                            (item.giphy && item.giphy.id) +
+                            "/giphy.gif"
+                          }
+                          width={250}
+                          style={{ borderRadius: "8px" }}
+                        />
                       </Box>
                     )}
-                    <Box
-                      sx={{
-                        color: userColor,
-                        fontWeight: 600,
-                        fontSize: "13.5px",
-                        textTransform: "capitalize",
-                      }}
-                    >
-                      {name}
-                    </Box>
                   </Box>
-
-                  {item?.type === "text" ? (
-                    <Box
-                      sx={{
-                        fontSize: "13.5px",
-                        pl: "2px",
-                        pr: "1.5px",
-                        lineHeight: "20px",
-                        fontWeight: "400",
-                        textTransform: "capitalize",
-                      }}
-                    >
-                      {item?.message}
-                    </Box>
-                  ) : (
-                    <Box
-                      style={{
-                        width: "100%",
-                        display: "flex",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <img
-                        src={
-                          "https://media.giphy.com/media/" +
-                          (item.giphy && item.giphy.id) +
-                          "/giphy.gif"
-                        }
-                        width={250}
-                        style={{ borderRadius: "8px" }}
-                      />
-                    </Box>
-                  )}
                 </Box>
-              </Box>
+                {renderChatAd(index)}
+              </Fragment>
             );
           })}
 
