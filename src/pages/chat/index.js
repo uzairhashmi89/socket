@@ -32,20 +32,22 @@ function Chat() {
     EditorState.createEmpty()
   );
   const [connectedUsersCount, setConnectedUsersCount] = useState(null);
-const fetchMessages = async () => {
-      try {
-        const response = await axios.get(
-          `${baseUrl}/messages/open/channel/${channelId}`
-        );
 
-        if (response.data) {
-          const data = await response.data;
-          setMessages(data);
-        }
-      } catch (error) {
-        console.error("Error during fetch:", error);
+  const fetchMessages = async () => {
+    try {
+      const response = await axios.get(
+        `${baseUrl}/messages/open/channel/${channelId}`
+      );
+
+      if (response.data) {
+        const data = await response.data;
+        setMessages(data);
       }
-    };
+    } catch (error) {
+      console.error("Error during fetch:", error);
+    }
+  };
+
   useEffect(() => {
     socket.on("viewer", (data) => {
       if (Array.isArray(data) && data[0]?.viewers !== undefined) {
@@ -78,9 +80,9 @@ const fetchMessages = async () => {
     socket.on("message", (message) => {
       setMessages((prev) => [message, ...prev]);
     });
-    
-    socket.on("messageDeleted", (message) => {
-      fetchMessages()
+
+    socket.on("messageDeleted", () => {
+      fetchMessages();
     });
 
     socket.on("connect_error", (err) => {
@@ -96,8 +98,6 @@ const fetchMessages = async () => {
   }, []);
 
   useEffect(() => {
-    
-
     fetchMessages();
   }, []);
 
@@ -210,7 +210,7 @@ const fetchMessages = async () => {
             <img
               src={chatAds[chatAdIndex].assetUrl}
               alt="Chat Ad"
-              style={{ borderRadius: 12, maxHeight: '130px', width: "100%" }}
+              style={{ borderRadius: 12, maxHeight: "130px", width: "100%" }}
             />
           )}
         </div>

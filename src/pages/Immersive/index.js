@@ -69,6 +69,10 @@ function Immersive({
       setMessages((prev) => [message, ...prev]);
     });
 
+    socket.on("messageDeleted", () => {
+      fetchMessages();
+    });
+
     socket.on("connect_error", (err) => {
       console.error("[Client] Connection error:", err.message);
     });
@@ -81,22 +85,22 @@ function Immersive({
     };
   }, []);
 
-  useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        const response = await axios.get(
-          `${baseUrl}/messages/open/channel/${channelId}`
-        );
+  const fetchMessages = async () => {
+    try {
+      const response = await axios.get(
+        `${baseUrl}/messages/open/channel/${channelId}`
+      );
 
-        if (response.data) {
-          const data = await response.data;
-          setMessages(data);
-        }
-      } catch (error) {
-        console.error("Error during fetch:", error);
+      if (response.data) {
+        const data = await response.data;
+        setMessages(data);
       }
-    };
+    } catch (error) {
+      console.error("Error during fetch:", error);
+    }
+  };
 
+  useEffect(() => {
     fetchMessages();
   }, []);
 
