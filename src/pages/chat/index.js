@@ -32,7 +32,20 @@ function Chat() {
     EditorState.createEmpty()
   );
   const [connectedUsersCount, setConnectedUsersCount] = useState(null);
+const fetchMessages = async () => {
+      try {
+        const response = await axios.get(
+          `${baseUrl}/messages/open/channel/${channelId}`
+        );
 
+        if (response.data) {
+          const data = await response.data;
+          setMessages(data);
+        }
+      } catch (error) {
+        console.error("Error during fetch:", error);
+      }
+    };
   useEffect(() => {
     socket.on("viewer", (data) => {
       if (Array.isArray(data) && data[0]?.viewers !== undefined) {
@@ -65,6 +78,10 @@ function Chat() {
     socket.on("message", (message) => {
       setMessages((prev) => [message, ...prev]);
     });
+    
+    socket.on("messageDeleted", (message) => {
+      fetchMessages()
+    });
 
     socket.on("connect_error", (err) => {
       console.error("[Client] Connection error:", err.message);
@@ -79,20 +96,7 @@ function Chat() {
   }, []);
 
   useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        const response = await axios.get(
-          `${baseUrl}/messages/open/channel/${channelId}`
-        );
-
-        if (response.data) {
-          const data = await response.data;
-          setMessages(data);
-        }
-      } catch (error) {
-        console.error("Error during fetch:", error);
-      }
-    };
+    
 
     fetchMessages();
   }, []);
