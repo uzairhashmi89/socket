@@ -3,6 +3,7 @@ import { io } from "socket.io-client";
 import { ContentState, convertToRaw, EditorState } from "draft-js";
 import { Box } from "@mui/material";
 import { ChatBubble } from "@mui/icons-material";
+import InfiniteScroll from "react-infinite-scroll-component";
 import RadioPlayer from "./Component/RadioPlayer";
 import QrCode from "../../Components/QrCode";
 import UserIcon from "../../assets/mdi_account-online.svg";
@@ -26,7 +27,7 @@ const socket = io(baseUrl, {
 function Immersive({
   VideoUrl = "https://api-ott.lightsoutsportstv.com/loggingmediaurlpassthrough/a.m3u8?version=12&id=8090&partner=boltplus",
 }) {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(null);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
 
@@ -66,7 +67,7 @@ function Immersive({
     });
 
     socket.on("message", (message) => {
-      setMessages((prev) => [message, ...prev]);
+      fetchMessages();
     });
 
     socket.on("messageDeleted", () => {
@@ -88,7 +89,7 @@ function Immersive({
   const fetchMessages = async () => {
     try {
       const response = await axios.get(
-        `${baseUrl}/messages/open/channel/${channelId}`
+        `${baseUrl}/messages/open/channel/${channelId}?page=1&pageSize=30`
       );
 
       if (response.data) {
@@ -229,6 +230,27 @@ function Immersive({
     return null;
   };
 
+  const fetchMoreData = async () => {
+    console.log("Fetching more data...", messages.pagination);
+    if (messages?.pagination?.hasMore) {
+      try {
+        const response = await axios.get(
+          `${baseUrl}/admin/channels/open/messages/${channelId}?page=${messages.pagination.page + 1}&pageSize=${messages.pagination.pageSize}`
+        );
+        if (response.data) {
+          const newData = await response.data;
+          setMessages((prev) => ({
+            ...prev,
+            data: [...prev.data, ...newData.data],
+            pagination: newData.pagination,
+          }));
+        }
+      } catch (error) {
+        console.error("Error fetching more messages:", error);
+      }
+    }
+  };
+
   return (
     <Box className="chat-ui">
       <RadioPlayer url={TestVideo} width="100%" />
@@ -355,138 +377,143 @@ function Immersive({
             🔴 LIVE: TVC News – Breaking Updates & Discussion
           </Box>
         </Box>
-        <Box
-          ref={scrollableContainerRef}
-          sx={{
+        <div
+          id="scrollableDiv"
+          style={{
+            overflow: "auto",
             display: "flex",
-            flexDirection: "column-reverse",
-            overflowY: "auto",
-            mt: "auto",
-            p: "0px 10px 15px",
-            scrollBehavior: "smooth",
-            gap: "0",
+            flexDirection: "column-reverse", // newest at bottom
           }}
-          className="message-container"
         >
-          {messages?.map((item, index) => {
-            const name = item?.sender || "User";
-            const avatarUrl = item?.profileImage || null;
-            const initial = getInitial(name);
-            const isFirstMessage = index === 0;
-            const userColor = getColorFromName(name);
-            return (
-              <Fragment key={index}>
-                <Box
-                  className="message"
-                  key={index}
-                  ref={isFirstMessage ? firstMessageRef : null}
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "10px 0",
-                    mb: 1,
-                  }}
-                  style={{
-                    marginBottom: "5px",
-                  }}
-                >
+          <InfiniteScroll
+            dataLength={messages?.pagination?.total || 0} //This is important field to render the next data
+            next={fetchMoreData}
+            style={{ display: "flex", flexDirection: "column-reverse" }} //To put endMessage and loader to the top.
+            inverse={true} //
+            hasMore={messages?.pagination?.hasMore || false}
+            loader={<h4 style={{ textAlign: "center" }}>Loading...</h4>}
+            scrollableTarget="scrollableDiv"
+          >
+            {messages?.data?.map((item, index) => {
+              const name = item?.sender || "User";
+              const avatarUrl = item?.profileImage || null;
+              const initial = getInitial(name);
+              const isFirstMessage = index === 0;
+              const userColor = getColorFromName(name);
+              return (
+                <Fragment key={index}>
                   <Box
-                    style={{
-                      width: "99%",
+                    className="message"
+                    key={index}
+                    ref={isFirstMessage ? firstMessageRef : null}
+                    sx={{
                       display: "flex",
-                      flexDirection: item?.type === "text" ? "row" : "column", // ← key line
-                      alignItems:
-                        item?.type === "text" ? "center" : "flex-start", // for better vertical alignment
-                      gap: "5px", // optional spacing
-                      padding: "5px 10px 5px 10px",
+                      flexDirection: "column",
+                      gap: "10px 0",
+                      mb: 1,
+                    }}
+                    style={{
+                      marginBottom: "5px",
                     }}
                   >
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      {avatarUrl ? (
+                    <Box
+                      style={{
+                        width: "92%",
+                        display: "flex",
+                        flexDirection: item?.type === "text" ? "row" : "column", // ← key line
+                        alignItems:
+                          item?.type === "text" ? "center" : "flex-start", // for better vertical alignment
+                        gap: "5px", // optional spacing
+                        padding: "5px 10px 5px 10px",
+                      }}
+                    >
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
+                        {avatarUrl ? (
+                          <Box
+                            component="img"
+                            src={avatarUrl}
+                            alt={name}
+                            sx={{
+                              width: 30,
+                              height: 30,
+                              borderRadius: "50%",
+                              objectFit: "cover",
+                              display: "block",
+                            }}
+                          />
+                        ) : (
+                          <Box
+                            sx={{
+                              width: 30,
+                              height: 30,
+                              borderRadius: "50%",
+                              backgroundColor: userColor,
+                              color: "white",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontWeight: "500",
+                              fontSize: "1rem",
+                              textTransform: "uppercase",
+                            }}
+                          >
+                            {initial}
+                          </Box>
+                        )}
                         <Box
-                          component="img"
-                          src={avatarUrl}
-                          alt={name}
                           sx={{
-                            width: 30,
-                            height: 30,
-                            borderRadius: "50%",
-                            objectFit: "cover",
-                            display: "block",
-                          }}
-                        />
-                      ) : (
-                        <Box
-                          sx={{
-                            width: 30,
-                            height: 30,
-                            borderRadius: "50%",
-                            backgroundColor: userColor,
-                            color: "white",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontWeight: "500",
-                            fontSize: "1rem",
-                            textTransform: "uppercase",
+                            color: userColor,
+                            fontWeight: 600,
+                            fontSize: "13.5px",
+                            textTransform: "capitalize",
                           }}
                         >
-                          {initial}
+                          {name}
+                        </Box>
+                      </Box>
+
+                      {item?.type === "text" ? (
+                        <Box
+                          sx={{
+                            fontSize: "13.5px",
+                            pl: "2px",
+                            pr: "1.5px",
+                            lineHeight: "20px",
+                            fontWeight: "400",
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          {item?.message}
+                        </Box>
+                      ) : (
+                        <Box
+                          style={{
+                            width: "100%",
+                            display: "flex",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <img
+                            src={
+                              "https://media.giphy.com/media/" +
+                              (item.giphy && item.giphy.id) +
+                              "/giphy.gif"
+                            }
+                            width={250}
+                            style={{ borderRadius: "8px" }}
+                          />
                         </Box>
                       )}
-                      <Box
-                        sx={{
-                          color: userColor,
-                          fontWeight: 600,
-                          fontSize: "13.5px",
-                          textTransform: "capitalize",
-                        }}
-                      >
-                        {name}
-                      </Box>
                     </Box>
-
-                    {item?.type === "text" ? (
-                      <Box
-                        sx={{
-                          fontSize: "13.5px",
-                          pl: "2px",
-                          pr: "1.5px",
-                          lineHeight: "20px",
-                          fontWeight: "400",
-                          textTransform: "capitalize",
-                        }}
-                      >
-                        {item?.message}
-                      </Box>
-                    ) : (
-                      <Box
-                        style={{
-                          width: "100%",
-                          display: "flex",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <img
-                          src={
-                            "https://media.giphy.com/media/" +
-                            (item.giphy && item.giphy.id) +
-                            "/giphy.gif"
-                          }
-                          width={250}
-                          style={{ borderRadius: "8px" }}
-                        />
-                      </Box>
-                    )}
                   </Box>
-                </Box>
-                {renderChatAd(index)}
-              </Fragment>
-            );
-          })}
-
-          <div ref={messagesEndRef} />
-        </Box>
+                  {renderChatAd(index)}
+                </Fragment>
+              );
+            })}
+          </InfiniteScroll>
+        </div>
         <Box className="qr-code-wrapper">
           <QrCode />
         </Box>
