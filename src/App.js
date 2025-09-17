@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Chat from "./pages/chat";
 import OnlyChat from "./pages/only-chat";
+import Scan from "./pages/Scan";
 import StreamImpressive from "./pages/StreamImpressive";
 import Immersive from "./pages/Immersive";
 import "@draft-js-plugins/emoji/lib/plugin.css";
@@ -12,6 +13,7 @@ function App() {
       <Routes>
         <Route strict path="/" element={<Chat />} />
         <Route strict path="/only-chat" element={<OnlyChat />} />
+        <Route strict path="/scan" element={<Scan />} />
         <Route
           strict
           path="/stream-impressive"

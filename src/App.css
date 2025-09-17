@@ -410,3 +410,10 @@ body {
   height: calc(100vh - 118px);
   padding-bottom: 60px !important;
 }
+
+.centered-box {
+  width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
