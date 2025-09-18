@@ -13,7 +13,7 @@ function App() {
       <Routes>
         <Route strict path="/" element={<Chat />} />
         <Route strict path="/only-chat" element={<OnlyChat />} />
-        <Route strict path="/scan" element={<Scan />} />
+        <Route strict path="/scan/:id" element={<Scan />} />
         <Route
           strict
           path="/stream-impressive"

@@ -9,14 +9,23 @@ const baseUrl = BASE_URLS[ENVIRONMENT_MODE].REACT_APP_API_BASE_URL;
 function Scan() {
   const [chatAds, setChatAds] = useState([]);
   const [chatAdIndex, setChatAdIndex] = useState(0);
+  const [qrRedirectUrl, setQrRedirectUrl] = useState();
+  const location = window.location.pathname;
+  const pathSegments = location.split("/");
+  const qrId = pathSegments[pathSegments.length - 1];
 
   useEffect(() => {
-    const redirectTimer = setTimeout(() => {
-      window.location.replace("https://www.google.com/");
-    }, 7000);
-
-    return () => clearTimeout(redirectTimer);
+    getQrAndPostTrackInfo(qrId);
   }, []);
+
+  useEffect(() => {
+    if (qrRedirectUrl) {
+      const redirectTimer = setTimeout(() => {
+        window.location.replace(qrRedirectUrl);
+      }, 7000);
+      return () => clearTimeout(redirectTimer);
+    }
+  }, [qrRedirectUrl])
 
   useEffect(() => {
     const fetchAds = async () => {
@@ -45,21 +54,33 @@ function Scan() {
     return () => clearInterval(interval); // Cleanup on unmount
   }, [chatAds]);
 
+  const getQrAndPostTrackInfo = async (id) => {
+    const url = `${baseUrl}/open/qrCodeTrack/${id}`;
+    try {
+      const response = await axios.get(url);
+      if (response.data && response.data?.redirectUrl) {
+        setQrRedirectUrl(response.data?.redirectUrl);
+      }
+    } catch (err) {
+      console.log(`Failed to call qrCode track: ${err.message}`);
+    }
+  };
+
   const renderChatAd = (index) => {
     if (chatAds.length === 0) return null; // No ads available
 
     // if ((index + 1) % 8 === 0) {
-      return (
-        <div>
-          {chatAds[chatAdIndex] && (
-            <img
-              src={chatAds[chatAdIndex].assetUrl}
-              alt="Chat Ad"
-              style={{ borderRadius: 12, maxHeight: "170px", width: "100%" }}
-            />
-          )}
-        </div>
-      );
+    return (
+      <div>
+        {chatAds[chatAdIndex] && (
+          <img
+            src={chatAds[chatAdIndex].assetUrl}
+            alt="Chat Ad"
+            style={{ borderRadius: 12, maxHeight: "170px", width: "100%" }}
+          />
+        )}
+      </div>
+    );
     // }
     return null;
   };
