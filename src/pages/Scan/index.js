@@ -5,16 +5,22 @@ import BoltLogo from "../../assets/bolt.png";
 import { BASE_URLS, ENVIRONMENT_MODE } from "../../config/constants";
 
 const baseUrl = BASE_URLS[ENVIRONMENT_MODE].REACT_APP_API_BASE_URL;
+const QR_TRACK_INFO = `${baseUrl}/open/qrCodeTrack/`;
+const ADDS_URL = `${baseUrl}/advertisements/get?limit=10&page=1&skip=0`;
+const ERROR_MESSAGE = 'Scan failed — please re-scan the QR code.';
 
 function Scan() {
   const [chatAds, setChatAds] = useState([]);
   const [chatAdIndex, setChatAdIndex] = useState(0);
   const [qrRedirectUrl, setQrRedirectUrl] = useState();
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
   const location = window.location.pathname;
   const pathSegments = location.split("/");
   const qrId = pathSegments[pathSegments.length - 1];
 
   useEffect(() => {
+    fetchAds();
     getQrAndPostTrackInfo(qrId);
   }, []);
 
@@ -28,40 +34,40 @@ function Scan() {
   }, [qrRedirectUrl])
 
   useEffect(() => {
-    const fetchAds = async () => {
-      try {
-        const response = await axios.get(
-          `${baseUrl}/advertisements/get?limit=10&page=1&skip=0`
-        );
-
-        if (response.data) {
-          const data = await response?.data?.data;
-          setChatAds(data.filter((ad) => ad.placement === "chat"));
-        }
-      } catch (error) {
-        console.error("Error during fetch:", error);
-      }
-    };
-
-    fetchAds();
-  }, []);
-
-  useEffect(() => {
     const interval = setInterval(() => {
       setChatAdIndex((prevIndex) => (prevIndex + 1) % chatAds.length);
-    }, 5000); // 3 seconds
+    }, 5000);
 
-    return () => clearInterval(interval); // Cleanup on unmount
+    return () => clearInterval(interval);
   }, [chatAds]);
 
+  const fetchAds = async () => {
+    try {
+      const response = await axios.get(ADDS_URL);
+
+      if (response.data) {
+        const data = await response?.data?.data;
+        setChatAds(data.filter((ad) => ad.placement === "chat"));
+      }
+    } catch (error) {
+      console.error("Error during fetch:", error);
+    }
+  };
+
   const getQrAndPostTrackInfo = async (id) => {
-    const url = `${baseUrl}/open/qrCodeTrack/${id}`;
+    setLoading(true);
+    const url = QR_TRACK_INFO + id;
     try {
       const response = await axios.get(url);
+      setLoading(false);
       if (response.data && response.data?.redirectUrl) {
         setQrRedirectUrl(response.data?.redirectUrl);
+      } else {
+        setError(true);
       }
     } catch (err) {
+      setLoading(false);
+      setError(true);
       console.log(`Failed to call qrCode track: ${err.message}`);
     }
   };
@@ -84,6 +90,7 @@ function Scan() {
     // }
     return null;
   };
+
   return (
     <Box style={{ height: "100vh" }} className="centered-box">
       <div
@@ -97,7 +104,11 @@ function Scan() {
           height: "calc(100vh - 80px)",
         }}
       >
-        <Typography>Redirecting...</Typography>
+        {
+          loading || !error ?
+            <Typography>Redirecting...</Typography> :
+            <Typography>{ERROR_MESSAGE}</Typography>
+        }
       </div>
       {renderChatAd(chatAdIndex)}
       <div
