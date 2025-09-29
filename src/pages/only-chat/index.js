@@ -76,6 +76,7 @@ function OnlyChat() {
   };
 
   const [connectedUsersCount, setConnectedUsersCount] = useState(null);
+  const [channelDetails, setChannelDetails] = useState({});
   useEffect(() => {
     socket.on("viewer", (data) => {
       if (Array.isArray(data) && data[0]?.viewers !== undefined) {
@@ -461,8 +462,41 @@ function OnlyChat() {
     }
   };
 
+  useEffect(() => {
+    const fetchChannelDetails = async () => {
+      const url = `${baseUrl}/channels/open/${channelId}`;
+      try {
+        const response = await axios.get(url);
+
+        if (response.data) {
+          setChannelDetails({
+            title: response.data.title || "",
+            channelId: response.data.channelId || "",
+            hlsUrl: response.data.hlsUrl || "",
+            description: response.data.description || "",
+            enableChat: response.data.enableChat || false,
+            enableShop: response.data.enableShop || false,
+            enableAI: response.data.enableAI || false,
+            enableRead: response.data.enableRead || false,
+            enableRewards: response.data.enableRewards || false,
+            status: response.data.status || "active",
+          });
+        }
+      } catch (err) {
+        console.log(`Failed to load channel details: ${err.message}`);
+      }
+    };
+
+    if (channelId && channelId !== "channels") {
+      fetchChannelDetails();
+    }
+  }, [channelId]);
+
   return (
-    <Box className="only-chat-ui" sx={{ backgroundColor: "#262825" }}>
+    <Box
+      className="only-chat-ui"
+      sx={{ backgroundColor: "#262825", position: "relative", height: "100vh" }}
+    >
       <Box
         className="main-chat"
         sx={{
@@ -771,96 +805,99 @@ function OnlyChat() {
             })}
           </InfiniteScroll>
         </div>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0 10px",
-            justifyContent: "space-between",
-            padding: "1rem 10px",
-            backgroundColor: "#262825 !important",
-            borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-            position: "absolute",
-            bottom: 0,
-            right: 0,
-            width: "100%",
-            opacity: 0.95,
-            borderRadius: "0 !important",
-          }}
-          className="send-message-input editor with_video"
-        >
-          <Avatar
-            sx={{
-              width: 30,
-              height: 30,
-              backgroundColor: "#fff",
-              color: "#000",
-              fontSize: "1rem",
-              textTransform: "uppercase",
-            }}
-          />
+        {channelDetails?.enableChat && (
           <Box
             sx={{
-              background: "#F0F0F11A",
-              padding: "10px",
-              width: "93%",
-              borderRadius: "8px",
-            }}
-          >
-            <Editor
-              editorState={editorState}
-              onChange={setEditorState}
-              plugins={plugins}
-              handleKeyCommand={handleKeyCommand}
-              placeholder="Type something..."
-            />
-            <EmojiSuggestions />
-            <EmojiSelect closeOnEmojiSelect />
-          </Box>
-          <button
-            onClick={sendMessage}
-            style={{
-              width: "50px",
-              height: "40px",
-              // background:
-              //   "linear-gradient(93.56deg, rgb(101, 53, 233) 4.6%, rgb(78, 51, 233) 96.96%)",
-              backgroundColor: "#E0032C",
-              border: "1px solid #E0032C",
-              outline: 0,
-              borderRadius: "8px",
-              color: "white",
-              cursor: "pointer",
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <SendIcon />
-          </button>
-
-          <Button
-            className="chat-gif-icon"
-            size="small"
-            onClick={() => setShowGiphyModal(true)}
-            sx={{
-              borderStyle: "solid",
-              height: 18,
-              minWidth: 40,
-              pl: 0,
-              pr: 0,
-              borderColor: "#818181",
-              borderWidth: 1,
-              color: "#818181",
-              fontSize: 12,
+              gap: "0 10px",
+              justifyContent: "space-between",
+              padding: "1rem 10px",
+              backgroundColor: "#262825 !important",
+              borderTop: "1px solid rgba(255, 255, 255, 0.1)",
               position: "absolute",
-              right: 113,
-              top: 27,
-              zIndex: 99, // Ensure it's above chat content
+              bottom: 0,
+              right: 0,
+              width: "100%",
+              opacity: 0.95,
+              borderRadius: "0 !important",
             }}
+            className="send-message-input editor with_video"
           >
-            GIF
-          </Button>
-        </Box>
+            <Avatar
+              sx={{
+                width: 30,
+                height: 30,
+                backgroundColor: "#fff",
+                color: "#000",
+                fontSize: "1rem",
+                textTransform: "uppercase",
+              }}
+            />
+            <Box
+              sx={{
+                background: "#F0F0F11A",
+                padding: "10px",
+                width: "93%",
+                borderRadius: "8px",
+              }}
+            >
+              <Editor
+                editorState={editorState}
+                onChange={setEditorState}
+                plugins={plugins}
+                handleKeyCommand={handleKeyCommand}
+                placeholder="Type something..."
+              />
+              <EmojiSuggestions />
+              <EmojiSelect closeOnEmojiSelect />
+            </Box>
+
+            <button
+              onClick={sendMessage}
+              style={{
+                width: "50px",
+                height: "40px",
+                // background:
+                //   "linear-gradient(93.56deg, rgb(101, 53, 233) 4.6%, rgb(78, 51, 233) 96.96%)",
+                backgroundColor: "#E0032C",
+                border: "1px solid #E0032C",
+                outline: 0,
+                borderRadius: "8px",
+                color: "white",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <SendIcon />
+            </button>
+
+            <Button
+              className="chat-gif-icon"
+              size="small"
+              onClick={() => setShowGiphyModal(true)}
+              sx={{
+                borderStyle: "solid",
+                height: 18,
+                minWidth: 40,
+                pl: 0,
+                pr: 0,
+                borderColor: "#818181",
+                borderWidth: 1,
+                color: "#818181",
+                fontSize: 12,
+                position: "absolute",
+                right: 113,
+                top: 27,
+                zIndex: 99, // Ensure it's above chat content
+              }}
+            >
+              GIF
+            </Button>
+          </Box>
+        )}
       </Box>
 
       {/* --- Profile Setting Modal --- */}
@@ -994,6 +1031,25 @@ function OnlyChat() {
         autoHideDuration={4000}
         onClose={handleSnackClose}
       />
+
+      {channelDetails?.enableChat === false && (
+        <Typography
+          sx={{
+            pt: 2,
+            pb: 2,
+            zIndex: 9,
+            textAlign: "center",
+            color: "white",
+            position: "absolute",
+            bottom: "0px",
+            textAlign: "center",
+            backgroundColor: "#000",
+            width: "100%",
+          }}
+        >
+          Chat is disabled for this channel.
+        </Typography>
+      )}
     </Box>
   );
 }
