@@ -26,6 +26,8 @@ const socket = io(baseUrl, {
 
 function Immersive({
   VideoUrl = "https://api-ott.lightsoutsportstv.com/loggingmediaurlpassthrough/a.m3u8?version=12&id=8090&partner=boltplus",
+  leftAlignBox = false,
+  leftAlignQR = false,
 }) {
   const [messages, setMessages] = useState(null);
   const [input, setInput] = useState("");
@@ -252,10 +254,10 @@ function Immersive({
   };
 
   return (
-    <Box className="chat-ui">
+    <Box className={leftAlignBox ? "chat-ui left-align" : "chat-ui"}>
       <RadioPlayer url={TestVideo} width="100%" />
       <Box
-        className="main-chat main-chat-inner"
+        className={leftAlignQR ? 'main-chat main-chat-inner left-qr' : "main-chat main-chat-inner"}
         sx={{
           display: "flex",
           flexDirection: "column",
@@ -292,6 +294,7 @@ function Immersive({
             padding: "5px 20px 5px 5px",
             height: "40px",
           }}
+          className="chat-header"
         >
           <button className="static-chat-button">
             <ChatBubble /> Chat
@@ -320,6 +323,7 @@ function Immersive({
             borderTop: "1px solid #818181",
             borderBottom: "1px solid #818181",
           }}
+           className="live-now"
         >
           <Box
             sx={{

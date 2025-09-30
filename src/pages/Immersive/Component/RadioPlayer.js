@@ -30,8 +30,8 @@ const RadioPlayer = ({ url, width }) => {
               style: {
                 width: '100%',
                 height: '100%',
-                aspectRatio: "16/9", // or "auto" if ReactPlayer handles it well
-                objectFit: "cover", // optional: to stretch and remove black bars
+                // aspectRatio: "16/9", // or "auto" if ReactPlayer handles it well
+                // objectFit: "cover", // optional: to stretch and remove black bars
               },
             },
 

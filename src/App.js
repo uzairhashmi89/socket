@@ -22,7 +22,8 @@ function App() {
         <Route strict path="/immersive" element={<Immersive />} />
         <Route strict path="/demo1" element={<Immersive VideoUrl="https://api-ott.motorvision.tv/loggingmediaurlpassthrough/a.m3u8?version=12&id=2459&partner=boltplus" />} />
         <Route strict path="/demo2" element={<Immersive VideoUrl="https://api-ott.lightsoutsportstv.com/loggingmediaurlpassthrough/a.m3u8?version=12&id=8090&partner=boltplus" />} />
-
+        <Route strict path="/demo3" element={<Immersive leftAlignBox VideoUrl="https://api-ott-adnet-oan.ottera.tv/loggingmediaurlpassthrough/a.m3u8?version=12&id=266&partner=boltplus" />} />
+        <Route strict path="/demo4" element={<Immersive leftAlignQR VideoUrl="https://api-ott-adnet-oan.ottera.tv/loggingmediaurlpassthrough/a.m3u8?version=12&id=266&partner=boltplus" />} />
       </Routes>
     </BrowserRouter>
   );

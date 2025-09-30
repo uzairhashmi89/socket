@@ -103,6 +103,28 @@ body {
   position: relative;
 }
 
+.chat-ui.left-align .main-chat {
+  margin-left: 60px;
+  right: auto;
+}
+
+.left-qr .qr-code-wrapper {
+  position: fixed;
+    left: 0;
+    width: 390px;
+    bottom: 30px;
+}
+
+.left-qr.main-chat {
+  background: transparent !important;
+}
+
+.left-qr .chat-header,
+.left-qr .live-now,
+.left-qr #scrollableDiv{
+  display: none !important;
+}
+
 .gradient-bg {
   background-image: url("../src/assets/bg-overlay3.png");
   background-repeat: no-repeat;
