@@ -89,7 +89,7 @@ function Scan() {
     return null;
   };
   return (
-    <Box style={{ height: "90vh" }} className="centered-box">
+    <Box style={{ height: "85vh" }} className="centered-box">
       <div
         style={{
           display: "flex",
