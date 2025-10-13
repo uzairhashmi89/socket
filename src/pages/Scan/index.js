@@ -7,6 +7,7 @@ import { BASE_URLS, ENVIRONMENT_MODE } from "../../config/constants";
 const baseUrl = BASE_URLS[ENVIRONMENT_MODE].REACT_APP_API_BASE_URL;
 
 function Scan() {
+  const [error, setError] = useState(null);
   const [chatAds, setChatAds] = useState([]);
   const [chatAdIndex, setChatAdIndex] = useState(0);
   const [qrRedirectUrl, setQrRedirectUrl] = useState();
@@ -55,13 +56,16 @@ function Scan() {
   }, [chatAds]);
 
   const getQrAndPostTrackInfo = async (id) => {
+    setError(null);
     const url = `${baseUrl}/open/qrCodeTrack/${id}`;
     try {
       const response = await axios.get(url);
       if (response.data && response.data?.redirectUrl) {
         setQrRedirectUrl(response.data?.redirectUrl);
       }
+      
     } catch (err) {
+      setError('Oops! Invalid QR Code');
       console.log(`Failed to call qrCode track: ${err.message}`);
     }
   };
@@ -85,7 +89,7 @@ function Scan() {
     return null;
   };
   return (
-    <Box style={{ height: "100vh" }} className="centered-box">
+    <Box style={{ height: "90vh" }} className="centered-box">
       <div
         style={{
           display: "flex",
@@ -97,7 +101,7 @@ function Scan() {
           height: "calc(100vh - 80px)",
         }}
       >
-        <Typography>Redirecting...</Typography>
+        <Typography>{error ? error : "Redirecting..."}</Typography>
       </div>
       {renderChatAd(chatAdIndex)}
       <div

@@ -40,7 +40,7 @@ import {
 import axios from "../../config/axiosInterceptor";
 
 const baseUrl = BASE_URLS[ENVIRONMENT_MODE].REACT_APP_API_BASE_URL;
-const channelId = BASE_URLS[ENVIRONMENT_MODE].CHANNEL_ID;
+// const channelId = BASE_URLS[ENVIRONMENT_MODE].CHANNEL_ID;
 
 const socket = io(baseUrl, {
   path: "/public-socket/",
@@ -61,6 +61,9 @@ function OnlyChat() {
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const location = window.location.pathname;
+  const pathSegments = location.split("/");
+  const channelId = pathSegments[pathSegments.length - 1];
 
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
@@ -644,9 +647,9 @@ function OnlyChat() {
                 textTransform: "uppercase",
               }}
             >
-              T
+              {channelDetails?.title ? channelDetails.title.charAt(0).toUpperCase() : ""}
             </Box>
-            TVC News{" "}
+            {channelDetails?.title || "Channel Title"}
             <VerifiedIcon
               sx={{
                 fontSize: "12px",
@@ -666,7 +669,7 @@ function OnlyChat() {
               textTransform: "capitalize",
             }}
           >
-            🔴 LIVE: TVC News – Breaking Updates & Discussion
+            🔴 LIVE: {channelDetails?.title || "Channel Title"} – Breaking Updates & Discussion
           </Box>
         </Box>
         <div

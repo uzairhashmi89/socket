@@ -13,10 +13,16 @@ function App() {
       <Routes>
         <Route strict path="/" element={<Chat />} />
         <Route strict path="/only-chat" element={<OnlyChat />} />
+        <Route strict path="/chat/:id" element={<OnlyChat />} />
         <Route strict path="/scan/:id" element={<Scan />} />
         <Route
           strict
           path="/stream-impressive"
+          element={<StreamImpressive />}
+        />
+        <Route
+          strict
+          path="/stream/:id"
           element={<StreamImpressive />}
         />
         <Route strict path="/immersive" element={<Immersive />} />
