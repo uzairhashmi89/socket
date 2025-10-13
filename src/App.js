@@ -6,20 +6,33 @@ import StreamImpressive from "./pages/StreamImpressive";
 import Immersive from "./pages/Immersive";
 import "@draft-js-plugins/emoji/lib/plugin.css";
 import "./App.css";
+import { Button } from "@mui/material";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route
+          path="*"
+          element={
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100vh" }}>
+              <h1>404 - Page Not Found</h1>
+              <p>The page you are looking for does not exist.</p>
+              {/* <Button variant="contained" onClick={() => window.location.href = "/"} style={{ marginTop: "16px", padding: "8px 16px" }}>
+                Go to Home Page
+              </Button> */}
+            </div>
+          }
+        />
         <Route strict path="/" element={<Chat />} />
-        <Route strict path="/only-chat" element={<OnlyChat />} />
+        {/* <Route strict path="/only-chat" element={<OnlyChat />} /> */}
         <Route strict path="/chat/:id" element={<OnlyChat />} />
         <Route strict path="/scan/:id" element={<Scan />} />
-        <Route
+        {/* <Route
           strict
           path="/stream-impressive"
           element={<StreamImpressive />}
-        />
+        /> */}
         <Route
           strict
           path="/stream/:id"
