@@ -1,5 +1,5 @@
 import React from 'react'
-import QR from '../assets/bolt_qr.svg'
+import QR from '../assets/qr-image.jpg'
 import BoltLogo from '../assets/bolt.png'
 const QrCode = () => {
   return (

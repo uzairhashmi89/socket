@@ -677,7 +677,8 @@ function OnlyChat() {
           style={{
             overflow: "auto",
             display: "flex",
-            flexDirection: "column-reverse", // newest at bottom
+            flexDirection: "column-reverse",
+            minHeight: "calc(100vh - 240px)",
           }}
         >
           <InfiniteScroll

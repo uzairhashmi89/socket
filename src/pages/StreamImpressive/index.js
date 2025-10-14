@@ -30,7 +30,7 @@ function StreamImpressive() {
   const location = window.location.pathname;
   const pathSegments = location.split("/");
   const channelId = pathSegments[pathSegments.length - 1];
-const [channelDetails, setChannelDetails] = useState({});
+  const [channelDetails, setChannelDetails] = useState({});
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
@@ -406,7 +406,8 @@ const [channelDetails, setChannelDetails] = useState({});
           style={{
             overflow: "auto",
             display: "flex",
-            flexDirection: "column-reverse", // newest at bottom
+            flexDirection: "column-reverse",
+            minHeight: "auto",
           }}
         >
           <InfiniteScroll

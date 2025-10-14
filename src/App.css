@@ -125,6 +125,10 @@ body {
   display: none !important;
 }
 
+#scrollableDiv {
+  min-height: 280px;
+}
+
 .gradient-bg {
   background-image: url("../src/assets/bg-overlay3.png");
   background-repeat: no-repeat;

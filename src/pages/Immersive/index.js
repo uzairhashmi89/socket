@@ -17,7 +17,7 @@ import {
 import axios from "../../config/axiosInterceptor";
 
 const baseUrl = BASE_URLS[ENVIRONMENT_MODE].REACT_APP_API_BASE_URL;
-const channelId = BASE_URLS[ENVIRONMENT_MODE].CHANNEL_ID;
+// const channelId = BASE_URLS[ENVIRONMENT_MODE].CHANNEL_ID;
 
 const socket = io(baseUrl, {
   path: "/public-socket/",
@@ -25,14 +25,17 @@ const socket = io(baseUrl, {
 });
 
 function Immersive({
-  VideoUrl = "https://api-ott.lightsoutsportstv.com/loggingmediaurlpassthrough/a.m3u8?version=12&id=8090&partner=boltplus",
+  VideoUrl = "",
   leftAlignBox = false,
   leftAlignQR = false,
 }) {
   const [messages, setMessages] = useState(null);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
-
+  const location = window.location.pathname;
+  const pathSegments = location.split("/");
+  const channelId = pathSegments[pathSegments.length - 1];
+  const [channelDetails, setChannelDetails] = useState({});
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
@@ -253,9 +256,39 @@ function Immersive({
     }
   };
 
+  useEffect(() => {
+    const fetchChannelDetails = async () => {
+      const url = `${baseUrl}/channels/open/${channelId}`;
+      try {
+        const response = await axios.get(url);
+
+        if (response.data) {
+          setChannelDetails({
+            title: response.data.title || "",
+            channelId: response.data.channelId || "",
+            hlsUrl: response.data.hlsUrl || "",
+            description: response.data.description || "",
+            enableChat: response.data.enableChat || false,
+            enableShop: response.data.enableShop || false,
+            enableAI: response.data.enableAI || false,
+            enableRead: response.data.enableRead || false,
+            enableRewards: response.data.enableRewards || false,
+            status: response.data.status || "active",
+          });
+        }
+      } catch (err) {
+        console.log(`Failed to load channel details: ${err.message}`);
+      }
+    };
+
+    if (channelId && channelId !== "channels") {
+      fetchChannelDetails();
+    }
+  }, [channelId]);
+
   return (
     <Box className={leftAlignBox ? "chat-ui left-align" : "chat-ui"}>
-      <RadioPlayer url={TestVideo} width="100%" />
+      <RadioPlayer url={channelDetails?.hlsUrl ?? TestVideo} width="100%" />
       <Box
         className={leftAlignQR ? 'main-chat main-chat-inner left-qr' : "main-chat main-chat-inner"}
         sx={{
