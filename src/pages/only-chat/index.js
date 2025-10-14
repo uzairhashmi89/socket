@@ -475,7 +475,7 @@ function OnlyChat() {
           setChannelDetails({
             title: response.data.title || "",
             channelId: response.data.channelId || "",
-            hlsUrl: response.data.hlsUrl || "",
+            url: response.data.url || "",
             description: response.data.description || "",
             enableChat: response.data.enableChat || false,
             enableShop: response.data.enableShop || false,

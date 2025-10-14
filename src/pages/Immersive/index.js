@@ -266,7 +266,7 @@ function Immersive({
           setChannelDetails({
             title: response.data.title || "",
             channelId: response.data.channelId || "",
-            hlsUrl: response.data.hlsUrl || "",
+            url: response.data.url || "",
             description: response.data.description || "",
             enableChat: response.data.enableChat || false,
             enableShop: response.data.enableShop || false,
@@ -288,7 +288,7 @@ function Immersive({
 
   return (
     <Box className={leftAlignBox ? "chat-ui left-align" : "chat-ui"}>
-      <RadioPlayer url={channelDetails?.hlsUrl ?? TestVideo} width="100%" />
+      <RadioPlayer url={channelDetails?.url ?? TestVideo} width="100%" />
       <Box
         className={leftAlignQR ? 'main-chat main-chat-inner left-qr' : "main-chat main-chat-inner"}
         sx={{
