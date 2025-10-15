@@ -126,7 +126,7 @@ body {
 }
 
 #scrollableDiv {
-  min-height: 280px;
+  min-height: calc(100vh - 280px);
 }
 
 .gradient-bg {
@@ -150,7 +150,7 @@ body {
 .main-chat {
   width: 27%;
   margin-left: auto;
-  height: calc(100vh - 175px);
+  height: calc(100vh - 50px);
   overflow-y: hidden;
   position: relative;
   z-index: 9;
