@@ -128,7 +128,7 @@ function Scan() {
               justifyContent: "center",
             }}
           >
-            <span style={{ fontSize: "13px" }}>Powered by</span>
+            <span style={{ fontSize: "13px" }}>مدعوم من</span>
             <img src={BoltLogo} alt="Bolt Logo" />
           </div>
         </div>

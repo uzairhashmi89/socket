@@ -8,7 +8,7 @@ import RadioPlayer from "./RadioPlayer";
 import QrCode from "../../Components/QrCode";
 import UserIcon from "../../assets/mdi_account-online.svg";
 import VerifiedIcon from "@mui/icons-material/Verified";
-import TvcIcon from "../../assets/tvc-news.svg";
+import chatIcon from "../../assets/al-jazeera.jpg";
 import {
   BASE_URLS,
   ENVIRONMENT_MODE,
@@ -278,12 +278,12 @@ function Chat() {
             alignItems: "center",
             justifyContent: "space-between",
             gap: "20px",
-            padding: "5px 20px 5px 5px",
+            padding: "5px 5px 5px 20px",
             height: "40px",
           }}
         >
           <button className="static-chat-button">
-            <ChatBubble /> Chat
+            <ChatBubble /> دردشة
           </button>
           <div
             className="connected-users-count"
@@ -338,12 +338,13 @@ function Chat() {
               }}
             >
               <img
-                src={TvcIcon}
+                src={chatIcon}
                 alt="Bolt Logo"
-                style={{ width: "100%", height: "100%" }}
+                style={{ width: "100%", height: "100%", borderRadius: "100%" }}
               />
             </Box>
-            TVC News{" "}
+            أخبار تلفزيو
+ سي إن سي
             <VerifiedIcon
               sx={{
                 fontSize: "12px",
@@ -363,7 +364,7 @@ function Chat() {
               textTransform: "capitalize",
             }}
           >
-            🔴 LIVE: TVC News – Breaking Updates & Discussion
+           <span>🔴</span> مباشر: أخبار تلفزيون سي إن سي – تحديثات عاجلة ونقاش
           </Box>
         </Box>
         <div

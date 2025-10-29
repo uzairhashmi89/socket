@@ -483,6 +483,7 @@ function OnlyChat() {
             enableRead: response.data.enableRead || false,
             enableRewards: response.data.enableRewards || false,
             status: response.data.status || "active",
+            thumbnail: response.data.thumbnail || "",
           });
         }
       } catch (err) {
@@ -527,7 +528,7 @@ function OnlyChat() {
             width: "100%",
             display: "flex",
             alignItems: "center",
-            padding: "4px 8px",
+            padding: "4px 0",
             height: "50px",
             justifyContent: "space-between",
           }}
@@ -537,7 +538,7 @@ function OnlyChat() {
             component="img"
             src={logo}
             alt="View Media Logo"
-            sx={{ height: 32 }}
+            sx={{ height: 32, paddingRight: 2 }}
           />
 
           <IconButton
@@ -588,12 +589,12 @@ function OnlyChat() {
             alignItems: "center",
             justifyContent: "space-between",
             gap: "20px",
-            padding: "5px 20px 5px 5px",
+            padding: "5px 5px 5px 20px",
             height: "40px",
           }}
         >
           <button className="static-chat-button">
-            <ChatBubble /> Chat
+            <ChatBubble /> دردشة
           </button>
           <div
             className="connected-users-count"
@@ -647,9 +648,14 @@ function OnlyChat() {
                 textTransform: "uppercase",
               }}
             >
-              {channelDetails?.title ? channelDetails.title.charAt(0).toUpperCase() : ""}
+              <img
+                src={channelDetails?.thumbnail}
+                alt="Bolt Logo"
+                style={{ width: "100%", height: "100%", borderRadius: "100%" }}
+              />
             </Box>
-            {channelDetails?.title || "Channel Title"}
+           أخبار تلفزيو
+ سي إن سي
             <VerifiedIcon
               sx={{
                 fontSize: "12px",
@@ -669,7 +675,7 @@ function OnlyChat() {
               textTransform: "capitalize",
             }}
           >
-            🔴 LIVE: {channelDetails?.title || "Channel Title"} – Breaking Updates & Discussion
+            <span>🔴</span> مباشر: أخبار تلفزيون سي إن سي – تحديثات عاجلة ونقاش
           </Box>
         </Box>
         <div
@@ -893,7 +899,7 @@ function OnlyChat() {
                 color: "#818181",
                 fontSize: 12,
                 position: "absolute",
-                right: 113,
+                left: 113,
                 top: 27,
                 zIndex: 99, // Ensure it's above chat content
               }}

@@ -274,6 +274,7 @@ function Immersive({
             enableRead: response.data.enableRead || false,
             enableRewards: response.data.enableRewards || false,
             status: response.data.status || "active",
+            thumbnail: response.data.thumbnail
           });
         }
       } catch (err) {
@@ -324,13 +325,13 @@ function Immersive({
             alignItems: "center",
             justifyContent: "space-between",
             gap: "20px",
-            padding: "5px 20px 5px 5px",
+            padding: "5px 5px 5px 20px",
             height: "40px",
           }}
           className="chat-header"
         >
           <button className="static-chat-button">
-            <ChatBubble /> Chat
+            <ChatBubble /> دردشة
           </button>
           <div
             className="connected-users-count"
@@ -386,12 +387,13 @@ function Immersive({
               }}
             >
               <img
-                src={TvcIcon}
+                src={channelDetails?.thumbnail}
                 alt="Bolt Logo"
-                style={{ width: "100%", height: "100%" }}
+                style={{ width: "100%", height: "100%", borderRadius: "100%" }}
               />
             </Box>
-            TVC News{" "}
+            أخبار تلفزيو
+ سي إن سي
             <VerifiedIcon
               sx={{
                 fontSize: "12px",
@@ -411,7 +413,7 @@ function Immersive({
               textTransform: "capitalize",
             }}
           >
-            🔴 LIVE: TVC News – Breaking Updates & Discussion
+            <span>🔴</span> مباشر: أخبار تلفزيون سي إن سي – تحديثات عاجلة ونقاش
           </Box>
         </Box>
         <div
