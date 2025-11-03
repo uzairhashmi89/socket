@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactPlayer from 'react-player';
-import Bgimage from '../../assets/new-ss.png'
+import Bgimage from '../../assets/screenshot.jpg'
 
 const RadioPlayer = ({ url }) => {
   return (

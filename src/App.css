@@ -134,7 +134,7 @@ body {
 }
 
 #scrollableDiv {
-  min-height: calc(100vh - 290px);
+  min-height: calc(100vh - 305px);
 }
 
 .gradient-bg {
