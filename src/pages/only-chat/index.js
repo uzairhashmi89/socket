@@ -80,6 +80,9 @@ function OnlyChat() {
 
   const [connectedUsersCount, setConnectedUsersCount] = useState(null);
   const [channelDetails, setChannelDetails] = useState({});
+  const [isCheckingMessage, setIsCheckingMessage] = useState(false);
+  const [moderationError, setModerationError] = useState(null);
+
   useEffect(() => {
     socket.on("viewer", (data) => {
       if (Array.isArray(data) && data[0]?.viewers !== undefined) {
@@ -142,6 +145,52 @@ function OnlyChat() {
       socket.emit("sendMessage", payload);
       setInput("");
       setEditorState(EditorState.createEmpty());
+    }
+  };
+
+  const handleSendMessage = async () => {
+    const text = (input?.message || "").trim();
+    if (!text) return; // nothing to send
+    // If we’re already validating, ignore additional submits.
+
+    if (isCheckingMessage) return;
+    setIsCheckingMessage(true);
+    setModerationError(null);
+    try {
+      // POST to `${AI_API_URL}/check-message` and accept a few liberal success flags.
+      console.log("data:", text, channelId);
+      const { data } = await axios.post(
+        "https://api.staging-new.boltplus.tv/ai/admin/check-message",
+        { text, channel: "viewmedia" }
+      );
+      const allowed = Boolean(
+        data?.allowed ?? data?.success ?? data?.ok ?? data?.result === "allowed"
+      );
+      console.log(allowed);
+      if (!allowed) {
+        // Do NOT clear the input; keep the user's text.
+        // Surface a clear, accessible error under the composer.
+        setModerationError(
+          "The message was flagged as being potentially dangerous."
+        );
+
+        setTimeout(() => {
+          setModerationError(null);
+        }, 4000);
+        return;
+      }
+      // Allowed → proceed with the original send path.
+      await sendMessage();
+    } catch (err) {
+      // On network/5xx issues, fail closed and let the user retry.
+      setModerationError(
+        "We couldn't validate your message. Please try again."
+      );
+      setTimeout(() => {
+        setModerationError(null);
+      }, 4000);
+    } finally {
+      setIsCheckingMessage(false);
     }
   };
 
@@ -253,7 +302,7 @@ function OnlyChat() {
 
   const handleKeyCommand = (command) => {
     if (command === "split-block" && !!sendMessage) {
-      sendMessage();
+      handleSendMessage();
       return "handled";
     }
     return "not-handled";
@@ -264,6 +313,7 @@ function OnlyChat() {
   };
 
   const onChangeText = (message) => {
+    if (moderationError) setModerationError(null);
     updateChatState({ message });
   };
 
@@ -647,7 +697,9 @@ function OnlyChat() {
                 textTransform: "uppercase",
               }}
             >
-              {channelDetails?.title ? channelDetails.title.charAt(0).toUpperCase() : ""}
+              {channelDetails?.title
+                ? channelDetails.title.charAt(0).toUpperCase()
+                : ""}
             </Box>
             {channelDetails?.title || "Channel Title"}
             <VerifiedIcon
@@ -669,7 +721,8 @@ function OnlyChat() {
               textTransform: "capitalize",
             }}
           >
-            🔴 LIVE: {channelDetails?.title || "Channel Title"} – Breaking Updates & Discussion
+            🔴 LIVE: {channelDetails?.title || "Channel Title"} – Breaking
+            Updates & Discussion
           </Box>
         </Box>
         <div
@@ -858,7 +911,7 @@ function OnlyChat() {
             </Box>
 
             <button
-              onClick={sendMessage}
+              onClick={handleSendMessage}
               style={{
                 width: "50px",
                 height: "40px",
@@ -1035,6 +1088,25 @@ function OnlyChat() {
         autoHideDuration={4000}
         onClose={handleSnackClose}
       />
+
+      {moderationError && (
+        <Typography
+          sx={{
+            pt: 2,
+            pb: 2,
+            zIndex: 9,
+            textAlign: "center",
+            color: "white",
+            position: "absolute",
+            bottom: "0px",
+            textAlign: "center",
+            backgroundColor: "#000",
+            width: "100%",
+          }}
+        >
+          {moderationError}
+        </Typography>
+      )}
 
       {channelDetails?.enableChat === false && (
         <Typography
