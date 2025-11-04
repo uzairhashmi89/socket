@@ -134,7 +134,7 @@ body {
 }
 
 #scrollableDiv {
-  min-height: calc(100vh - 290px);
+  min-height: calc(100vh - 305px);
 }
 
 .gradient-bg {
@@ -503,6 +503,36 @@ body {
 ::-webkit-scrollbar-thumb {
   background-color: #333;
   border-radius: 2px;
+}
+
+.simple_tabs_parent .simple_tabs {
+  font-family: 'Instrument Sans', 'Cairo', sans-serif;
+  color: #fff;
+  flex-direction: row;
+  gap: 5px;
+  padding: 0;
+  min-height: 48px;
+  padding: 0 5px;
+}
+
+.simple_tabs_parent .simple_tabs.Mui-selected {
+  color: #fff;
+}
+
+.simple_tabs_parent .MuiTabs-indicator {
+    background-color: #fff;
+}
+
+.simple_tabs_parent .simple_tabs svg {
+  margin: 0;
+}
+
+/* .simple_tabs_parent .MuiTabs-list {
+  gap: 10px;
+} */
+
+.simple_tabs_panel  {
+  padding: 0 !important;
 }
 
 @media only screen and (max-width: 767px) {

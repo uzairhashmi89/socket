@@ -12,8 +12,8 @@ const QrCode = () => {
                 <img src={BoltLogo} alt="Bolt Logo" />
             </div>
         </div>
-        <div>
-            <img src={QR} alt="QR Code" style={{width:'75px', borderRadius: '5px'}} />
+        <div style={{padding: "4px", borderRadius: "10px", background: "#fff"}}>
+            <img src={QR} alt="QR Code" style={{width:'95px'}} />
         </div>
     </div>
   )
