@@ -34,6 +34,7 @@ export const GiphyModal = ({
             <SearchContextManager
               apiKey="AIXHdn1pkImFhwXod1c5kQvfGNviJ1NT"
               theme={{ darkMode: true }}
+              options={{ rating: "g" }}
             >
               <GiphyComponent onSelectItem={setSelectedGiphy} />
             </SearchContextManager>
