@@ -421,7 +421,8 @@ function Messages(props) {
             overflow: "auto",
             display: "flex",
             flexDirection: "column-reverse",
-            height: "calc(100vh - 225px)",
+            height: "calc(100vh - 250px)",
+            minHeight: "auto",
           }}
         >
           <InfiniteScroll
