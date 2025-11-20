@@ -226,7 +226,7 @@ function Immersive({
             <img
               src={chatAds[chatAdIndex].assetUrl}
               alt="Chat Ad"
-              style={{ borderRadius: 12, maxHeight: "130px", width: "100%" }}
+              style={{ borderRadius: 12, maxHeight: "130px", maxWidth: "500px", width: "100%" }}
             />
           )}
         </div>

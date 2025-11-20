@@ -80,7 +80,7 @@ function Scan() {
           <img
             src={chatAds[chatAdIndex].assetUrl}
             alt="Chat Ad"
-            style={{ borderRadius: 12, maxHeight: "170px", width: "100%" }}
+            style={{ borderRadius: 12, maxHeight: "170px", maxWidth: "500px", width: "100%" }}
           />
         )}
       </div>

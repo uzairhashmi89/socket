@@ -284,7 +284,7 @@ function Messages(props) {
             <img
               src={chatAds[chatAdIndex].assetUrl}
               alt="Chat Ad"
-              style={{ borderRadius: 12, maxHeight: "250px", width: "100%" }}
+              style={{ borderRadius: 12, maxHeight: "250px", maxWidth: "500px", width: "100%" }}
             />
           )}
         </div>
