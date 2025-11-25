@@ -38,7 +38,7 @@ function StreamImpressive() {
 
   useEffect(() => {
     socket.on("viewer", (data) => {
-      console.log("Viewer event received:", data);
+      //console.log("Viewer event received:", data);
 
       // If data is an array like [{ viewers: 3 }]
       if (Array.isArray(data) && data[0]?.viewers !== undefined) {
@@ -57,14 +57,14 @@ function StreamImpressive() {
   }, []);
   useEffect(() => {
     socket.on("disconnect", () => {
-      console.log("Disconnected");
+      //console.log("Disconnected");
     });
   }, []);
   // Aimal code end
 
   useEffect(() => {
     socket.on("connect", () => {
-      console.log("[Client] Connected:", socket.id);
+      //console.log("[Client] Connected:", socket.id);
       if (localStorage.getItem("userName")) {
         emitJoin(localStorage.getItem("userName"));
       } else {
@@ -81,10 +81,10 @@ function StreamImpressive() {
     });
 
     socket.on("connect_error", (err) => {
-      console.error("[Client] Connection error:", err.message);
+      //console.error("[Client] Connection error:", err.message);
     });
     socket.on("pong", () => {
-      console.log("PONG received");
+      //console.log("PONG received");
     });
     socket.emit("ping");
     return () => {
@@ -103,7 +103,7 @@ function StreamImpressive() {
         setMessages(data);
       }
     } catch (error) {
-      console.error("Error during fetch:", error);
+      //console.error("Error during fetch:", error);
     }
   };
 
@@ -145,7 +145,7 @@ function StreamImpressive() {
       channelType: "channel",
       user: userPayload,
     };
-    console.log("Joining channel with payload:", payload);
+    //console.log("Joining channel with payload:", payload);
     socket.emit("join", payload);
   };
   const scrollableContainerRef = useRef(null);
@@ -207,7 +207,7 @@ function StreamImpressive() {
           setChatAds(data.filter((ad) => ad.placement === "chat"));
         }
       } catch (error) {
-        console.error("Error during fetch:", error);
+        //console.error("Error during fetch:", error);
       }
     };
 
@@ -242,7 +242,7 @@ function StreamImpressive() {
   };
 
   const fetchMoreData = async () => {
-    console.log("Fetching more data...", messages.pagination);
+    //console.log("Fetching more data...", messages.pagination);
     if (messages?.pagination?.hasMore) {
       try {
         const response = await axios.get(
@@ -257,7 +257,7 @@ function StreamImpressive() {
           }));
         }
       } catch (error) {
-        console.error("Error fetching more messages:", error);
+        //console.error("Error fetching more messages:", error);
       }
     }
   };
@@ -283,7 +283,7 @@ function StreamImpressive() {
           });
         }
       } catch (err) {
-        console.log(`Failed to load channel details: ${err.message}`);
+        //console.log(`Failed to load channel details: ${err.message}`);
       }
     };
 
@@ -505,7 +505,7 @@ function StreamImpressive() {
                             fontSize: "20px",
                             pl: "2px",
                             pr: "1.5px",
-                            lineHeight: "20px",
+                            lineHeight: "26px",
                             fontWeight: "800",
                             textTransform: "capitalize",
                             letterSpacing: "1px",
@@ -539,7 +539,7 @@ function StreamImpressive() {
             })}
           </InfiniteScroll>
         </div>
-        <Box className="qr-code-wrapper_stream">&nbsp;</Box>
+        {/* <Box className="qr-code-wrapper_stream" style={{ marginBottom: "0"}}>&nbsp;</Box> */}
       </Box>
     </Box>
   );

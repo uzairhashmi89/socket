@@ -57,13 +57,13 @@ function Immersive({
 
   useEffect(() => {
     socket.on("disconnect", () => {
-      console.log("Disconnected");
+      //console.log("Disconnected");
     });
   }, []);
 
   useEffect(() => {
     socket.on("connect", () => {
-      console.log("[Client] Connected:", socket.id);
+      //console.log("[Client] Connected:", socket.id);
       if (localStorage.getItem("userName")) {
         emitJoin(localStorage.getItem("userName"));
       } else {
@@ -80,10 +80,10 @@ function Immersive({
     });
 
     socket.on("connect_error", (err) => {
-      console.error("[Client] Connection error:", err.message);
+      //console.error("[Client] Connection error:", err.message);
     });
     socket.on("pong", () => {
-      console.log("PONG received");
+      //console.log("PONG received");
     });
     socket.emit("ping");
     return () => {
@@ -102,7 +102,7 @@ function Immersive({
         setMessages(data);
       }
     } catch (error) {
-      console.error("Error during fetch:", error);
+      //console.error("Error during fetch:", error);
     }
   };
 
@@ -134,7 +134,7 @@ function Immersive({
       channelType: "channel",
       user: userPayload,
     };
-    console.log("Joining channel with payload:", payload);
+    //console.log("Joining channel with payload:", payload);
     socket.emit("join", payload);
   };
   const scrollableContainerRef = useRef(null);
@@ -201,7 +201,7 @@ function Immersive({
           setChatAds(data.filter((ad) => ad.placement === "chat"));
         }
       } catch (error) {
-        console.error("Error during fetch:", error);
+        //console.error("Error during fetch:", error);
       }
     };
 
@@ -236,7 +236,7 @@ function Immersive({
   };
 
   const fetchMoreData = async () => {
-    console.log("Fetching more data...", messages.pagination);
+    //console.log("Fetching more data...", messages.pagination);
     if (messages?.pagination?.hasMore) {
       try {
         const response = await axios.get(
@@ -251,7 +251,7 @@ function Immersive({
           }));
         }
       } catch (error) {
-        console.error("Error fetching more messages:", error);
+        //console.error("Error fetching more messages:", error);
       }
     }
   };
@@ -277,7 +277,7 @@ function Immersive({
           });
         }
       } catch (err) {
-        console.log(`Failed to load channel details: ${err.message}`);
+        //console.log(`Failed to load channel details: ${err.message}`);
       }
     };
 

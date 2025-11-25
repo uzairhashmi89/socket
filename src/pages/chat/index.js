@@ -45,7 +45,7 @@ function Chat() {
         setMessages(data);
       }
     } catch (error) {
-      console.error("Error during fetch:", error);
+      //console.error("Error during fetch:", error);
     }
   };
 
@@ -65,7 +65,7 @@ function Chat() {
 
   useEffect(() => {
     socket.on("disconnect", () => {
-      console.log("Disconnected");
+      //console.log("Disconnected");
     });
   }, []);
 
@@ -87,10 +87,10 @@ function Chat() {
     });
 
     socket.on("connect_error", (err) => {
-      console.error("[Client] Connection error:", err.message);
+      //console.error("[Client] Connection error:", err.message);
     });
     socket.on("pong", () => {
-      console.log("PONG received");
+      //console.log("PONG received");
     });
     socket.emit("ping");
     return () => {
@@ -186,7 +186,7 @@ function Chat() {
           setChatAds(data.filter((ad) => ad.placement === "chat"));
         }
       } catch (error) {
-        console.error("Error during fetch:", error);
+        //console.error("Error during fetch:", error);
       }
     };
 
@@ -221,7 +221,7 @@ function Chat() {
   };
 
   const fetchMoreData = async () => {
-    console.log("Fetching more data...", messages.pagination);
+    //console.log("Fetching more data...", messages.pagination);
     if (messages?.pagination?.hasMore) {
       try {
         const response = await axios.get(
@@ -236,7 +236,7 @@ function Chat() {
           }));
         }
       } catch (error) {
-        console.error("Error fetching more messages:", error);
+        //console.error("Error fetching more messages:", error);
       }
     }
   };

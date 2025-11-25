@@ -17,7 +17,7 @@ authInterceptors.interceptors.request.use(
   (config) => {
     const jsonToken = localStorage.getItem("@viewToken");
     if (jsonToken) {
-      console.log(jsonToken);
+      //console.log(jsonToken);
       config.headers.Authorization = `Bearer ${jsonToken}`;
       config.headers.Accept = "application/json";
     }

@@ -40,7 +40,7 @@ function Scan() {
           setChatAds(data.filter((ad) => ad.placement === "chat"));
         }
       } catch (error) {
-        console.error("Error during fetch:", error);
+        //console.error("Error during fetch:", error);
       }
     };
 
@@ -66,7 +66,7 @@ function Scan() {
       
     } catch (err) {
       setError('Oops! Invalid QR Code');
-      console.log(`Failed to call qrCode track: ${err.message}`);
+      //console.log(`Failed to call qrCode track: ${err.message}`);
     }
   };
 

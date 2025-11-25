@@ -99,7 +99,7 @@ function OnlyChat() {
 
   useEffect(() => {
     socket.on("disconnect", () => {
-      console.log("Disconnected");
+      //console.log("Disconnected");
     });
   }, []);
 
@@ -124,10 +124,10 @@ function OnlyChat() {
     });
 
     socket.on("connect_error", (err) => {
-      console.error("[Client] Connection error:", err.message);
+      //console.error("[Client] Connection error:", err.message);
     });
     socket.on("pong", () => {
-      console.log("PONG received");
+      //console.log("PONG received");
     });
     socket.emit("ping");
     return () => {
@@ -158,7 +158,7 @@ function OnlyChat() {
     setModerationError(null);
     try {
       // POST to `${AI_API_URL}/check-message` and accept a few liberal success flags.
-      console.log("data:", text, channelId);
+      //console.log("data:", text, channelId);
       const { data } = await axios.post(
         "https://api.staging-new.boltplus.tv/ai/admin/check-message",
         { text, channel: "viewmedia" }
@@ -166,7 +166,7 @@ function OnlyChat() {
       const allowed = Boolean(
         data?.allowed ?? data?.success ?? data?.ok ?? data?.result === "allowed"
       );
-      console.log(allowed);
+      //console.log(allowed);
       if (!allowed) {
         // Do NOT clear the input; keep the user's text.
         // Surface a clear, accessible error under the composer.
@@ -220,7 +220,7 @@ function OnlyChat() {
         setMessages(data);
       }
     } catch (error) {
-      console.error("Error during fetch:", error);
+      //console.error("Error during fetch:", error);
     }
   };
 
@@ -434,7 +434,7 @@ function OnlyChat() {
           setProfilePhoto(imageUrl);
         }
       } catch (error) {
-        console.error("Failed to upload image:", error);
+        //console.error("Failed to upload image:", error);
       } finally {
         setIsUploading(false);
       }
@@ -460,7 +460,7 @@ function OnlyChat() {
           setChatAds(data.filter((ad) => ad.placement === "chat"));
         }
       } catch (error) {
-        console.error("Error during fetch:", error);
+        //console.error("Error during fetch:", error);
       }
     };
 
@@ -495,7 +495,7 @@ function OnlyChat() {
   };
 
   const fetchMoreData = async () => {
-    console.log("Fetching more data...", messages.pagination);
+    //console.log("Fetching more data...", messages.pagination);
     if (messages?.pagination?.hasMore) {
       try {
         const response = await axios.get(
@@ -510,7 +510,7 @@ function OnlyChat() {
           }));
         }
       } catch (error) {
-        console.error("Error fetching more messages:", error);
+        //console.error("Error fetching more messages:", error);
       }
     }
   };
@@ -536,7 +536,7 @@ function OnlyChat() {
           });
         }
       } catch (err) {
-        console.log(`Failed to load channel details: ${err.message}`);
+        //console.log(`Failed to load channel details: ${err.message}`);
       }
     };
 
